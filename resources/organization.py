@@ -43,5 +43,5 @@ class Organization(Resource):
 class OrganizationList(Resource):
     @jwt_required()
     def get(self):
-        return {'organization': list(map(lambda x: x.json(),
-                                         OrganizationModel.query.all()))}
+        return {'organizations': list(map(lambda x: x.json(),
+                                          OrganizationModel.query.all()))}

@@ -23,6 +23,7 @@ class OrganizationModel(ModelMixin, db.Model):
 
     def json(self):
         return {
+            'id': self.id,
             'name': self.name,
             'is_active': self.is_active,
             'users': [user.json() for user in self.users]

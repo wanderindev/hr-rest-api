@@ -34,6 +34,7 @@ class UserModel(ModelMixin, db.Model):
 
     def json(self):
         return {
+            'id': self.id,
             'username': self.username,
             'password': self.password,
             'organization_id': self.organization_id,
