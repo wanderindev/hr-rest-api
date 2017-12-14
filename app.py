@@ -7,11 +7,27 @@ from resources.user import User
 from security import authenticate, identity
 
 
-def create_app(config_type):
+def create_app(config_file=None):
+    """
+    App factory for the creation of a Flask app.
+
+    Creates a Flask app.  The app configuration is set from the
+    file passed-in as an argument.  The file must be located
+    within the config folder.
+
+    Secret or sensitive configuration settings should be placed
+    in the 'instance/settings.py' file which is kept out
+    of version control.
+
+    :param config_file: The name of the file (without .py) within the
+        'config' folder which has the configuration values.
+    :return: A Flask app instance.
+    """
     app = Flask(__name__, instance_relative_config=True)
 
     # Load config settings for development or testing.
-    app.config.from_object(f'config.{config_type}')
+    if config_file:
+        app.config.from_object(f'config.{config_file}')
 
     # Apply production settings, if available.
     app.config.from_pyfile('settings.py', silent=True)

@@ -1,8 +1,8 @@
 from db import db
-from models.mixin import ModelMixin
+from models.mixin import ModelsMixin
 
 
-class OrganizationModel(ModelMixin, db.Model):
+class OrganizationModel(ModelsMixin, db.Model):
     __tablename__ = 'organizations'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -20,11 +20,3 @@ class OrganizationModel(ModelMixin, db.Model):
     @classmethod
     def find_by_name(cls, name):
         return cls.query.filter_by(name=name).first()
-
-    def json(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'is_active': self.is_active,
-            'users': [user.json() for user in self.users]
-        }

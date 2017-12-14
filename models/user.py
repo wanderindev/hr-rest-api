@@ -1,8 +1,8 @@
 from db import db
-from models.mixin import ModelMixin
+from models.mixin import ModelsMixin
 
 
-class UserModel(ModelMixin, db.Model):
+class UserModel(ModelsMixin, db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -31,14 +31,3 @@ class UserModel(ModelMixin, db.Model):
     @classmethod
     def find_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
-
-    def json(self):
-        return {
-            'id': self.id,
-            'username': self.username,
-            'password': self.password,
-            'organization_id': self.organization_id,
-            'is_super': self.is_super,
-            'is_owner': self.is_owner,
-            'is_active': self.is_active
-        }

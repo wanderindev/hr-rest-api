@@ -19,7 +19,7 @@ class Organization(Resource):
     def get(self, name):
         organization = OrganizationModel.find_by_name(name)
         if organization:
-            return organization.json()
+            return organization.to_dict()
         return {'message': 'Organization not found'}, 404
 
     @staticmethod
@@ -37,11 +37,11 @@ class Organization(Resource):
             return {'message': 'An error occurred creating '
                                'the organization.'}, 500
 
-        return organization.json(), 201
+        return {"message": "Organization created successfully."}, 201
 
 
 class OrganizationList(Resource):
     @jwt_required()
     def get(self):
-        return {'organizations': list(map(lambda x: x.json(),
+        return {'organizations': list(map(lambda x: x.to_dict(),
                                           OrganizationModel.query.all()))}

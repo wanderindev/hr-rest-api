@@ -36,7 +36,7 @@ class User(Resource):
     def get(self, username):
         user = UserModel.find_by_username(username)
         if user:
-            return user.json()
+            return user.to_dict()
         return {'message': 'User not found'}, 404
 
     @staticmethod
