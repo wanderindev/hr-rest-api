@@ -29,5 +29,9 @@ class UserModel(ModelsMixin, db.Model):
         return cls.query.filter_by(id=_id).first()
 
     @classmethod
+    def find_by_organization_id(cls, _id):
+        return cls.query.filter_by(organization_id=_id).all()
+
+    @classmethod
     def find_by_username(cls, username):
         return cls.query.filter_by(username=username).first()

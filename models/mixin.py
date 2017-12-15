@@ -13,16 +13,20 @@ class ModelsMixin(object):
 
     def activate(self):
         if hasattr(self, 'is_active'):
-            self.active = True
+            self.is_active = True
             self.save_to_db()
 
     def delete_from_db(self):
-        db.session.delete(self)
-        db.session.commit()
+        if hasattr(self, 'is_active'):
+            raise ValueError('Deleting this record is not allowed.  '
+                             'Try making it inactive')
+        else:
+            db.session.delete(self)
+            db.session.commit()
 
     def inactivate(self):
         if hasattr(self, 'is_active'):
-            self.active = False
+            self.is_active = False
             self.save_to_db()
 
     def save_to_db(self):
