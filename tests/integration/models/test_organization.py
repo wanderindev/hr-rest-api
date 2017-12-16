@@ -1,5 +1,5 @@
 from models.organization import OrganizationModel
-from tests.integration.models.base_test import BaseTest
+from tests.base_test import BaseTest
 
 
 class TestOrganization(BaseTest):

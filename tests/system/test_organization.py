@@ -1,113 +1,177 @@
 import json
 
 from models.organization import OrganizationModel
-from tests.system.base_test import BaseTest
+from tests.base_test import BaseTest
 
 
-class OrganizationTest(BaseTest):
-    def test_org_post_new(self):
+class TestOrganization(BaseTest):
+    """System tests for the organization resource."""
+    def setUp(self):
+        """
+        Extend the BaseTest setUp method by creating dicts
+        representing a user and an organization so they are
+        available for the different tests.
+        """
+        super(TestOrganization, self).setUp()
+        self.o_dict = {
+            'name': 'Test Org',
+            'is_active': True
+        }
+
+        self.u_dict = {
+            'username': 'javier',
+            'password': '1234',
+            'organization_id': 1,
+            'is_super': True,
+            'is_owner': True,
+            'is_active': True
+        }
+
+    def test_organization_post_new(self):
+        """
+        Test that a POST request to the /organization endpoint returns
+        status code 201 and that the organization is present in the
+        database after the POST request.
+        """
         with self.app() as c:
             with self.app_context():
-                org_dict = {'name': 'TestOrg', 'is_active': True}
+                # Check that 'Test Org' is not in the db to begin with.
+                self.assertIsNone(OrganizationModel.find_by_name('Test Org'))
 
-                # Assert 'TestOrg' is not in db.
-                self.assertIsNone(OrganizationModel.find_by_name('TestOrg'))
+                # Send POST request to the /organization endpoint.
+                r = c.post('/organization', data=self.o_dict)
 
-                # Register the organization.
-                r = c.post('/organization', data=org_dict)
-
-                # Assert status code for created is returned.
+                # Check that status code 201 is returned.
                 self.assertEqual(r.status_code, 201,
-                                 f'\nWrong status code returned.'
+                                 f'Wrong status code returned.'
                                  f'\nExpected: 201'
                                  f'\nGot: {r.status_code}')
 
-                # Assert user with id 1 is in db.
-                self.assertIsNotNone(OrganizationModel.find_by_name('TestOrg'),
-                                     f'Expected to find organization with name'
-                                     f'"Test Org" in the db but no organization'
-                                     f' was returned.')
-
-    def test_org_post_duplicate(self):
+    def test_organization_post_duplicate(self):
+        """
+        Test that status code 400 is returned when trying to
+        POST duplicate data to the /organization endpoint.
+        """
         with self.app() as c:
             with self.app_context():
-                org_dict = {'name': 'TestOrg', 'is_active': True}
+                # Send POST request to the /organization endpoint.
+                c.post('/organization', data=self.o_dict)
 
-                # Assert 'TestOrg' is not in db.
-                self.assertIsNone(OrganizationModel.find_by_name('TestOrg'))
+                # Send duplicated POST request to the /organization endpoint.
+                r = c.post('/organization', data=self.o_dict)
 
-                # Register the organization.
-                c.post('/organization', data=org_dict)
-
-                # Register same organization again.
-                r = c.post('/organization', data=org_dict)
-
-                # Assert status code for bad request is returned.
+                # Check that status code 400 is returned.
                 self.assertEqual(r.status_code, 400,
-                                 f'\nWrong status code returned.'
+                                 f'Wrong status code returned.'
                                  f'\nExpected: 400'
                                  f'\nGot: {r.status_code}')
 
-    def test_org_get(self):
+    def test_organization_get_with_authentication(self):
+        """
+        Test that a GET request to the /organization/<string:name>
+        endpoint returns the correct organization if the user is
+        authenticated.
+        """
         with self.app() as c:
             with self.app_context():
-                org_dict = {'name': 'TestOrg', 'is_active': True}
-
-                user_dict = {
-                    'username': 'javier',
-                    'password': '1234',
-                    'organization_id': 1,
-                    'is_super': True,
-                    'is_owner': True,
-                    'is_active': True
-                }
-
                 # Register the organization.
-                c.post('/organization', data=org_dict)
+                c.post('/organization', data=self.o_dict)
 
-                # Register the user.
-                c.post('/user', data=user_dict)
+                # Send the GET request to the endpoint.
+                r = c.get('/organization/Test%20Org',
+                          headers=self.authorize())
 
-                # Authenticate with registered user.
-                r = c.post('/auth', data=json.dumps({
-                    'username': 'javier',
-                    'password': '1234'
-                }), headers={'Content-Type': 'application/json'})
-
-                # Build and authorization header with access_token returned.
-                auth_header = f'JWT {json.loads(r.data)["access_token"]}'
-
-                # Get the organization from the endpoint.
-                r = c.get('/organization/TestOrg',
-                          headers={'Authorization': auth_header})
-
-                # Assert status code for success is returned.
+                # Check that status code 200 is returned.
                 self.assertEqual(r.status_code, 200,
-                                 f'\nWrong status code returned.'
+                                 f'Wrong status code returned.'
                                  f'\nExpected: 200'
                                  f'\nGot: {r.status_code}')
 
-                # Add the id to org_dict and user_dict.
-                org_dict['id'] = 1
-                user_dict['id'] = 1
+                # Add the id=1 to o_dict.
+                self.o_dict['id'] = 1
 
-                # Add the user to org_dict.
-                org_dict['users'] = [user_dict]
-
-                # Assert the endpoint returned the correct organization.
+                # Check that the endpoint returned the
+                # correct organization.
                 self.assertDictEqual(json.loads(r.data),
-                                     org_dict,
-                                     f'\nThe organization returned by the '
+                                     self.o_dict,
+                                     f'\The organization returned by the '
                                      f'endpoint did not meet expectations.'
-                                     f'\nExpected: {org_dict}'
+                                     f'\nExpected: {self.o_dict}'
                                      f'\nGot: {json.loads(r.data)}')
 
-                # Try to get the organization from the endpoint
-                # without authorization.
-                r = c.get('/organization/TestOrg',
-                          headers={'Authorization': 'faketoken'})
+    def test_organization_get_without_authentication(self):
+        """
+        Test that a GET request to the /organization/<string:name>
+        endpoint returns status code 401 if the user is not
+        authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Register the organization.
+                c.post('/organization', data=self.o_dict)
 
-                # Assert status code for not authorized is returned.
+                # Send the GET request to the endpoint
+                # with wrong access_token.
+                r = c.get('/organization/Test%20Org',
+                          headers={'Authorization': 'FaKeToKeN!!'})
+
+                # Check that status code 401 is returned.
+                self.assertEqual(r.status_code, 401,
+                                 f'Wrong status code returned.'
+                                 f'\nExpected: 401'
+                                 f'\nGot: {r.status_code}')
+
+    def test_organization_list_with_authentication(self):
+        """
+        Test that GET requests to the /organizations endpoint
+        returns the list of organizations if the user is
+        authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Register the organization.
+                c.post('/organization', data=self.o_dict)
+
+                # Get the organization list from the endpoint.
+                r = c.get('/organizations',
+                          headers=self.authorize())
+
+                # Check that status code 200 is returned.
+                self.assertEqual(r.status_code, 200,
+                                 f'Wrong status code returned.'
+                                 f'\nExpected: 200'
+                                 f'\nGot: {r.status_code}')
+
+                expected = {
+                    'organizations': [
+                        OrganizationModel.find_by_name('Test Org').to_dict()
+                    ]
+                }
+
+                # Check that the endpoint returned the correct organizations.
+                self.assertDictEqual(json.loads(r.data),
+                                     expected,
+                                     f'The organizations returned by the '
+                                     f'endpoint did not meet expectations.'
+                                     f'\nExpected: {expected}'
+                                     f'\nGot: {json.loads(r.data)}')
+
+    def test_organization_list_without_authentication(self):
+        """
+        Test that GET requests to the /organizations endpoint
+        returns status code 401 if the user is not authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Register the organization.
+                c.post('/organization', data=self.o_dict)
+
+                # Send the GET request to the endpoint
+                # with wrong access_token.
+                r = c.get('/organizations',
+                          headers={'Authorization': 'FaKeToKeN!!'})
+
+                # Check that status code 401 is returned.
                 self.assertEqual(r.status_code, 401,
                                  f'\nWrong status code returned.'
                                  f'\nExpected: 401'

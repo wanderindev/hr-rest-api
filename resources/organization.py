@@ -19,7 +19,7 @@ class Organization(Resource):
     def get(self, name):
         organization = OrganizationModel.find_by_name(name)
         if organization:
-            return organization.to_dict()
+            return organization.to_dict(), 200
         return {'message': 'Organization not found'}, 404
 
     @staticmethod
