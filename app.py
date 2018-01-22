@@ -7,6 +7,7 @@ from resources.user import User
 from security import authenticate, identity
 
 
+# noinspection PyTypeChecker
 def create_app(config_file=None):
     """
     App factory for the creation of a Flask app.
@@ -16,7 +17,7 @@ def create_app(config_file=None):
     within the config folder.
 
     Secret or sensitive configuration settings should be placed
-    in the 'instance/settings.py' file which is kept out
+    in the 'instance/settings.py' file which should be kept out
     of version control.
 
     :param config_file: The name of the file (without .py) within the
@@ -38,7 +39,7 @@ def create_app(config_file=None):
 
     # Add API resources.
     api.add_resource(Organization, '/organization',
-                     '/organization/<string:name>')
+                     '/organization/<string:organization_name>')
     api.add_resource(OrganizationList, '/organizations')
     api.add_resource(User, '/user', '/user/<string:username>')
 

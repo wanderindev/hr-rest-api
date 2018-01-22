@@ -1,14 +1,17 @@
-from werkzeug.security import safe_str_cmp
-
-from models.user import UserModel
+from datetime import datetime
+from models.user import AppUserModel
 
 
 def authenticate(username, password):
-    user = UserModel.find_by_username(username)
-    if user and safe_str_cmp(user.password, password):
+    user = AppUserModel.find_by_username(username)
+    if user and user.check_password(password):
+        user.login_count += 1
+        user.last_login = user.current_login
+        user.current_login = datetime.utcnow()
+        user.save_to_db()
+
         return user
 
 
 def identity(payload):
-    user_id = payload['identity']
-    return UserModel.find_by_id(user_id)
+    return AppUserModel.find_by_id(payload['identity'])

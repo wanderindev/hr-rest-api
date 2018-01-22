@@ -1,6 +1,11 @@
+from datetime import date, datetime
+
+from sqlalchemy.orm import collections
+
 from db import db
 
 
+# noinspection PyAttributeOutsideInit
 class ModelsMixin(object):
     def __iter__(self):
         return ((k, v) for k, v in vars(self).items() if not k.startswith('_'))
@@ -35,6 +40,13 @@ class ModelsMixin(object):
 
     def to_dict(self):
         output = {}
+
         for k, v in self:
-            output[k] = v
+            if type(v) == collections.InstrumentedList:
+                output[k] = [item.to_dict() for item in v]
+            elif isinstance(v, (date, datetime)):
+                output[k] = v.isoformat()
+            else:
+                output[k] = v
+
         return output

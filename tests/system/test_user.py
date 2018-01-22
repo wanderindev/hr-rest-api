@@ -1,7 +1,7 @@
 import json
 
 from models.organization import OrganizationModel
-from models.user import UserModel
+from models.user import AppUserModel
 from tests.base_test import BaseTest
 
 
@@ -36,7 +36,7 @@ class TestUser(BaseTest):
             with self.app_context():
                 # Check that the user is not in the db
                 # prior to the POST request.
-                self.assertIsNone(UserModel.find_by_id(1))
+                self.assertIsNone(AppUserModel.find_by_id(1))
 
                 # Send POST request to /user endpoint.
                 r = c.post('/user', data=self.u_dict)
@@ -48,7 +48,7 @@ class TestUser(BaseTest):
                                  f'\nGot: {r.status_code}')
 
                 # Check that the user is in the db after the POST request.
-                self.assertIsNotNone(UserModel.find_by_id(1),
+                self.assertIsNotNone(AppUserModel.find_by_id(1),
                                      f'Expected to find user with id 1'
                                      f'in the db but no user was returned.')
 

@@ -1,5 +1,5 @@
 from models.organization import OrganizationModel
-from models.user import UserModel
+from models.user import AppUserModel
 from tests.base_test import BaseTest
 
 
@@ -13,7 +13,7 @@ class TestUser(BaseTest):
         """
         super(TestUser, self).setUp()
         self.o = OrganizationModel('Test Org', True)
-        self.u = UserModel('javier', '1234', 1, True, True, True)
+        self.u = AppUserModel('javier', '1234', 1, True, True, True)
 
     def test_find_user(self):
         """
@@ -24,9 +24,9 @@ class TestUser(BaseTest):
             self.o.save_to_db()
             self.u.save_to_db()
 
-            u_by_username = UserModel.find_by_username(self.u.username)
-            u_by_id = UserModel.find_by_id(self.u.id)
-            u_by_o_id = UserModel.find_by_organization_id(
+            u_by_username = AppUserModel.find_by_username(self.u.username)
+            u_by_id = AppUserModel.find_by_id(self.u.id)
+            u_by_o_id = AppUserModel.find_by_organization_id(
                 self.u.organization_id)[0]
 
             self.assertIsNotNone(u_by_id,
@@ -57,7 +57,7 @@ class TestUser(BaseTest):
             self.o.save_to_db()
             self.u.save_to_db()
 
-            u_list = UserModel.find_by_organization_id(self.o.id)
+            u_list = AppUserModel.find_by_organization_id(self.o.id)
             o_u_list = OrganizationModel.find_by_name(self.o.name).users.all()
 
             self.assertListEqual(u_list,

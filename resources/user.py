@@ -2,7 +2,7 @@ from flask_jwt import jwt_required
 from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
-from models.user import UserModel
+from models.user import AppUserModel
 
 
 class User(Resource):
@@ -12,6 +12,10 @@ class User(Resource):
                         required=True,
                         help="This field cannot be blank.")
     parser.add_argument('password',
+                        type=str,
+                        required=True,
+                        help="This field cannot be blank.")
+    parser.add_argument('email',
                         type=str,
                         required=True,
                         help="This field cannot be blank.")
@@ -34,7 +38,7 @@ class User(Resource):
 
     @jwt_required()
     def get(self, username):
-        user = UserModel.find_by_username(username)
+        user = AppUserModel.find_by_username(username)
         if user:
             return user.to_dict()
         return {'message': 'User not found'}, 404
@@ -43,15 +47,16 @@ class User(Resource):
     def post():
         data = User.parser.parse_args()
 
-        if UserModel.find_by_username(data['username']):
+        if AppUserModel.find_by_username(data['username']):
             return {"message": "A user with that username already exists"}, 400
 
-        user = UserModel(data['username'],
-                         data['password'],
-                         data['organization_id'],
-                         data['is_super'],
-                         data['is_owner'],
-                         data['is_active'])
+        user = AppUserModel(data['username'],
+                            data['password'],
+                            data['email'],
+                            data['organization_id'],
+                            data['is_super'],
+                            data['is_owner'],
+                            data['is_active'])
 
         try:
             user.save_to_db()

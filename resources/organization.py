@@ -7,7 +7,7 @@ from models.organization import OrganizationModel
 
 class Organization(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('name',
+    parser.add_argument('organization_name',
                         type=str,
                         required=True)
     parser.add_argument('is_active',
@@ -16,8 +16,8 @@ class Organization(Resource):
                         required=False)
 
     @jwt_required()
-    def get(self, name):
-        organization = OrganizationModel.find_by_name(name)
+    def get(self, organization_name):
+        organization = OrganizationModel.find_by_name(organization_name)
         if organization:
             return organization.to_dict(), 200
         return {'message': 'Organization not found'}, 404
@@ -26,11 +26,14 @@ class Organization(Resource):
     def post():
         data = Organization.parser.parse_args()
 
-        if OrganizationModel.find_by_name(data['name']):
+        if OrganizationModel.find_by_name(data['organization_name']):
             return {'message': "An organization with name '{}'"
-                               " already exists.".format(data['name'])}, 400
+                               " already exists.".format(
+                                 data['organization_name'])}, 400
 
-        organization = OrganizationModel(data['name'], data['is_active'])
+        organization = OrganizationModel(
+            data['organization_name'],
+            data['is_active'])
         try:
             organization.save_to_db()
         except exc.SQLAlchemyError:
