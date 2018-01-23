@@ -2,8 +2,9 @@ from flask import Flask
 from flask_jwt import JWT
 from flask_restful import Api
 
-from resources.organization import Organization, OrganizationList
-from resources.user import User
+from resources.organization import ActivateOrganization, Organization, \
+    OrganizationList
+from resources.user import ActivateUser, User
 from security import authenticate, identity
 
 
@@ -38,9 +39,17 @@ def create_app(config_file=None):
     api = Api(app)
 
     # Add API resources.
-    api.add_resource(Organization, '/organization',
+    api.add_resource(Organization,
+                     '/organization',
                      '/organization/<string:organization_name>')
-    api.add_resource(OrganizationList, '/organizations')
-    api.add_resource(User, '/user', '/user/<string:username>')
+    api.add_resource(ActivateOrganization,
+                     '/activate_organization/<string:organization_name>')
+    api.add_resource(OrganizationList,
+                     '/organizations')
+    api.add_resource(User,
+                     '/user',
+                     '/user/<string:username>')
+    api.add_resource(ActivateUser,
+                     '/activate_user/<string:username>')
 
     return app

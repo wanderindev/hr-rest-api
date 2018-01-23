@@ -23,6 +23,7 @@ class Organization(Resource):
         return {'message': 'Organization not found'}, 404
 
     @staticmethod
+    @jwt_required()
     def post():
         data = Organization.parser.parse_args()
 
@@ -41,6 +42,60 @@ class Organization(Resource):
                                'the organization.'}, 500
 
         return {"message": "Organization created successfully."}, 201
+
+    @jwt_required()
+    def put(self, organization_name):
+        data = Organization.parser.parse_args()
+
+        organization = OrganizationModel.find_by_name(organization_name)
+
+        if organization:
+            organization.organization_name = data['organization_name']
+
+            try:
+                organization.save_to_db()
+                return {"message": "Organization updated successfully."}, 200
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred updating '
+                                   'the organization.'}, 500
+        else:
+            return {'message': 'Organization not found'}, 404
+
+    @jwt_required()
+    def delete(self, organization_name):
+        organization = OrganizationModel.find_by_name(organization_name)
+
+        if organization:
+            if organization.is_active:
+                try:
+                    organization.inactivate()
+                    return {"message": "Organization is now inactive."}, 200
+                except exc.SQLAlchemyError:
+                    return {'message': 'An error occurred while inactivating'
+                                       'the organization.'}, 500
+            else:
+                return {'message': 'Organization was already inactive.'}, 400
+        else:
+            return {'message': 'Organization not found'}, 404
+
+
+class ActivateOrganization(Resource):
+    @jwt_required()
+    def put(self, organization_name):
+        organization = OrganizationModel.find_by_name(organization_name)
+
+        if organization:
+            if not organization.is_active:
+                try:
+                    organization.activate()
+                    return {"message": "Organization is now active."}, 200
+                except exc.SQLAlchemyError:
+                    return {'message': 'An error occurred while activating'
+                                       'the organization.'}, 500
+            else:
+                return {'message': 'Organization was already active.'}, 400
+        else:
+            return {'message': 'Organization not found'}, 404
 
 
 class OrganizationList(Resource):

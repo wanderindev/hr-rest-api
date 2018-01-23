@@ -48,3 +48,6 @@ class AppUserModel(ModelsMixin, db.Model):
     @classmethod
     def find_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
+
+    def set_password_hash(self, password):
+        self.password_hash = generate_password_hash(password)

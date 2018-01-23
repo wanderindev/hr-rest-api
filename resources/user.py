@@ -44,6 +44,7 @@ class User(Resource):
         return {'message': 'User not found'}, 404
 
     @staticmethod
+    @jwt_required()
     def post():
         data = User.parser.parse_args()
 
@@ -65,3 +66,61 @@ class User(Resource):
                                'the user.'}, 500
 
         return {"message": "User created successfully."}, 201
+
+    @jwt_required()
+    def put(self, username):
+        data = User.parser.parse_args()
+
+        user = AppUserModel.find_by_username(username)
+
+        if user:
+            user.username = data['username']
+            user.set_password_hash(data['password'])
+            user.email = data['email']
+            user.is_super = data['is_super']
+            user.is_owner = data['is_owner']
+
+            try:
+                user.save_to_db()
+                return {"message": "User updated successfully."}, 200
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred updating '
+                                   'the user.'}, 500
+        else:
+            return {'message': 'User not found'}, 404
+
+    @jwt_required()
+    def delete(self, username):
+        user = AppUserModel.find_by_username(username)
+
+        if user:
+            if user.is_active:
+                try:
+                    user.inactivate()
+                    return {"message": "User is now inactive."}, 200
+                except exc.SQLAlchemyError:
+                    return {'message': 'An error occurred while inactivating'
+                                       'the user.'}, 500
+            else:
+                return {'message': 'User was already inactive.'}, 400
+        else:
+            return {'message': 'User not found'}, 404
+
+
+class ActivateUser(Resource):
+    @jwt_required()
+    def put(self, username):
+        user = AppUserModel.find_by_username(username)
+
+        if user:
+            if not user.is_active:
+                try:
+                    user.activate()
+                    return {"message": "User is now active."}, 200
+                except exc.SQLAlchemyError:
+                    return {'message': 'An error occurred while activating'
+                                       'the user.'}, 500
+            else:
+                return {'message': 'User was already active.'}, 400
+        else:
+            return {'message': 'User not found'}, 404
