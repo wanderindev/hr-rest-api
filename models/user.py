@@ -43,7 +43,7 @@ class AppUserModel(ModelsMixin, db.Model):
 
     @classmethod
     def find_by_organization_id(cls, _id):
-        return cls.query.filter_by(organization_id=_id).all()
+        return cls.query.filter_by(organization_id=_id).order_by(cls.id).all()
 
     @classmethod
     def find_by_username(cls, username):

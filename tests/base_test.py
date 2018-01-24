@@ -4,6 +4,8 @@ from unittest import TestCase
 
 from app import create_app
 from db import db
+from models.organization import OrganizationModel
+from models.user import AppUserModel
 
 app = create_app('testing')
 
@@ -34,7 +36,9 @@ class BaseTest(TestCase):
         """Drop all db tables after each test."""
         with app.app_context():
             db.session.remove()
-            db.drop_all()
+            OrganizationModel.query.filter(OrganizationModel.id != 1).delete()
+            AppUserModel.query.filter(AppUserModel.id != 1).delete()
+            db.session.commit()
 
     def authorize(self):
         """
@@ -49,14 +53,13 @@ class BaseTest(TestCase):
         """
         with self.app() as c:
             with self.app_context():
-                # Register the user.
-                c.post('/user', data=self.u_dict)
-
+                # Send request to auth endpoint.
                 r = c.post('/auth', data=json.dumps({
-                    'username': 'javier',
+                    'username': 'jfeliu',
                     'password': '1234'
                 }), headers={'Content-Type': 'application/json'})
 
                 return {
+                    'Content-Type': 'application/json',
                     'Authorization': "JWT " + json.loads(r.data)["access_token"]
                 }

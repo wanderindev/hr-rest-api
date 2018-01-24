@@ -1,41 +1,35 @@
 from unittest import TestCase
 
-from models.user import UserModel
+from models.user import AppUserModel
 
 
 class TestUser(TestCase):
-    """Unit tests for the UserModel."""
+    """Unit tests for the AppUserModel."""
     def setUp(self):
-        self.u = UserModel('javier', '1234', 1, True, True, True)
+        self.u = AppUserModel('test_u', 'test_p', 'test_u@test_o.com',
+                              1, True, True, True)
 
-    def test_init_and_repr(self):
-        """Test the __init__ method of the UserModel class."""
-        self.assertEqual(self.u.username, 'javier',
-                         f'Wrong username.'
-                         f'\nExpected: \'javier\''
-                         f'\nGot: {self.u.username}')
+    def test_init_and_check_password(self):
+        """
+        Test the __init__ and check_password methods
+        of the AppUserModel class.
+        """
+        self.assertEqual(self.u.username, 'test_u')
 
-        self.assertEqual(self.u.password, '1234',
-                         f'Wrong password.'
-                         f'\nExpected: \'1234\''
-                         f'\nGot: {self.u.password}')
+        self.assertTrue(self.u.check_password('test_p'))
 
-        self.assertEqual(self.u.organization_id, 1,
-                         f'Wrong organization_id.'
-                         f'\nExpected: 1'
-                         f'\nGot: {self.u.organization_id}')
+        self.assertEqual(self.u.email, 'test_u@test_o.com')
 
-        self.assertEqual(self.u.is_super, True,
-                         f'Wrong is_super.'
-                         f'\nExpected: True'
-                         f'\nGot: {self.u.is_super}')
+        self.assertEqual(self.u.organization_id, 1)
 
-        self.assertEqual(self.u.is_owner, True,
-                         f'Wrong is_owner.'
-                         f'\nExpected: True'
-                         f'\nGot: {self.u.is_owner}')
+        self.assertTrue(self.u.is_super)
 
-        self.assertEqual(self.u.is_active, True,
-                         f'Wrong is_active.'
-                         f'\nExpected: True'
-                         f'\nGot: {self.u.is_active}')
+        self.assertTrue(self.u.is_owner)
+
+        self.assertTrue(self.u.is_active)
+
+    def test_set_password_hash(self):
+        """Test the set_password_hash method of the AppUserModel class."""
+        self.u.set_password_hash('new_password')
+
+        self.assertTrue(self.u.check_password('new_password'))
