@@ -6,7 +6,7 @@ from tests.base_test import BaseTest
 
 
 class TestUser(BaseTest):
-    """System tests for the organization resource."""
+    """System tests for the user resource."""
     def setUp(self):
         """
         Extend the BaseTest setUp method by creating a dict representing
@@ -15,18 +15,19 @@ class TestUser(BaseTest):
         """
         super(TestUser, self).setUp()
         with self.app_context():
+            OrganizationModel('test_o', True).save_to_db()
+
             self.u_dict = {
-                'username': 'javier',
-                'password': '1234',
-                'organization_id': 1,
+                'username': 'test_u',
+                'password': 'test_p',
+                'email': 'test_u@test_o.com',
+                'organization_id': OrganizationModel.find_by_name('test_o').id,
                 'is_super': True,
                 'is_owner': True,
                 'is_active': True
             }
 
-            OrganizationModel('Test Org', True).save_to_db()
-
-    def test_user_post_new(self):
+    def test_user_post_with_authentication(self):
         """
         Test that a POST request to the /user endpoint returns
         status code 201 and that the user is present in the
@@ -34,23 +35,35 @@ class TestUser(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Check that the user is not in the db
-                # prior to the POST request.
-                self.assertIsNone(AppUserModel.find_by_id(1))
+                # Check that 'test_u' is not in the database.
+                self.assertIsNone(AppUserModel.find_by_username('test_u'))
 
-                # Send POST request to /user endpoint.
-                r = c.post('/user', data=self.u_dict)
+                # Send POST request to the /user endpoint.
+                r = c.post('/user',
+                           data=json.dumps(self.u_dict),
+                           headers=self.get_headers())
 
-                # Check that status 201 is returned.
-                self.assertEqual(r.status_code, 201,
-                                 f'\nWrong status code returned.'
-                                 f'\nExpected: 201'
-                                 f'\nGot: {r.status_code}')
+                self.assertEqual(r.status_code, 201)
 
-                # Check that the user is in the db after the POST request.
-                self.assertIsNotNone(AppUserModel.find_by_id(1),
-                                     f'Expected to find user with id 1'
-                                     f'in the db but no user was returned.')
+                self.assertIsNotNone(AppUserModel.find_by_username('test_u'))
+
+    def test_user_post_without_authentication(self):
+        """
+        Test that a POST request to the /user endpoint returns
+        status code 401 if the user is not authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Send POST request to the /user endpoint with
+                # wrong authentication header.
+                r = c.post('/user',
+                           data=json.dumps(self.u_dict),
+                           headers={
+                               'Content-Type': 'application/json',
+                               'Authorization': 'JWT FaKeToKeN!!'
+                           })
+
+                self.assertEqual(r.status_code, 401)
 
     def test_user_post_duplicate(self):
         """
@@ -59,17 +72,16 @@ class TestUser(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Send POST request to /user endpoint.
-                c.post('/user', data=self.u_dict)
+                c.post('/user',
+                       data=json.dumps(self.u_dict),
+                       headers=self.get_headers())
 
-                # Send duplicated POST request to /user endpoint.
-                r = c.post('/user', data=self.u_dict)
+                # Send duplicated POST request..
+                r = c.post('/user',
+                           data=json.dumps(self.u_dict),
+                           headers=self.get_headers())
 
-                # Check that status code 400 is returned.
-                self.assertEqual(r.status_code, 400,
-                                 f'Wrong status code returned.'
-                                 f'\nExpected: 400'
-                                 f'\nGot: {r.status_code}')
+                self.assertEqual(r.status_code, 400)
 
     def test_user_get_with_authentication(self):
         """
@@ -79,52 +91,255 @@ class TestUser(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # GET the user from the endpoint.
-                r = c.get('/user/javier',
-                          headers=self.authorize())
+                c.post('/user',
+                       data=json.dumps(self.u_dict),
+                       headers=self.get_headers())
 
-                # Check that status code 200 is returned.
-                self.assertEqual(r.status_code, 200,
-                                 f'Wrong status code returned.'
-                                 f'\nExpected: 200'
-                                 f'\nGot: {r.status_code}')
+                # Send GET request to the endpoint.
+                r = c.get('/user/test_u',
+                          headers=self.get_headers())
 
-                # Add id=1 to u_dict.
-                self.u_dict['id'] = 1
+                r_dict = json.loads(r.data)
 
-                # Check that the endpoint returned the correct user.
-                self.assertDictEqual(json.loads(r.data),
-                                     self.u_dict,
-                                     f'The user returned by the endpoint'
-                                     f'did not meet expectations.'
-                                     f'\nExpected: {self.u_dict}'
-                                     f'\nGot: {json.loads(r.data)}')
+                self.assertEqual(r.status_code, 200)
 
-                # Try to get the user from the endpoint without authorization.
-                r = c.get('/user/javier',
-                          headers={'Authorization': 'faketoken'})
+                self.assertEqual(r_dict['username'],
+                                 self.u_dict['username'])
 
-                # Assert status code for not authorized is returned.
-                self.assertEqual(r.status_code, 401,
-                                 f'\nWrong status code returned.'
-                                 f'\nExpected: 401'
-                                 f'\nGot: {r.status_code}')
-
-    def test_user_get_without_authentication(self):
+    def test_user_get_not_found(self):
         """
         Test that a GET request to the /user/<string:username>
-        endpoint returns status code 401 if the user is not
-        authenticated.
+        endpoint returns status code 404 if the user is not found
+        in the database table.
         """
         with self.app() as c:
             with self.app_context():
-                # Send the GET request to the endpoint
-                # with wrong access_token.
-                r = c.get('/user/javier',
-                          headers={'Authorization': 'FaKeToKeN!!'})
+                # Send the GET request to the endpoint.
+                r = c.get('/user/test_u',
+                          headers=self.get_headers())
 
-                # Check that status code 401 is returned.
-                self.assertEqual(r.status_code, 401,
-                                 f'Wrong status code returned.'
-                                 f'\nExpected: 401'
-                                 f'\nGot: {r.status_code}')
+                self.assertEqual(r.status_code, 404)
+
+    def test_user_get_without_authentication(self):
+        """
+        Test that a GET request to the /user/<string:username> endpoint
+        returns status code 401 if the user is not authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Send the GET request to the /user endpoint with
+                # wrong authentication header.
+                r = c.get('/user/test_u',
+                          headers={
+                              'Content-Type': 'application/json',
+                              'Authorization': 'JWT FaKeToKeN!!'
+                          })
+
+                self.assertEqual(r.status_code, 401)
+
+
+    def test_user_put_with_authentication(self):
+        """
+        Test that a PUT request to the /user/<string:username>
+        endpoint returns status code 200.
+        """
+        with self.app() as c:
+            with self.app_context():
+                c.post('/user',
+                       data=json.dumps(self.u_dict),
+                       headers=self.get_headers())
+
+                # Send PUT request to the /user/test_u endpoint.
+                r = c.put('/user/test_u',
+                          data=json.dumps({
+                              'username': 'new_test_u',
+                              'password': 'new_test_p',
+                              'email': 'new_test_u@test_o.com',
+                              'organization_id': self.u_dict['organization_id'],
+                              'is_super': True,
+                              'is_owner': True
+                          }),
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 200)
+
+    def test_user_put_without_authentication(self):
+        """
+        Test that a PUT request to the /user/<string:username>
+        endpoint returns status code 401 if the user is not authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Send PUT request to the /user/test_u endpoint with
+                # wrong authentication header.
+                r = c.put('/user/test_u',
+                          data=json.dumps({
+                              'username': 'new_test_u',
+                              'password': 'new_test_p',
+                              'email': 'new_test_u@test_o.com',
+                              'organization_id': self.u_dict['organization_id'],
+                              'is_super': True,
+                              'is_owner': True
+                          }),
+                          headers={
+                              'Content-Type': 'application/json',
+                              'Authorization': 'JWT FaKeToKeN!!'
+                          })
+
+                self.assertEqual(r.status_code, 401)
+
+    def test_user_put_not_found(self):
+        """
+        Test that a PUT request to the /user/<string:username>
+        endpoint returns status code 404 if the user is not
+        in the database.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.put('/user/test_u',
+                          data=json.dumps({
+                              'username': 'new_test_u',
+                              'password': 'new_test_p',
+                              'email': 'new_test_u@test_o.com',
+                              'organization_id': self.u_dict['organization_id'],
+                              'is_super': True,
+                              'is_owner': True
+                          }),
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 404)
+
+    def test_user_delete_with_authentication(self):
+        """
+        Test that a DELETE request to the /user/<string:username>
+        endpoint returns status code 200.
+        """
+        with self.app() as c:
+            with self.app_context():
+                c.post('/user',
+                       data=json.dumps(self.u_dict),
+                       headers=self.get_headers())
+
+                # Send DELETE request to the /user/test_u endpoint.
+                r = c.delete('/user/test_u',
+                             headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 200)
+
+    def test_user_delete_without_authentication(self):
+        """
+        Test that a DELETE request to the /user/<string:username>
+        endpoint returns status code 401 if user is not authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Send DELETE request to the /user/test_u endpoint
+                # with wrong authorization header.
+                r = c.delete('/user/test_u',
+                             headers={
+                                 'Content-Type': 'application/json',
+                                 'Authorization': 'JWT FaKeToKeN!!'
+                             })
+
+                self.assertEqual(r.status_code, 401)
+
+    def test_user_delete_inactive(self):
+        """
+        Test that a DELETE request to the /user/<string:username>
+        endpoint returns status code 400 if the user is already inactive.
+        """
+        with self.app() as c:
+            with self.app_context():
+                c.post('/user',
+                       data=json.dumps(self.u_dict),
+                       headers=self.get_headers())
+
+                # Make user inactive.
+                r = c.delete('/user/test_u',
+                             headers=self.get_headers())
+
+                # Try DELETE on inactive user.
+                r = c.delete('/user/test_u',
+                             headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 400)
+
+    def test_user_delete_not_found(self):
+        """
+        Test that a DELETE request to the /user/<string:username>
+        endpoint returns status code 404 if the user is not found.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.delete('/user/test_u',
+                             headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 404)
+
+    def test_activate_user_with_authentication(self):
+        """
+        Test that a PUT request to the /activate_user/<string:username>
+        endpoint returns status code 200.
+        """
+        with self.app() as c:
+            with self.app_context():
+                c.post('/user',
+                       data=json.dumps(self.u_dict),
+                       headers=self.get_headers())
+
+                # Make user inactive.
+                r = c.delete('/user/test_u',
+                             headers=self.get_headers())
+
+                # Send PUT request to /activate_user/test_u
+                r = c.put('/activate_user/test_u',
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 200)
+
+    def test_activate_user_without_authentication(self):
+        """
+        Test that a PUT request to the /activate_user/<string:username>
+        endpoint returns status code 401 if the user is not authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Send PUT request to /activate_user/test_u with
+                # wrong authorization header.
+                r = c.put('/activate_user/test_u',
+                          headers={
+                              'Content-Type': 'application/json',
+                              'Authorization': 'JWT FaKeToKeN!!'
+                          })
+
+                self.assertEqual(r.status_code, 401)
+
+    def test_activate_user_active(self):
+        """
+        Test that a PUT request to the /activate_user/<string:username>
+        endpoint returns status code 400 if the user is already active.
+        """
+        with self.app() as c:
+            with self.app_context():
+                c.post('/user',
+                       data=json.dumps(self.u_dict),
+                       headers=self.get_headers())
+
+                # Send PUT request to /activate_user/test_u
+                r = c.put('/activate_user/test_u',
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 400)
+
+    def test_activate_user_not_found(self):
+        """
+        Test that a PUT request to the /activate_user/<string:username>
+        endpoint returns status code 404 if the user is not found.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Send PUT request to /activate_user/test_u
+                r = c.put('/activate_user/test_u',
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 404)

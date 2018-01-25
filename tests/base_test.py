@@ -36,8 +36,8 @@ class BaseTest(TestCase):
         """Drop all db tables after each test."""
         with app.app_context():
             db.session.remove()
-            OrganizationModel.query.filter(OrganizationModel.id != 1).delete()
             AppUserModel.query.filter(AppUserModel.id != 1).delete()
+            OrganizationModel.query.filter(OrganizationModel.id != 1).delete()
             db.session.commit()
 
     def get_headers(self):
