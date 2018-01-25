@@ -40,16 +40,17 @@ class BaseTest(TestCase):
             AppUserModel.query.filter(AppUserModel.id != 1).delete()
             db.session.commit()
 
-    def authorize(self):
+    def get_headers(self):
         """
-        Authenticate user and return the authorization header.
+        Authenticate user and return request headers that include
+        the authorization JWT.
 
-        Some endpoints requires an authorization header with a
+        All endpoints requires an authorization header with a
         JWT access token.  This method authenticates the user
-        and returns the authorization header.
+        and returns correct headers.
 
         Returns:
-            An authorization header.
+            The request headers.
         """
         with self.app() as c:
             with self.app_context():
@@ -61,5 +62,5 @@ class BaseTest(TestCase):
 
                 return {
                     'Content-Type': 'application/json',
-                    'Authorization': "JWT " + json.loads(r.data)["access_token"]
+                    'Authorization': 'JWT ' + json.loads(r.data)['access_token']
                 }
