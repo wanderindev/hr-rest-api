@@ -4,6 +4,7 @@ from unittest import TestCase
 
 from app import create_app
 from db import db
+from models.department import DepartmentModel
 from models.organization import OrganizationModel
 from models.user import AppUserModel
 
@@ -37,6 +38,7 @@ class BaseTest(TestCase):
         with app.app_context():
             db.session.remove()
             AppUserModel.query.filter(AppUserModel.id != 1).delete()
+            DepartmentModel.query.delete()
             OrganizationModel.query.filter(OrganizationModel.id != 1).delete()
             db.session.commit()
 

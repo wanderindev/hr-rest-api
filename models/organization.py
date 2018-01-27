@@ -13,6 +13,10 @@ class OrganizationModel(ModelsMixin, db.Model):
                                 backref='organization',
                                 lazy='joined')
 
+    departments = db.relationship('DepartmentModel',
+                                   backref='organization',
+                                   lazy='joined')
+
     def __init__(self, organization_name, is_active):
         self.organization_name = organization_name
         self.is_active = is_active
