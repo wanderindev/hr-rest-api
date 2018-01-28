@@ -14,8 +14,8 @@ class OrganizationModel(ModelsMixin, db.Model):
                                 lazy='joined')
 
     departments = db.relationship('DepartmentModel',
-                                   backref='organization',
-                                   lazy='joined')
+                                  backref='organization',
+                                  lazy='joined')
 
     def __init__(self, organization_name, is_active):
         self.organization_name = organization_name

@@ -76,7 +76,7 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                # Send duplicated POST request..
+                # Send duplicated POST request.
                 r = c.post('/user',
                            data=json.dumps(self.u_dict),
                            headers=self.get_headers())
@@ -136,7 +136,6 @@ class TestUser(BaseTest):
                           })
 
                 self.assertEqual(r.status_code, 401)
-
 
     def test_user_put_with_authentication(self):
         """
@@ -255,8 +254,8 @@ class TestUser(BaseTest):
                        headers=self.get_headers())
 
                 # Make user inactive.
-                r = c.delete('/user/test_u',
-                             headers=self.get_headers())
+                c.delete('/user/test_u',
+                         headers=self.get_headers())
 
                 # Try DELETE on inactive user.
                 r = c.delete('/user/test_u',
@@ -288,8 +287,8 @@ class TestUser(BaseTest):
                        headers=self.get_headers())
 
                 # Make user inactive.
-                r = c.delete('/user/test_u',
-                             headers=self.get_headers())
+                c.delete('/user/test_u',
+                         headers=self.get_headers())
 
                 # Send PUT request to /activate_user/test_u
                 r = c.put('/activate_user/test_u',

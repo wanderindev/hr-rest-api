@@ -9,6 +9,8 @@ Available functions:
 from app import create_app
 from db import db
 
+from models.department import DepartmentModel
+
 app = create_app('development')
 db.init_app(app)
 

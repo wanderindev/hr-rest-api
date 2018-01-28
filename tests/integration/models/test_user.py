@@ -18,7 +18,7 @@ class TestUser(BaseTest):
 
     def test_find_user(self):
         """
-        Test the find_by_id, find_by_organization_id, and find_by_username
+        Test the find_by_id and find_by_username
         methods of the AppUserModel class.
         """
         with self.app_context():
@@ -28,18 +28,12 @@ class TestUser(BaseTest):
 
             u_by_username = AppUserModel.find_by_username(self.u.username)
             u_by_id = AppUserModel.find_by_id(self.u.id)
-            u_by_o_id = AppUserModel.find_by_organization_id(
-                self.u.organization_id)[0]
 
             self.assertIsNotNone(u_by_id)
 
             self.assertIsNotNone(u_by_username)
 
-            self.assertIsNotNone(u_by_o_id)
-
             self.assertEqual(u_by_id, u_by_username)
-
-            self.assertEqual(u_by_id, u_by_o_id)
 
     def test_user_list_in_organization(self):
         """Test that the org object contains a user list."""
@@ -48,7 +42,8 @@ class TestUser(BaseTest):
             self.u.organization_id = OrganizationModel.find_by_name('test_o').id
             self.u.save_to_db()
 
-            u_list = AppUserModel.find_by_organization_id(self.o.id)
+            u_list = AppUserModel.query\
+                .filter_by(organization_id=self.o.id).all()
             o_u_list = OrganizationModel.\
                 find_by_name(self.o.organization_name).app_users
 
