@@ -24,7 +24,7 @@ class TestDepartment(BaseTest):
             self.d.organization_id = OrganizationModel.find_by_name('test_o').id
             self.d.save_to_db()
 
-            d_by_name = DepartmentModel.find_by_name(self.d.department_name,
+            d_by_name = DepartmentModel.find_by_name('test_d',
                                                      self.d.organization_id)
 
             self.assertIsNotNone(d_by_name)
@@ -39,6 +39,6 @@ class TestDepartment(BaseTest):
             d_list = DepartmentModel.query\
                 .filter_by(organization_id=self.o.id).all()
             o_d_list = OrganizationModel\
-                .find_by_name(self.o.organization_name).departments
+                .find_by_name('test_o').departments
 
             self.assertListEqual(d_list, o_d_list)

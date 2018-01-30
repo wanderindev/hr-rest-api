@@ -10,7 +10,7 @@ class Department(Resource):
     parser.add_argument('department_name',
                         type=str,
                         required=True,
-                        help="This field cannot be blank.")
+                        help='This field cannot be blank.')
     parser.add_argument('is_active',
                         default=True,
                         type=bool,
@@ -18,7 +18,7 @@ class Department(Resource):
     parser.add_argument('organization_id',
                         type=int,
                         required=True,
-                        help="A deparment must belong to an organization")
+                        help='A deparment must belong to an organization')
 
     @jwt_required()
     def get(self, department_name, organization_id):
@@ -34,8 +34,8 @@ class Department(Resource):
 
         if DepartmentModel.find_by_name(data['department_name'],
                                         data['organization_id']):
-            return {"message": "A department with that name already "
-                               "exists in the organization"}, 400
+            return {'message': 'A department with that name already '
+                               'exists in the organization'}, 400
 
         dept = DepartmentModel(data['department_name'],
                                data['organization_id'],
@@ -47,7 +47,7 @@ class Department(Resource):
             return {'message': 'An error occurred creating '
                                'the department.'}, 500
 
-        return {"message": "Department created successfully."}, 201
+        return {'message': 'Department created successfully.'}, 201
 
     @jwt_required()
     def put(self,  department_name, organization_id):
@@ -60,7 +60,7 @@ class Department(Resource):
 
             try:
                 dept.save_to_db()
-                return {"message": "Department updated successfully."}, 200
+                return {'message': 'Department updated successfully.'}, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the department.'}, 500
@@ -75,7 +75,7 @@ class Department(Resource):
             if dept.is_active:
                 try:
                     dept.inactivate()
-                    return {"message": "Department is now inactive."}, 200
+                    return {'message': 'Department is now inactive.'}, 200
                 except exc.SQLAlchemyError:
                     return {'message': 'An error occurred while inactivating'
                                        'the department.'}, 500
@@ -94,7 +94,7 @@ class ActivateDepartment(Resource):
             if not dept.is_active:
                 try:
                     dept.activate()
-                    return {"message": "Department is now active."}, 200
+                    return {'message': 'Department is now active.'}, 200
                 except exc.SQLAlchemyError:
                     return {'message': 'An error occurred while activating'
                                        'the department.'}, 500

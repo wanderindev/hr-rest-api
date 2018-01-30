@@ -28,8 +28,8 @@ class Organization(Resource):
         data = Organization.parser.parse_args()
 
         if OrganizationModel.find_by_name(data['organization_name']):
-            return {'message': "An organization with name '{}'"
-                               " already exists.".format(
+            return {'message': 'An organization with name "{}"'
+                               ' already exists.'.format(
                                  data['organization_name'])}, 400
 
         organization = OrganizationModel(
@@ -41,7 +41,7 @@ class Organization(Resource):
             return {'message': 'An error occurred creating '
                                'the organization.'}, 500
 
-        return {"message": "Organization created successfully."}, 201
+        return {'message': 'Organization created successfully.'}, 201
 
     @jwt_required()
     def put(self, organization_name):
@@ -54,7 +54,7 @@ class Organization(Resource):
 
             try:
                 organization.save_to_db()
-                return {"message": "Organization updated successfully."}, 200
+                return {'message': 'Organization updated successfully.'}, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the organization.'}, 500
@@ -69,7 +69,7 @@ class Organization(Resource):
             if organization.is_active:
                 try:
                     organization.inactivate()
-                    return {"message": "Organization is now inactive."}, 200
+                    return {'message': 'Organization is now inactive.'}, 200
                 except exc.SQLAlchemyError:
                     return {'message': 'An error occurred while inactivating'
                                        'the organization.'}, 500
@@ -88,7 +88,7 @@ class ActivateOrganization(Resource):
             if not organization.is_active:
                 try:
                     organization.activate()
-                    return {"message": "Organization is now active."}, 200
+                    return {'message': 'Organization is now active.'}, 200
                 except exc.SQLAlchemyError:
                     return {'message': 'An error occurred while activating'
                                        'the organization.'}, 500

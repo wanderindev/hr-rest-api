@@ -13,6 +13,10 @@ class OrganizationModel(ModelsMixin, db.Model):
                                 backref='organization',
                                 lazy='joined')
 
+    employment_positions = db.relationship('EmploymentPositionModel',
+                                           backref='organization',
+                                           lazy='joined')
+
     departments = db.relationship('DepartmentModel',
                                   backref='organization',
                                   lazy='joined')
