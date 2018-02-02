@@ -15,7 +15,7 @@ class EmploymentPosition(Resource):
                         type=str,
                         required=True,
                         help='This field cannot be blank.')
-    parser.add_argument('minimun_hourly_wage',
+    parser.add_argument('minimum_hourly_wage',
                         type=float,
                         required=False,
                         help='This field must be a number.')
@@ -26,7 +26,8 @@ class EmploymentPosition(Resource):
     parser.add_argument('organization_id',
                         type=int,
                         required=True,
-                        help='A deparment must belong to an organization')
+                        help='An employment postion must belong '
+                             'to an organization')
 
     @jwt_required()
     def get(self, position_name, organization_id):
@@ -52,7 +53,7 @@ class EmploymentPosition(Resource):
 
         e_p = EmploymentPositionModel(data['position_name_feminine'],
                                       data['position_name_masculine'],
-                                      data['minimun_hourly_wage'],
+                                      data['minimum_hourly_wage'],
                                       data['is_active'],
                                       data['organization_id'])
 
@@ -62,7 +63,7 @@ class EmploymentPosition(Resource):
             return {'message': 'An error occurred creating '
                                'the employment position.'}, 500
 
-        return {'message': 'Department created successfully.'}, 201
+        return {'message': 'Employment position created successfully.'}, 201
 
     @jwt_required()
     def put(self,  position_name, organization_id):
@@ -72,9 +73,9 @@ class EmploymentPosition(Resource):
                                                    organization_id)
 
         if e_p:
-            e_p.department_name = data['position_name_feminine']
-            e_p.department_name = data['position_name_masculine']
-            e_p.department_name = data['minimun_hourly_wage']
+            e_p.position_name_feminine = data['position_name_feminine']
+            e_p.position_name_masculine = data['position_name_masculine']
+            e_p.minimum_hourly_wage = data['minimum_hourly_wage']
 
             try:
                 e_p.save_to_db()

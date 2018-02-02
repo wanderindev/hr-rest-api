@@ -10,6 +10,7 @@ from app import create_app
 from db import db
 
 from models.department import DepartmentModel
+from models.employment_position import EmploymentPositionModel
 
 app = create_app('development')
 db.init_app(app)

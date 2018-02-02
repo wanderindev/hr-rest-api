@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 
 from sqlalchemy.orm import collections
 
@@ -46,6 +47,8 @@ class ModelsMixin(object):
                 output[k] = [item.to_dict() for item in v]
             elif isinstance(v, (date, datetime)):
                 output[k] = v.isoformat()
+            elif isinstance(v, (float, Decimal)):
+                output[k] = str(v)
             else:
                 output[k] = v
 
