@@ -22,8 +22,8 @@ class TestEmploymentPosition(BaseTest):
                 'position_name_feminine': 'test_e_p_f',
                 'position_name_masculine': 'test_e_p_m',
                 'minimum_hourly_wage': 1.00,
-                'organization_id': OrganizationModel.find_by_name('test_o').id,
-                'is_active': True
+                'is_active': True,
+                'organization_id': OrganizationModel.find_by_name('test_o').id
             }
 
     def test_emp_pos_post_with_authentication(self):
@@ -147,3 +147,237 @@ class TestEmploymentPosition(BaseTest):
                           })
 
                 self.assertEqual(r.status_code, 401)
+
+    def test_emp_pos_put_with_authentication(self):
+        """
+        Test that a PUT request to the
+        /employment_position/<string:position_name/organization_id>
+        endpoint returns status code 200.
+        """
+        with self.app() as c:
+            with self.app_context():
+                c.post(f'/employment_position',
+                       data=json.dumps(self.e_p_dict),
+                       headers=self.get_headers())
+
+                # Send PUT request to the endpoint.
+                r = c.put(f'/employment_position/test_e_p_f'
+                          f'/{self.e_p_dict["organization_id"]}',
+                          data=json.dumps({
+                              'position_name_feminine': 'new_test_e_p_f',
+                              'position_name_masculine': 'new_test_e_p_m',
+                              'minimum_hourly_wage': 2.00,
+                              'organization_id': self.e_p_dict[
+                                  'organization_id'],
+                              'is_active': True
+                          }),
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 200)
+
+    def test_emp_pos_put_without_authentication(self):
+        """
+        Test that a PUT request to the
+        /employment_position/<string:position_name/organization_id>
+        endpoint returns status code 401 if the user is not authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Send PUT request to the endpoint with
+                # wrong authentication header.
+                r = c.put(f'/employment_position/test_e_p_f'
+                          f'/{self.e_p_dict["organization_id"]}',
+                          data=json.dumps({
+                              'position_name_feminine': 'new_test_e_p_f',
+                              'position_name_masculine': 'new_test_e_p_m',
+                              'minimum_hourly_wage': 2.00,
+                              'organization_id': self.e_p_dict[
+                                  'organization_id'],
+                              'is_active': True
+                          }),
+                          headers={
+                              'Content-Type': 'application/json',
+                              'Authorization': 'JWT FaKeToKeN!!'
+                          })
+
+                self.assertEqual(r.status_code, 401)
+
+    def test_emp_pos_put_not_found(self):
+        """
+        Test that a PUT request to the
+        /employment_position/<string:position_name/organization_id>
+        endpoint returns status code 404 if the department is not
+        in the database.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.put(f'/employment_position/test_e_p_f'
+                          f'/{self.e_p_dict["organization_id"]}',
+                          data=json.dumps({
+                              'position_name_feminine': 'new_test_e_p_f',
+                              'position_name_masculine': 'new_test_e_p_m',
+                              'minimum_hourly_wage': 2.00,
+                              'organization_id': self.e_p_dict[
+                                  'organization_id'],
+                              'is_active': True
+                          }),
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 404)
+
+    def test_emp_pos_delete_with_authentication(self):
+        """
+        Test that a DELETE request to the
+        /employment_position/<string:position_name/organization_id>
+        endpoint returns status code 200.
+        """
+        with self.app() as c:
+            with self.app_context():
+                c.post('/employment_position',
+                       data=json.dumps(self.e_p_dict),
+                       headers=self.get_headers())
+
+                # Send DELETE request to the endpoint.
+                r = c.delete(f'/employment_position/test_e_p_f'
+                             f'/{self.e_p_dict["organization_id"]}',
+                             headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 200)
+
+    def test_emp_pos_delete_without_authentication(self):
+        """
+        Test that a DELETE request to the
+        /employment_position/<string:position_name/organization_id>
+        endpoint returns status code 401 if user is not authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Send DELETE request to the endpoint
+                # with wrong authorization header.
+                r = c.delete(f'/employment_position/test_e_p_f'
+                             f'/{self.e_p_dict["organization_id"]}',
+                             headers={
+                                 'Content-Type': 'application/json',
+                                 'Authorization': 'JWT FaKeToKeN!!'
+                             })
+
+                self.assertEqual(r.status_code, 401)
+
+    def test_emp_pos_delete_inactive(self):
+        """
+        Test that a DELETE request to the
+        /employment_position/<string:position_name/organization_id>
+        endpoint returns status code 400 if the employment_position
+        is already inactive.
+        """
+        with self.app() as c:
+            with self.app_context():
+                c.post('/employment_position',
+                       data=json.dumps(self.e_p_dict),
+                       headers=self.get_headers())
+
+                # Make employment_position inactive.
+                c.delete(f'/employment_position/test_e_p_f'
+                         f'/{self.e_p_dict["organization_id"]}',
+                         headers=self.get_headers())
+
+                # Try DELETE on inactive employment_position.
+                r = c.delete(f'/employment_position/test_e_p_f'
+                             f'/{self.e_p_dict["organization_id"]}',
+                             headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 400)
+
+    def test_emp_pos_delete_not_found(self):
+        """
+        Test that a DELETE request to the
+        /employment_position/<string:position_name/organization_id>
+        endpoint returns status code 404 if the employment_position
+        is not found.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.delete(f'/employment_position/test_e_p_f'
+                             f'/{self.e_p_dict["organization_id"]}',
+                             headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 404)
+
+    def test_activate_emp_pos_with_authentication(self):
+        """
+        Test that a PUT request to the
+        /activate_employment_position/<string:position_name/organization_id>
+        endpoint returns status code 200.
+        """
+        with self.app() as c:
+            with self.app_context():
+                c.post('/employment_position',
+                       data=json.dumps(self.e_p_dict),
+                       headers=self.get_headers())
+
+                # Make employment_position inactive.
+                c.delete(f'/employment_position/test_e_p_f'
+                         f'/{self.e_p_dict["organization_id"]}',
+                         headers=self.get_headers())
+
+                # Send PUT request to /activate_employment_position
+                r = c.put(f'/activate_employment_position/test_e_p_f'
+                          f'/{self.e_p_dict["organization_id"]}',
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 200)
+
+    def test_activate_emp_pos_without_authentication(self):
+        """
+        Test that a PUT request to the
+        /activate_employment_position/<string:position_name/organization_id>
+        endpoint returns status code 401 if the user is not authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Send PUT request to activate_employment_position
+                # with wrong authorization header.
+                r = c.put(f'/activate_employment_position/test_e_p_f'
+                          f'/{self.e_p_dict["organization_id"]}',
+                          headers={
+                              'Content-Type': 'application/json',
+                              'Authorization': 'JWT FaKeToKeN!!'
+                          })
+
+                self.assertEqual(r.status_code, 401)
+
+    def test_activate_emp_pos_active(self):
+        """
+        Test that a PUT request to the
+        /activate_employment_position/<string:position_name/organization_id>
+        endpoint returns status code 400 if the employment_position is
+        already active.
+        """
+        with self.app() as c:
+            with self.app_context():
+                c.post('/employment_position',
+                       data=json.dumps(self.e_p_dict),
+                       headers=self.get_headers())
+
+                # Send PUT request to /activate_employment_position
+                r = c.put(f'/activate_employment_position/test_e_p_f'
+                          f'/{self.e_p_dict["organization_id"]}',
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 400)
+
+    def test_activate_emp_pos_not_found(self):
+        """
+        Test that a PUT request to the
+        /activate_employment_position/<string:position_name/organization_id>
+        endpoint returns status code 404 if the employment_position
+        is not found.
+        """
+        with self.app() as c:
+            with self.app_context():
+                # Send PUT request to /activate_employment_position
+                r = c.put(f'/activate_employment_position/test_e_p_f'
+                          f'/{self.e_p_dict["organization_id"]}',
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 404)

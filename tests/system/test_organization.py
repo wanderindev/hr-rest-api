@@ -361,17 +361,17 @@ class TestOrganization(BaseTest):
                 # Get the organization list from the endpoint.
                 r = c.get('/organizations',
                           headers=self.get_headers())
+                org_list = json.loads(r.data)['organizations']
 
                 self.assertEqual(r.status_code, 200)
 
-                expected = {
-                    'organizations': [
-                        OrganizationModel.find_by_name('Nuvanz').to_dict(),
-                        OrganizationModel.find_by_name('test_o').to_dict()
-                    ]
-                }
+                self.assertIn(
+                    OrganizationModel.find_by_name('Nuvanz').to_dict(),
+                    org_list)
 
-                self.assertDictEqual(json.loads(r.data), expected)
+                self.assertIn(
+                    OrganizationModel.find_by_name('test_o').to_dict(),
+                    org_list)
 
     def test_organization_list_without_authentication(self):
         """
