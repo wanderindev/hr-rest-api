@@ -10,8 +10,8 @@ class TestDepartment(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by creating a dict representing
-        a user and instantiating an OrganizationModel object and saving it
-        to the db so they are available for the different tests.
+        a department and instantiating an OrganizationModel object and saving
+        it to the db so they are available for the different tests.
         """
         super(TestDepartment, self).setUp()
         with self.app_context():

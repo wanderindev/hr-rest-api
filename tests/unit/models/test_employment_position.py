@@ -7,7 +7,7 @@ class TestEmploymentPosition(TestCase):
     """Unit tests for the EmploymentPositionModel."""
     def setUp(self):
         self.e_p = EmploymentPositionModel('test_e_p_f', 'test_e_p_m',
-                                           1.00, 1, True)
+                                           1.00, True, 1)
 
     def test_init(self):
         """Test the __init__ method of the EmploymentPositionModel class."""
@@ -15,7 +15,7 @@ class TestEmploymentPosition(TestCase):
 
         self.assertEqual(self.e_p.position_name_masculine, 'test_e_p_m')
 
-        self.assertEqual(self.e_p.minimun_hourly_wage, 1.00)
+        self.assertEqual(self.e_p.minimum_hourly_wage, 1.00)
 
         self.assertEqual(self.e_p.is_active, True)
 

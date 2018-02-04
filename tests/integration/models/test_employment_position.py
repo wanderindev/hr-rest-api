@@ -14,7 +14,7 @@ class TestEmploymentPosition(BaseTest):
         super(TestEmploymentPosition, self).setUp()
         self.o = OrganizationModel('test_o', True)
         self.e_p = EmploymentPositionModel('test_e_p_f', 'test_e_p_m',
-                                           1.00, 1, True)
+                                           1.00, True, 1)
 
     def test_find_employment_position(self):
         """
