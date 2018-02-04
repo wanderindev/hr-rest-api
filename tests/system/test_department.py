@@ -304,7 +304,7 @@ class TestDepartment(BaseTest):
                          f'/{self.d_dict["organization_id"]}',
                          headers=self.get_headers())
 
-                # Send PUT request to activate_department
+                # Send PUT request to /activate_department
                 r = c.put(f'/activate_department/test_d'
                           f'/{self.d_dict["organization_id"]}',
                           headers=self.get_headers())
@@ -319,7 +319,7 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Send PUT request to activate_department with
+                # Send PUT request to /activate_department with
                 # wrong authorization header.
                 r = c.put(f'/activate_department/test_d'
                           f'/{self.d_dict["organization_id"]}',
@@ -342,7 +342,7 @@ class TestDepartment(BaseTest):
                        data=json.dumps(self.d_dict),
                        headers=self.get_headers())
 
-                # Send PUT request to activate_department
+                # Send PUT request to /activate_department
                 r = c.put(f'/activate_department/test_d'
                           f'/{self.d_dict["organization_id"]}',
                           headers=self.get_headers())
@@ -357,7 +357,7 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Send PUT request to /activate_user/test_u
+                # Send PUT request to /activate_department
                 r = c.put(f'/activate_department/test_d'
                           f'/{self.d_dict["organization_id"]}',
                           headers=self.get_headers())

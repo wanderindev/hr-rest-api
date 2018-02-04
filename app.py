@@ -8,6 +8,7 @@ from resources.employment_position import ActivateEmploymentPosition, \
 from resources.marital_status import MaritalStatusList
 from resources.organization import ActivateOrganization, Organization, \
     OrganizationList
+from resources.shift import ActivateShift, Shift
 from resources.user import ActivateUser, User
 from security import authenticate, identity
 
@@ -50,11 +51,13 @@ def create_app(config_file=None):
                      '/activate_organization/<string:organization_name>')
     api.add_resource(OrganizationList,
                      '/organizations')
+
     api.add_resource(User,
                      '/user',
                      '/user/<string:username>')
     api.add_resource(ActivateUser,
                      '/activate_user/<string:username>')
+
     api.add_resource(Department,
                      '/department',
                      '/department/<string:department_name>'
@@ -62,14 +65,23 @@ def create_app(config_file=None):
     api.add_resource(ActivateDepartment,
                      '/activate_department/<string:department_name>'
                      '/<int:organization_id>')
+
     api.add_resource(MaritalStatusList,
                      '/marital_statuses')
+
     api.add_resource(EmploymentPosition,
                      '/employment_position',
                      '/employment_position/<string:position_name>'
                      '/<int:organization_id>')
     api.add_resource(ActivateEmploymentPosition,
                      '/activate_employment_position/<string:position_name>'
+                     '/<int:organization_id>')
+
+    api.add_resource(Shift,
+                     '/shift',
+                     '/shift/<string:shift_name>/<int:organization_id>')
+    api.add_resource(ActivateShift,
+                     '/activate_shift/<string:shift_name>'
                      '/<int:organization_id>')
 
     return app

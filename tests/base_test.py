@@ -7,6 +7,7 @@ from db import db
 from models.department import DepartmentModel
 from models.employment_position import EmploymentPositionModel
 from models.organization import OrganizationModel
+from models.shift import ShiftModel
 from models.user import AppUserModel
 
 app = create_app('testing')
@@ -41,6 +42,7 @@ class BaseTest(TestCase):
             AppUserModel.query.filter(AppUserModel.id != 1).delete()
             DepartmentModel.query.delete()
             EmploymentPositionModel.query.delete()
+            ShiftModel.query.delete()
             OrganizationModel.query.filter(OrganizationModel.id != 1).delete()
             db.session.commit()
 

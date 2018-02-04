@@ -29,8 +29,8 @@ class TestEmploymentPosition(BaseTest):
     def test_emp_pos_post_with_authentication(self):
         """
         Test that a POST request to the /employment_position endpoint
-        returns status code 201 and that the department is present in the
-        database after the POST request.
+        returns status code 201 and that the employment_position
+        is present in the database after the POST request.
         """
         with self.app() as c:
             with self.app_context():
@@ -206,7 +206,7 @@ class TestEmploymentPosition(BaseTest):
         """
         Test that a PUT request to the
         /employment_position/<string:position_name/organization_id>
-        endpoint returns status code 404 if the department is not
+        endpoint returns status code 404 if the employment_position is not
         in the database.
         """
         with self.app() as c:
