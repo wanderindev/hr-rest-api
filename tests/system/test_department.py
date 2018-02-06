@@ -6,7 +6,7 @@ from tests.base_test import BaseTest
 
 
 class TestDepartment(BaseTest):
-    """System tests for the deparment resource."""
+    """System tests for the department resource."""
     def setUp(self):
         """
         Extend the BaseTest setUp method by creating a dict representing
