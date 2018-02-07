@@ -12,6 +12,10 @@ class DepartmentModel(ModelsMixin, db.Model):
                                 db.ForeignKey('organization.id'),
                                 nullable=False, index=True)
 
+    employees = db.relationship('EmployeeModel',
+                                backref='department',
+                                lazy='joined')
+
     def __init__(self, department_name, organization_id, is_active):
         self.department_name = department_name
         self.organization_id = organization_id

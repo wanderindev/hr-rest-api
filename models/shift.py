@@ -51,6 +51,10 @@ class ShiftModel(ModelsMixin, db.Model):
                                 db.ForeignKey('organization.id'),
                                 nullable=False, index=True)
 
+    employees = db.relationship('EmployeeModel',
+                                backref='shift',
+                                lazy='joined')
+
     def __init__(self, shift_name, weekly_hours, is_rotating,
                  payment_period, break_length, is_break_included_in_shift,
                  is_active, organization_id, **kwargs):

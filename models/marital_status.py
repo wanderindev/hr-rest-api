@@ -9,6 +9,10 @@ class MaritalStatusModel(ModelsMixin, db.Model):
     status_feminine = db.Column(db.String(25), nullable=False)
     status_masculine = db.Column(db.String(25), nullable=False)
 
+    employees = db.relationship('EmployeeModel',
+                                backref='marital_status',
+                                lazy='joined')
+
     def __init__(self, status_feminine, status_masculine):
         self.status_feminine = status_feminine
         self.status_masculine = status_masculine

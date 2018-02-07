@@ -5,6 +5,7 @@ from unittest import TestCase
 from app import create_app
 from db import db
 from models.department import DepartmentModel
+from models.employee import EmployeeModel
 from models.employment_position import EmploymentPositionModel
 from models.organization import OrganizationModel
 from models.shift import ShiftModel
@@ -40,6 +41,7 @@ class BaseTest(TestCase):
         with app.app_context():
             db.session.remove()
             AppUserModel.query.filter(AppUserModel.id != 1).delete()
+            EmployeeModel.query.delete()
             DepartmentModel.query.delete()
             EmploymentPositionModel.query.delete()
             ShiftModel.query.delete()

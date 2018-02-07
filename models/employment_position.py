@@ -15,6 +15,10 @@ class EmploymentPositionModel(ModelsMixin, db.Model):
                                 db.ForeignKey('organization.id'),
                                 nullable=False, index=True)
 
+    employees = db.relationship('EmployeeModel',
+                                backref='employment_position',
+                                lazy='joined')
+
     def __init__(self, position_name_feminine, position_name_masculine,
                  minimum_hourly_wage,  is_active, organization_id):
         self.position_name_feminine = position_name_feminine
