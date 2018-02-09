@@ -1,4 +1,4 @@
-from flask_jwt import jwt_required
+from flask_jwt import current_identity, jwt_required
 from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
@@ -135,8 +135,9 @@ class Shift(Resource):
                         required=False)
 
     @jwt_required()
-    def get(self, shift_name, organization_id):
-        shift = ShiftModel.find_by_name(shift_name, organization_id)
+    def get(self, shift_name):
+        shift = ShiftModel.find_by_name(shift_name,
+                                        current_identity.organization_id)
         if shift:
             return shift.to_dict()
         return {'message': 'Shift not found'}, 404
@@ -230,10 +231,11 @@ class Shift(Resource):
         return {'message': 'Shift created successfully.'}, 201
 
     @jwt_required()
-    def put(self,  shift_name, organization_id):
+    def put(self,  shift_name):
         data = Shift.parser.parse_args()
 
-        shift = ShiftModel.find_by_name(shift_name, organization_id)
+        shift = ShiftModel.find_by_name(shift_name,
+                                        current_identity.organization_id)
 
         if shift:
             shift.shift_name = data['shift_name']
@@ -304,8 +306,9 @@ class Shift(Resource):
             return {'message': 'Shift not found'}, 404
 
     @jwt_required()
-    def delete(self, shift_name, organization_id):
-        shift = ShiftModel.find_by_name(shift_name, organization_id)
+    def delete(self, shift_name):
+        shift = ShiftModel.find_by_name(shift_name,
+                                        current_identity.organization_id)
 
         if shift:
             if shift.is_active:
@@ -323,8 +326,9 @@ class Shift(Resource):
 
 class ActivateShift(Resource):
     @jwt_required()
-    def put(self, shift_name, organization_id):
-        shift = ShiftModel.find_by_name(shift_name, organization_id)
+    def put(self, shift_name):
+        shift = ShiftModel.find_by_name(shift_name,
+                                        current_identity.organization_id)
 
         if shift:
             if not shift.is_active:

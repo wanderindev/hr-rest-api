@@ -60,28 +60,23 @@ def create_app(config_file=None):
 
     api.add_resource(Department,
                      '/department',
-                     '/department/<string:department_name>'
-                     '/<int:organization_id>')
+                     '/department/<string:department_name>')
     api.add_resource(ActivateDepartment,
-                     '/activate_department/<string:department_name>'
-                     '/<int:organization_id>')
+                     '/activate_department/<string:department_name>')
 
     api.add_resource(MaritalStatusList,
                      '/marital_statuses')
 
     api.add_resource(EmploymentPosition,
                      '/employment_position',
-                     '/employment_position/<string:position_name>'
-                     '/<int:organization_id>')
+                     '/employment_position/<string:position_name>')
     api.add_resource(ActivateEmploymentPosition,
-                     '/activate_employment_position/<string:position_name>'
-                     '/<int:organization_id>')
+                     '/activate_employment_position/<string:position_name>')
 
     api.add_resource(Shift,
                      '/shift',
-                     '/shift/<string:shift_name>/<int:organization_id>')
+                     '/shift/<string:shift_name>')
     api.add_resource(ActivateShift,
-                     '/activate_shift/<string:shift_name>'
-                     '/<int:organization_id>')
+                     '/activate_shift/<string:shift_name>')
 
     return app

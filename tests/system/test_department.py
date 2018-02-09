@@ -1,7 +1,6 @@
 import json
 
 from models.department import DepartmentModel
-from models.organization import OrganizationModel
 from tests.base_test import BaseTest
 
 
@@ -10,16 +9,13 @@ class TestDepartment(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by creating a dict representing
-        a department and instantiating an OrganizationModel object and saving
-        it to the db so they are available for the different tests.
+        a department so it is available for the different tests.
         """
         super(TestDepartment, self).setUp()
         with self.app_context():
-            OrganizationModel('test_o', True).save_to_db()
-
             self.d_dict = {
                 'department_name': 'test_d',
-                'organization_id': OrganizationModel.find_by_name('test_o').id,
+                'organization_id': 1,
                 'is_active': True
             }
 
@@ -86,8 +82,7 @@ class TestDepartment(BaseTest):
 
     def test_dept_get_with_authentication(self):
         """
-        Test that a GET request to the
-        /department/<string:department_name/organization_id>
+        Test that a GET request to the /department/<string:department_name>
         endpoint returns the correct department if the user is
         authenticated.
         """
@@ -98,8 +93,7 @@ class TestDepartment(BaseTest):
                        headers=self.get_headers())
 
                 # Send GET request to the endpoint.
-                r = c.get(f'/department/test_d'
-                          f'/{self.d_dict["organization_id"]}',
+                r = c.get(f'/department/test_d',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
@@ -111,32 +105,28 @@ class TestDepartment(BaseTest):
 
     def test_dept_get_not_found(self):
         """
-        Test that a GET request to the
-        /department/<string:department_name/organization_id>
-        endpoint returns status code 404 if the department
-        is not found in the database table.
+        Test that a GET request to the /department/<string:department_name>
+        endpoint returns status code 404 if the department is not found in
+        the database table.
         """
         with self.app() as c:
             with self.app_context():
                 # Send the GET request to the endpoint.
-                r = c.get(f'/department/test_d'
-                          f'/{self.d_dict["organization_id"]}',
+                r = c.get(f'/department/test_d',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
 
     def test_dept_get_without_authentication(self):
         """
-        Test that a GET request to the
-        /department/<string:department_name/organization_id>
+        Test that a GET request to the /department/<string:department_name>
         returns status code 401 if the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/department/test_d'
-                          f'/{self.d_dict["organization_id"]}',
+                r = c.get(f'/department/test_d',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -146,8 +136,7 @@ class TestDepartment(BaseTest):
 
     def test_dept_put_with_authentication(self):
         """
-        Test that a PUT request to the
-        /department/<string:department_name/organization_id>
+        Test that a PUT request to the /department/<string:department_name>
         endpoint returns status code 200.
         """
         with self.app() as c:
@@ -157,8 +146,7 @@ class TestDepartment(BaseTest):
                        headers=self.get_headers())
 
                 # Send PUT request to the endpoint.
-                r = c.put(f'/department/test_d'
-                          f'/{self.d_dict["organization_id"]}',
+                r = c.put(f'/department/test_d',
                           data=json.dumps({
                               'department_name': 'new_test_d',
                               'organization_id': self.d_dict['organization_id'],
@@ -169,16 +157,14 @@ class TestDepartment(BaseTest):
 
     def test_dept_put_without_authentication(self):
         """
-        Test that a PUT request to the
-        /department/<string:department_name/organization_id>
+        Test that a PUT request to the /department/<string:department_name
         endpoint returns status code 401 if the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/department/test_d'
-                          f'/{self.d_dict["organization_id"]}',
+                r = c.put(f'/department/test_d',
                           data=json.dumps({
                               'department_name': 'new_test_d',
                               'organization_id': self.d_dict['organization_id'],
@@ -192,15 +178,13 @@ class TestDepartment(BaseTest):
 
     def test_dept_put_not_found(self):
         """
-        Test that a PUT request to the
-        /department/<string:department_name/organization_id>
+        Test that a PUT request to the /department/<string:department_name
         endpoint returns status code 404 if the department is not
         in the database.
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/department/test_d'
-                          f'/{self.d_dict["organization_id"]}',
+                r = c.put(f'/department/test_d',
                           data=json.dumps({
                               'department_name': 'new_test_d',
                               'organization_id': self.d_dict['organization_id'],
@@ -211,8 +195,7 @@ class TestDepartment(BaseTest):
 
     def test_dept_delete_with_authentication(self):
         """
-        Test that a DELETE request to the
-        /department/<string:department_name/organization_id>
+        Test that a DELETE request to the /department/<string:department_name
         endpoint returns status code 200.
         """
         with self.app() as c:
@@ -222,24 +205,21 @@ class TestDepartment(BaseTest):
                        headers=self.get_headers())
 
                 # Send DELETE request to the endpoint.
-                r = c.delete(f'/department/test_d'
-                             f'/{self.d_dict["organization_id"]}',
+                r = c.delete(f'/department/test_d',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
 
     def test_dept_delete_without_authentication(self):
         """
-        Test that a DELETE request to the
-        /department/<string:department_name/organization_id>
+        Test that a DELETE request to the /department/<string:department_name
         endpoint returns status code 401 if user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/department/test_d'
-                             f'/{self.d_dict["organization_id"]}',
+                r = c.delete(f'/department/test_d',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -249,8 +229,7 @@ class TestDepartment(BaseTest):
 
     def test_dept_delete_inactive(self):
         """
-        Test that a DELETE request to the
-        /department/<string:department_name/organization_id>
+        Test that a DELETE request to the /department/<string:department_name
         endpoint returns status code 400 if the department
         is already inactive.
         """
@@ -261,37 +240,31 @@ class TestDepartment(BaseTest):
                        headers=self.get_headers())
 
                 # Make department inactive.
-                c.delete(f'/department/test_d'
-                         f'/{self.d_dict["organization_id"]}',
+                c.delete(f'/department/test_d',
                          headers=self.get_headers())
 
                 # Try DELETE on inactive department.
-                r = c.delete(f'/department/test_d'
-                             f'/{self.d_dict["organization_id"]}',
+                r = c.delete(f'/department/test_d',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
 
     def test_dept_delete_not_found(self):
         """
-        Test that a DELETE request to the
-        /department/<string:department_name/organization_id>
-        endpoint returns status code 404 if the department
-        is not found.
+        Test that a DELETE request to the /department/<string:department_name
+        endpoint returns status code 404 if the department is not found.
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete(f'/department/test_d'
-                             f'/{self.d_dict["organization_id"]}',
+                r = c.delete(f'/department/test_d',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
 
     def test_activate_dept_with_authentication(self):
         """
-        Test that a PUT request to the
-        /activate_department/<string:department_name/organization_id>
-        endpoint returns status code 200.
+        Test that a PUT request to the /activate_department
+        /<string:department_name endpoint returns status code 200.
         """
         with self.app() as c:
             with self.app_context():
@@ -300,29 +273,26 @@ class TestDepartment(BaseTest):
                        headers=self.get_headers())
 
                 # Make department inactive.
-                c.delete(f'/department/test_d'
-                         f'/{self.d_dict["organization_id"]}',
+                c.delete(f'/department/test_d',
                          headers=self.get_headers())
 
                 # Send PUT request to /activate_department
-                r = c.put(f'/activate_department/test_d'
-                          f'/{self.d_dict["organization_id"]}',
+                r = c.put(f'/activate_department/test_d',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
 
     def test_activate_dept_without_authentication(self):
         """
-        Test that a PUT request to the
-        /activate_department/<string:department_name/organization_id>
-        endpoint returns status code 401 if the user is not authenticated.
+        Test that a PUT request to the /activate_department
+        /<string:department_name endpoint returns status code
+        401 if the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send PUT request to /activate_department with
                 # wrong authorization header.
-                r = c.put(f'/activate_department/test_d'
-                          f'/{self.d_dict["organization_id"]}',
+                r = c.put(f'/activate_department/test_d',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -332,9 +302,9 @@ class TestDepartment(BaseTest):
 
     def test_activate_dept_active(self):
         """
-        Test that a PUT request to the
-        /activate_department/<string:department_name/organization_id>
-        endpoint returns status code 400 if the department is already active.
+        Test that a PUT request to the /activate_department
+        /<string:department_name endpoint returns status code 400
+        if the department is already active.
         """
         with self.app() as c:
             with self.app_context():
@@ -343,23 +313,21 @@ class TestDepartment(BaseTest):
                        headers=self.get_headers())
 
                 # Send PUT request to /activate_department
-                r = c.put(f'/activate_department/test_d'
-                          f'/{self.d_dict["organization_id"]}',
+                r = c.put(f'/activate_department/test_d',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
 
     def test_activate_dept_not_found(self):
         """
-        Test that a PUT request to the
-        /activate_department/<string:department_name/organization_id>
-        endpoint returns status code 404 if the department is not found.
+        Test that a PUT request to the /activate_department
+        /<string:department_name endpoint returns status code
+        404 if the department is not found.
         """
         with self.app() as c:
             with self.app_context():
                 # Send PUT request to /activate_department
-                r = c.put(f'/activate_department/test_d'
-                          f'/{self.d_dict["organization_id"]}',
+                r = c.put(f'/activate_department/test_d',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)

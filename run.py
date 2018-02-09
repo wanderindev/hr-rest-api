@@ -10,6 +10,7 @@ from app import create_app
 from db import db
 
 from models.department import DepartmentModel
+from models.employee import EmployeeModel
 from models.employment_position import EmploymentPositionModel
 from models.shift import ShiftModel
 

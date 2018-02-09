@@ -1,4 +1,4 @@
-from flask_jwt import jwt_required
+from flask_jwt import current_identity, jwt_required
 from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
@@ -30,9 +30,9 @@ class EmploymentPosition(Resource):
                              'to an organization')
 
     @jwt_required()
-    def get(self, position_name, organization_id):
-        e_p = EmploymentPositionModel.find_by_name(position_name,
-                                                   organization_id)
+    def get(self, position_name):
+        e_p = EmploymentPositionModel\
+            .find_by_name(position_name, current_identity.organization_id)
         if e_p:
             return e_p.to_dict()
         return {'message': 'Employment position not found'}, 404
@@ -66,11 +66,11 @@ class EmploymentPosition(Resource):
         return {'message': 'Employment position created successfully.'}, 201
 
     @jwt_required()
-    def put(self,  position_name, organization_id):
+    def put(self,  position_name):
         data = EmploymentPosition.parser.parse_args()
 
-        e_p = EmploymentPositionModel.find_by_name(position_name,
-                                                   organization_id)
+        e_p = EmploymentPositionModel\
+            .find_by_name(position_name, current_identity.organization_id)
 
         if e_p:
             e_p.position_name_feminine = data['position_name_feminine']
@@ -88,9 +88,9 @@ class EmploymentPosition(Resource):
             return {'message': 'Employment position not found'}, 404
 
     @jwt_required()
-    def delete(self, position_name, organization_id):
-        e_p = EmploymentPositionModel.find_by_name(position_name,
-                                                   organization_id)
+    def delete(self, position_name):
+        e_p = EmploymentPositionModel\
+            .find_by_name(position_name, current_identity.organization_id)
 
         if e_p:
             if e_p.is_active:
@@ -110,9 +110,9 @@ class EmploymentPosition(Resource):
 
 class ActivateEmploymentPosition(Resource):
     @jwt_required()
-    def put(self, position_name, organization_id):
-        e_p = EmploymentPositionModel.find_by_name(position_name,
-                                                   organization_id)
+    def put(self, position_name):
+        e_p = EmploymentPositionModel\
+            .find_by_name(position_name, current_identity.organization_id)
 
         if e_p:
             if not e_p.is_active:

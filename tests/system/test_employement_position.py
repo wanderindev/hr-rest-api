@@ -1,7 +1,6 @@
 import json
 
 from models.employment_position import EmploymentPositionModel
-from models.organization import OrganizationModel
 from tests.base_test import BaseTest
 
 
@@ -10,20 +9,16 @@ class TestEmploymentPosition(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by creating a dict representing
-        an employement_position and instantiating an OrganizationModel
-        object and saving it to the db so they are available for the
-        different tests.
+        an employment_position so it is available for the different tests.
         """
         super(TestEmploymentPosition, self).setUp()
         with self.app_context():
-            OrganizationModel('test_o', True).save_to_db()
-
             self.e_p_dict = {
                 'position_name_feminine': 'test_e_p_f',
                 'position_name_masculine': 'test_e_p_m',
                 'minimum_hourly_wage': 1.00,
                 'is_active': True,
-                'organization_id': OrganizationModel.find_by_name('test_o').id
+                'organization_id': 1
             }
 
     def test_emp_pos_post_with_authentication(self):
@@ -90,10 +85,9 @@ class TestEmploymentPosition(BaseTest):
 
     def test_emp_pos_get_with_authentication(self):
         """
-        Test that a GET request to the
-        /employment_position/<string:position_name/organization_id>
-        endpoint returns the correct employment_position if the user is
-        authenticated.
+        Test that a GET request to the /employment_position
+        /<string:position_name> endpoint returns the correct
+        employment_position if the user is authenticated.
         """
         with self.app() as c:
             with self.app_context():
@@ -102,8 +96,7 @@ class TestEmploymentPosition(BaseTest):
                        headers=self.get_headers())
 
                 # Send GET request to the endpoint.
-                r = c.get(f'employment_position/test_e_p_f'
-                          f'/{self.e_p_dict["organization_id"]}',
+                r = c.get(f'employment_position/test_e_p_f',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
@@ -115,32 +108,30 @@ class TestEmploymentPosition(BaseTest):
 
     def test_emp_pos_get_not_found(self):
         """
-        Test that a GET request to the
-        /employment_position/<string:position_name/organization_id>
-        endpoint returns status code 404 if the employment_position
-        is not found in the database table.
+        Test that a GET request to the /employment_position
+        /<string:position_name> endpoint returns status code
+        404 if the employment_position is not found in the
+        database table.
         """
         with self.app() as c:
             with self.app_context():
                 # Send the GET request to the endpoint.
-                r = c.get(f'/employment_position/test_e_p_f'
-                          f'/{self.e_p_dict["organization_id"]}',
+                r = c.get(f'/employment_position/test_e_p_f',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
 
     def test_emp_pos_get_without_authentication(self):
         """
-        Test that a GET request to the
-        /employment_position/<string:position_name/organization_id>
-        returns status code 401 if the user is not authenticated.
+        Test that a GET request to the /employment_position
+        /<string:position_name> returns status code 401 if
+        the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/employment_position/test_e_p_f'
-                          f'/{self.e_p_dict["organization_id"]}',
+                r = c.get(f'/employment_position/test_e_p_f',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -150,9 +141,8 @@ class TestEmploymentPosition(BaseTest):
 
     def test_emp_pos_put_with_authentication(self):
         """
-        Test that a PUT request to the
-        /employment_position/<string:position_name/organization_id>
-        endpoint returns status code 200.
+        Test that a PUT request to the /employment_position
+        /<string:position_name> endpoint returns status code 200.
         """
         with self.app() as c:
             with self.app_context():
@@ -161,8 +151,7 @@ class TestEmploymentPosition(BaseTest):
                        headers=self.get_headers())
 
                 # Send PUT request to the endpoint.
-                r = c.put(f'/employment_position/test_e_p_f'
-                          f'/{self.e_p_dict["organization_id"]}',
+                r = c.put(f'/employment_position/test_e_p_f',
                           data=json.dumps({
                               'position_name_feminine': 'new_test_e_p_f',
                               'position_name_masculine': 'new_test_e_p_m',
@@ -177,16 +166,15 @@ class TestEmploymentPosition(BaseTest):
 
     def test_emp_pos_put_without_authentication(self):
         """
-        Test that a PUT request to the
-        /employment_position/<string:position_name/organization_id>
-        endpoint returns status code 401 if the user is not authenticated.
+        Test that a PUT request to the /employment_position
+        /<string:position_name> endpoint returns status code
+        401 if the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/employment_position/test_e_p_f'
-                          f'/{self.e_p_dict["organization_id"]}',
+                r = c.put(f'/employment_position/test_e_p_f',
                           data=json.dumps({
                               'position_name_feminine': 'new_test_e_p_f',
                               'position_name_masculine': 'new_test_e_p_m',
@@ -204,15 +192,13 @@ class TestEmploymentPosition(BaseTest):
 
     def test_emp_pos_put_not_found(self):
         """
-        Test that a PUT request to the
-        /employment_position/<string:position_name/organization_id>
-        endpoint returns status code 404 if the employment_position is not
-        in the database.
+        Test that a PUT request to the /employment_position
+        /<string:position_name> endpoint returns status code
+        404 if the employment_position is not in the database.
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/employment_position/test_e_p_f'
-                          f'/{self.e_p_dict["organization_id"]}',
+                r = c.put(f'/employment_position/test_e_p_f',
                           data=json.dumps({
                               'position_name_feminine': 'new_test_e_p_f',
                               'position_name_masculine': 'new_test_e_p_m',
@@ -227,9 +213,8 @@ class TestEmploymentPosition(BaseTest):
 
     def test_emp_pos_delete_with_authentication(self):
         """
-        Test that a DELETE request to the
-        /employment_position/<string:position_name/organization_id>
-        endpoint returns status code 200.
+        Test that a DELETE request to the /employment_position
+        /<string:position_name> endpoint returns status code 200.
         """
         with self.app() as c:
             with self.app_context():
@@ -238,24 +223,22 @@ class TestEmploymentPosition(BaseTest):
                        headers=self.get_headers())
 
                 # Send DELETE request to the endpoint.
-                r = c.delete(f'/employment_position/test_e_p_f'
-                             f'/{self.e_p_dict["organization_id"]}',
+                r = c.delete(f'/employment_position/test_e_p_f',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
 
     def test_emp_pos_delete_without_authentication(self):
         """
-        Test that a DELETE request to the
-        /employment_position/<string:position_name/organization_id>
-        endpoint returns status code 401 if user is not authenticated.
+        Test that a DELETE request to the /employment_position
+        /<string:position_name> endpoint returns status code
+        401 if user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/employment_position/test_e_p_f'
-                             f'/{self.e_p_dict["organization_id"]}',
+                r = c.delete(f'/employment_position/test_e_p_f',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -265,10 +248,9 @@ class TestEmploymentPosition(BaseTest):
 
     def test_emp_pos_delete_inactive(self):
         """
-        Test that a DELETE request to the
-        /employment_position/<string:position_name/organization_id>
-        endpoint returns status code 400 if the employment_position
-        is already inactive.
+        Test that a DELETE request to the /employment_position
+        /<string:position_name> endpoint returns status code 400
+        if the employment_position is already inactive.
         """
         with self.app() as c:
             with self.app_context():
@@ -277,37 +259,32 @@ class TestEmploymentPosition(BaseTest):
                        headers=self.get_headers())
 
                 # Make employment_position inactive.
-                c.delete(f'/employment_position/test_e_p_f'
-                         f'/{self.e_p_dict["organization_id"]}',
+                c.delete(f'/employment_position/test_e_p_f',
                          headers=self.get_headers())
 
                 # Try DELETE on inactive employment_position.
-                r = c.delete(f'/employment_position/test_e_p_f'
-                             f'/{self.e_p_dict["organization_id"]}',
+                r = c.delete(f'/employment_position/test_e_p_f',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
 
     def test_emp_pos_delete_not_found(self):
         """
-        Test that a DELETE request to the
-        /employment_position/<string:position_name/organization_id>
-        endpoint returns status code 404 if the employment_position
-        is not found.
+        Test that a DELETE request to the /employment_position
+        /<string:position_name> endpoint returns status code
+        404 if the employment_position is not found.
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete(f'/employment_position/test_e_p_f'
-                             f'/{self.e_p_dict["organization_id"]}',
+                r = c.delete(f'/employment_position/test_e_p_f',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
 
     def test_activate_emp_pos_with_authentication(self):
         """
-        Test that a PUT request to the
-        /activate_employment_position/<string:position_name/organization_id>
-        endpoint returns status code 200.
+        Test that a PUT request to the /activate_employment_position
+        /<string:position_name> endpoint returns status code 200.
         """
         with self.app() as c:
             with self.app_context():
@@ -316,29 +293,26 @@ class TestEmploymentPosition(BaseTest):
                        headers=self.get_headers())
 
                 # Make employment_position inactive.
-                c.delete(f'/employment_position/test_e_p_f'
-                         f'/{self.e_p_dict["organization_id"]}',
+                c.delete(f'/employment_position/test_e_p_f',
                          headers=self.get_headers())
 
                 # Send PUT request to /activate_employment_position
-                r = c.put(f'/activate_employment_position/test_e_p_f'
-                          f'/{self.e_p_dict["organization_id"]}',
+                r = c.put(f'/activate_employment_position/test_e_p_f',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
 
     def test_activate_emp_pos_without_authentication(self):
         """
-        Test that a PUT request to the
-        /activate_employment_position/<string:position_name/organization_id>
-        endpoint returns status code 401 if the user is not authenticated.
+        Test that a PUT request to the /activate_employment_position
+        /<string:position_name> endpoint returns status code 401
+        if the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send PUT request to activate_employment_position
                 # with wrong authorization header.
-                r = c.put(f'/activate_employment_position/test_e_p_f'
-                          f'/{self.e_p_dict["organization_id"]}',
+                r = c.put(f'/activate_employment_position/test_e_p_f',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -348,10 +322,9 @@ class TestEmploymentPosition(BaseTest):
 
     def test_activate_emp_pos_active(self):
         """
-        Test that a PUT request to the
-        /activate_employment_position/<string:position_name/organization_id>
-        endpoint returns status code 400 if the employment_position is
-        already active.
+        Test that a PUT request to the /activate_employment_position
+        /<string:position_name> endpoint returns status code 400 if
+        the employment_position is already active.
         """
         with self.app() as c:
             with self.app_context():
@@ -360,24 +333,21 @@ class TestEmploymentPosition(BaseTest):
                        headers=self.get_headers())
 
                 # Send PUT request to /activate_employment_position
-                r = c.put(f'/activate_employment_position/test_e_p_f'
-                          f'/{self.e_p_dict["organization_id"]}',
+                r = c.put(f'/activate_employment_position/test_e_p_f',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
 
     def test_activate_emp_pos_not_found(self):
         """
-        Test that a PUT request to the
-        /activate_employment_position/<string:position_name/organization_id>
-        endpoint returns status code 404 if the employment_position
-        is not found.
+        Test that a PUT request to the /activate_employment_position
+        /<string:position_name> endpoint returns status code 404
+        if the employment_position is not found.
         """
         with self.app() as c:
             with self.app_context():
                 # Send PUT request to /activate_employment_position
-                r = c.put(f'/activate_employment_position/test_e_p_f'
-                          f'/{self.e_p_dict["organization_id"]}',
+                r = c.put(f'/activate_employment_position/test_e_p_f',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)

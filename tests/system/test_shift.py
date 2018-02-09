@@ -1,6 +1,5 @@
 import json
 
-from models.organization import OrganizationModel
 from models.shift import ShiftModel
 from tests.base_test import BaseTest
 
@@ -10,14 +9,11 @@ class TestShift(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by creating two dicts representing
-        a rotating shift and a fixed shift and instantiating an
-        OrganizationModel object and saving it to the db so they are
-        available for the different tests.
+        a rotating shift and a fixed shift so they are available for the
+        different tests.
         """
         super(TestShift, self).setUp()
         with self.app_context():
-            OrganizationModel('test_o', True).save_to_db()
-
             self.s_r_dict = {
                 'shift_name': 'test_s_r',
                 'weekly_hours': 48,
@@ -26,7 +22,7 @@ class TestShift(BaseTest):
                 'break_length': '00:30:00',
                 'is_break_included_in_shift': False,
                 'is_active': True,
-                'organization_id': OrganizationModel.find_by_name('test_o').id,
+                'organization_id': 1,
                 'rotation_start_hour': '06:00:00',
                 'rotation_end_hour': '21:00:00'
             }
@@ -39,7 +35,7 @@ class TestShift(BaseTest):
                 'break_length': '00:30:00',
                 'is_break_included_in_shift': False,
                 'is_active': True,
-                'organization_id': OrganizationModel.find_by_name('test_o').id,
+                'organization_id': 1,
                 'fixed_start_hour_monday': '08:00:00',
                 'fixed_start_break_hour_monday': '12:00:00',
                 'fixed_end_break_hour_monday': '12:30:00',
@@ -146,10 +142,8 @@ class TestShift(BaseTest):
 
     def test_shift_get_with_authentication(self):
         """
-        Test that a GET request to the
-        /shift/<string:shift_name/organization_id>
-        endpoint returns the correct shift if the user is
-        authenticated.
+        Test that a GET request to the /shift/<string:shift_name> endpoint
+        returns the correct shift if the user is authenticated.
         """
         with self.app() as c:
             with self.app_context():
@@ -158,8 +152,7 @@ class TestShift(BaseTest):
                        headers=self.get_headers())
 
                 # Send GET request to the endpoint.
-                r = c.get(f'/shift/test_s_r'
-                          f'/{self.s_r_dict["organization_id"]}',
+                r = c.get(f'/shift/test_s_r',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
@@ -171,32 +164,28 @@ class TestShift(BaseTest):
 
     def test_shift_get_not_found(self):
         """
-        Test that a GET request to the
-        /shift/<string:shift_name/organization_id>
-        endpoint returns status code 404 if the shift
-        is not found in the database table.
+        Test that a GET request to the /shift/<string:shift_name>
+        endpoint returns status code 404 if the shift is not found
+        in the database table.
         """
         with self.app() as c:
             with self.app_context():
                 # Send the GET request to the endpoint.
-                r = c.get(f'/shift/test_s_r'
-                          f'/{self.s_r_dict["organization_id"]}',
+                r = c.get(f'/shift/test_s_r',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
 
     def test_shift_get_without_authentication(self):
         """
-        Test that a GET request to the
-        /shift/<string:shift_name/organization_id>
+        Test that a GET request to the /shift/<string:shift_name>
         returns status code 401 if the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/shift/test_s_r'
-                          f'/{self.s_r_dict["organization_id"]}',
+                r = c.get(f'/shift/test_s_r',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -206,8 +195,7 @@ class TestShift(BaseTest):
 
     def test_shift_put_with_authentication(self):
         """
-        Test that a PUT request to the
-        /shift/<string:shift_name/organization_id>
+        Test that a PUT request to the /shift/<string:shift_name>
         endpoint returns status code 200.
         """
         with self.app() as c:
@@ -221,8 +209,7 @@ class TestShift(BaseTest):
                        headers=self.get_headers())
 
                 # Send PUT request to the endpoint.
-                r = c.put(f'/shift/test_s_r'
-                          f'/{self.s_r_dict["organization_id"]}',
+                r = c.put(f'/shift/test_s_r',
                           data=json.dumps({
                               'shift_name': 'new_test_s_r',
                               'weekly_hours': 44,
@@ -241,8 +228,7 @@ class TestShift(BaseTest):
                 self.assertEqual(r.status_code, 200)
 
                 # Send PUT request to the endpoint.
-                r = c.put(f'/shift/test_s_f'
-                          f'/{self.s_f_dict["organization_id"]}',
+                r = c.put(f'/shift/test_s_f',
                           data=json.dumps({
                               'shift_name': 'test_s_f',
                               'weekly_hours': 48,
@@ -287,17 +273,14 @@ class TestShift(BaseTest):
 
     def test_shift_put_without_authentication(self):
         """
-        Test that a PUT request to the
-        /shift/<string:shift_name/organization_id>
-        endpoint returns status code 401 if the user is
-        not authenticated.
+        Test that a PUT request to the /shift/<string:shift_name>
+        endpoint returns status code 401 if the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/shift/test_s_r'
-                          f'/{self.s_r_dict["organization_id"]}',
+                r = c.put(f'/shift/test_s_r',
                           data=json.dumps({
                               'shift_name': 'new_test_s_r',
                               'weekly_hours': 44,
@@ -320,15 +303,12 @@ class TestShift(BaseTest):
 
     def test_shift_put_not_found(self):
         """
-        Test that a PUT request to the
-        /shift/<string:shift_name/organization_id>
-        endpoint returns status code 404 if the shift is not
-        in the database.
+        Test that a PUT request to the /shift/<string:shift_name>
+        endpoint returns status code 404 if the shift is not in the database.
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/shift/test_s_r'
-                          f'/{self.s_r_dict["organization_id"]}',
+                r = c.put(f'/shift/test_s_r',
                           data=json.dumps({
                               'shift_name': 'new_test_s_r',
                               'weekly_hours': 44,
@@ -348,8 +328,7 @@ class TestShift(BaseTest):
 
     def test_shift_delete_with_authentication(self):
         """
-        Test that a DELETE request to the
-        /shift/<string:shift_name/organization_id>
+        Test that a DELETE request to the /shift/<string:shift_name>
         endpoint returns status code 200.
         """
         with self.app() as c:
@@ -359,25 +338,21 @@ class TestShift(BaseTest):
                        headers=self.get_headers())
 
                 # Send DELETE request to the endpoint.
-                r = c.delete(f'/shift/test_s_r'
-                             f'/{self.s_r_dict["organization_id"]}',
+                r = c.delete(f'/shift/test_s_r',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
 
     def test_shift_delete_without_authentication(self):
         """
-        Test that a DELETE request to the
-        /shift/<string:shift_name/organization_id>
-        endpoint returns status code 401 if user
-        is not authenticated.
+        Test that a DELETE request to the /shift/<string:shift_name>
+        endpoint returns status code 401 if user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/shift/test_s_r'
-                             f'/{self.s_r_dict["organization_id"]}',
+                r = c.delete(f'/shift/test_s_r',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -387,8 +362,7 @@ class TestShift(BaseTest):
 
     def test_shift_delete_inactive(self):
         """
-        Test that a DELETE request to the
-        /shift/<string:shift_name/organization_id>
+        Test that a DELETE request to the /shift/<string:shift_name>
         endpoint returns status code 400 if the shift
         is already inactive.
         """
@@ -399,36 +373,30 @@ class TestShift(BaseTest):
                        headers=self.get_headers())
 
                 # Make shift inactive.
-                c.delete(f'/shift/test_s_r'
-                         f'/{self.s_r_dict["organization_id"]}',
+                c.delete(f'/shift/test_s_r',
                          headers=self.get_headers())
 
                 # Try DELETE on inactive shift.
-                r = c.delete(f'/shift/test_s_r'
-                             f'/{self.s_r_dict["organization_id"]}',
+                r = c.delete(f'/shift/test_s_r',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
 
     def test_shift_delete_not_found(self):
         """
-        Test that a DELETE request to the
-        /shift/<string:shift_name/organization_id>
-        endpoint returns status code 404 if the shift
-        is not found.
+        Test that a DELETE request to the /shift/<string:shift_name>
+        endpoint returns status code 404 if the shift is not found.
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete(f'/shift/test_s_r'
-                             f'/{self.s_r_dict["organization_id"]}',
+                r = c.delete(f'/shift/test_s_r',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
 
     def test_activate_shift_with_authentication(self):
         """
-        Test that a PUT request to the
-        /activate_shift/<string:shift_name/organization_id>
+        Test that a PUT request to the /activate_shift/<string:shift_name>
         endpoint returns status code 200.
         """
         with self.app() as c:
@@ -438,29 +406,25 @@ class TestShift(BaseTest):
                        headers=self.get_headers())
 
                 # Make shift inactive.
-                c.delete(f'/shift/test_s_r'
-                         f'/{self.s_r_dict["organization_id"]}',
+                c.delete(f'/shift/test_s_r',
                          headers=self.get_headers())
 
                 # Send PUT request to /activate_shift
-                r = c.put(f'/activate_shift/test_s_r'
-                          f'/{self.s_r_dict["organization_id"]}',
+                r = c.put(f'/activate_shift/test_s_r',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
 
     def test_activate_shift_without_authentication(self):
         """
-        Test that a PUT request to the
-        /activate_shift/<string:shift_name/organization_id>
+        Test that a PUT request to the /activate_shift/<string:shift_name>
         endpoint returns status code 401 if the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send PUT request to /activate_shift with
                 # wrong authorization header.
-                r = c.put(f'/activate_shift/test_s_r'
-                          f'/{self.s_r_dict["organization_id"]}',
+                r = c.put(f'/activate_shift/test_s_r',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -470,8 +434,7 @@ class TestShift(BaseTest):
 
     def test_activate_shift_active(self):
         """
-        Test that a PUT request to the
-        /activate_shift/<string:shift_name/organization_id>
+        Test that a PUT request to the /activate_shift/<string:shift_name>
         endpoint returns status code 400 if the shift is already active.
         """
         with self.app() as c:
@@ -481,23 +444,20 @@ class TestShift(BaseTest):
                        headers=self.get_headers())
 
                 # Send PUT request to /activate_shift
-                r = c.put(f'/activate_shift/test_s_r'
-                          f'/{self.s_r_dict["organization_id"]}',
+                r = c.put(f'/activate_shift/test_s_r',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
 
     def test_activate_shift_not_found(self):
         """
-        Test that a PUT request to the
-        /activate_shift/<string:shift_name/organization_id>
+        Test that a PUT request to the /activate_shift/<string:shift_name>
         endpoint returns status code 404 if the shift is not found.
         """
         with self.app() as c:
             with self.app_context():
                 # Send PUT request to /activate_shift
-                r = c.put(f'/activate_shift/test_s_r'
-                          f'/{self.s_r_dict["organization_id"]}',
+                r = c.put(f'/activate_shift/test_s_r',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)

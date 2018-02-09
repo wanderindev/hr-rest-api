@@ -1,4 +1,4 @@
-from flask_jwt import jwt_required
+from flask_jwt import current_identity, jwt_required
 from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
@@ -21,8 +21,10 @@ class Department(Resource):
                         help='A deparment must belong to an organization')
 
     @jwt_required()
-    def get(self, department_name, organization_id):
-        dept = DepartmentModel.find_by_name(department_name, organization_id)
+    def get(self, department_name):
+
+        dept = DepartmentModel.find_by_name(department_name,
+                                            current_identity.organization_id)
         if dept:
             return dept.to_dict()
         return {'message': 'Department not found'}, 404
@@ -50,10 +52,11 @@ class Department(Resource):
         return {'message': 'Department created successfully.'}, 201
 
     @jwt_required()
-    def put(self,  department_name, organization_id):
+    def put(self,  department_name):
         data = Department.parser.parse_args()
 
-        dept = DepartmentModel.find_by_name(department_name, organization_id)
+        dept = DepartmentModel.find_by_name(department_name,
+                                            current_identity.organization_id)
 
         if dept:
             dept.department_name = data['department_name']
@@ -68,8 +71,9 @@ class Department(Resource):
             return {'message': 'Department not found'}, 404
 
     @jwt_required()
-    def delete(self, department_name, organization_id):
-        dept = DepartmentModel.find_by_name(department_name, organization_id)
+    def delete(self, department_name):
+        dept = DepartmentModel.find_by_name(department_name,
+                                            current_identity.organization_id)
 
         if dept:
             if dept.is_active:
@@ -87,8 +91,9 @@ class Department(Resource):
 
 class ActivateDepartment(Resource):
     @jwt_required()
-    def put(self, department_name, organization_id):
-        dept = DepartmentModel.find_by_name(department_name, organization_id)
+    def put(self, department_name):
+        dept = DepartmentModel.find_by_name(department_name,
+                                            current_identity.organization_id)
 
         if dept:
             if not dept.is_active:
