@@ -22,6 +22,11 @@ class DepartmentModel(ModelsMixin, db.Model):
         self.is_active = is_active
 
     @classmethod
+    def find_by_id(cls, _id, organization_id):
+        return cls.query.filter_by(id=_id,
+                                   organization_id=organization_id).first()
+
+    @classmethod
     def find_by_name(cls, department_name, organization_id):
         return cls.query.filter_by(department_name=department_name,
                                    organization_id=organization_id).first()

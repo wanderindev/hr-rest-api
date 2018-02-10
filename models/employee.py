@@ -1,6 +1,7 @@
 from db import db
 from models.enum import GENDER, PAYMENT_METHOD, TERMINATION_REASON, \
     TYPE_OF_CONTRACT
+from models.department import DepartmentModel
 from models.mixin import ModelsMixin
 
 
@@ -78,5 +79,30 @@ class EmployeeModel(ModelsMixin, db.Model):
         self.shift_id = shift_id
 
     @classmethod
-    def find_by_id(cls, _id):
-        return cls.query.filter_by(id=_id).first()
+    def find_by_id(cls, _id, organization_id):
+        empl = cls.query.filter_by(id=_id).first()
+
+        if empl:
+            if DepartmentModel\
+                    .find_by_id(empl.department_id, organization_id)\
+                    .organization_id == organization_id:
+                return empl
+
+        return None
+
+    @classmethod
+    def find_by_name(cls, first_name, second_name, first_surname,
+                     second_surname, organization_id):
+        empl = cls.query.filter_by(first_name=first_name,
+                                   second_name=second_name,
+                                   first_surname=first_surname,
+                                   second_surname=second_surname,
+                                   is_active=True).first()
+
+        if empl:
+            if DepartmentModel\
+                    .find_by_id(empl.department_id, organization_id)\
+                    .organization_id == organization_id:
+                return empl
+
+        return None

@@ -3,6 +3,7 @@ from flask_jwt import JWT
 from flask_restful import Api
 
 from resources.department import ActivateDepartment, Department
+from resources.employee import ActivateEmployee, Employee
 from resources.employment_position import ActivateEmploymentPosition, \
     EmploymentPosition
 from resources.marital_status import MaritalStatusList
@@ -78,5 +79,11 @@ def create_app(config_file=None):
                      '/shift/<string:shift_name>')
     api.add_resource(ActivateShift,
                      '/activate_shift/<string:shift_name>')
+
+    api.add_resource(Employee,
+                     '/employee',
+                     '/employee/<int:employee_id>')
+    api.add_resource(ActivateEmployee,
+                     '/activate_employee/<int:employee_id>')
 
     return app
