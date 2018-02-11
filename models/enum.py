@@ -13,6 +13,7 @@ PAYMENT_PERIOD = db.Enum('Diario', 'Semanal', 'Bisemanal',
                          name='payment_period')
 
 TERMINATION_REASON = db.Enum('Renuncia', 'Período de Prueba',
+                             'Expiración de Contrato',
                              'Despido Causa Justificada', 'Abandono de Trabajo',
                              name='termination_reason')
 

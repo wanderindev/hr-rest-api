@@ -174,7 +174,10 @@ class Employee(Resource):
             return {'message': 'An error occurred creating '
                                'the employee.'}, 500
 
-        return {'message': 'Employee created successfully.'}, 201
+        return {
+                   'message': 'Employee created successfully.',
+                   'id': empl.id
+               }, 201
 
     @jwt_required()
     def put(self,  employee_id):
