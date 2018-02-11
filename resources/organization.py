@@ -28,7 +28,7 @@ class Organization(Resource):
         data = Organization.parser.parse_args()
 
         if OrganizationModel.find_by_name(data['organization_name']):
-            return {'message': 'An organization with name "{}"'
+            return {'message': 'An organization with name {}'
                                ' already exists.'.format(
                                  data['organization_name'])}, 400
 
@@ -41,7 +41,12 @@ class Organization(Resource):
             return {'message': 'An error occurred creating '
                                'the organization.'}, 500
 
-        return {'message': 'Organization created successfully.'}, 201
+        return {
+                   'message': 'Organization created successfully.',
+                   'organization': OrganizationModel.find_by_id(
+                       organization.id
+                   ).to_dict()
+               }, 201
 
     @jwt_required()
     def put(self, organization_name):
@@ -54,7 +59,12 @@ class Organization(Resource):
 
             try:
                 organization.save_to_db()
-                return {'message': 'Organization updated successfully.'}, 200
+                return {
+                           'message': 'Organization updated successfully.',
+                           'organization': OrganizationModel.find_by_id(
+                               organization.id
+                           ).to_dict()
+                       }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the organization.'}, 500

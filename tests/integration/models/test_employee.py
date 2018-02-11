@@ -52,7 +52,7 @@ class TestEmployee(BaseTest):
 
             e_id = EmployeeModel.query.filter_by(first_name='f_n').first().id
 
-            e_by_id = EmployeeModel.find_by_id(e_id)
+            e_by_id = EmployeeModel.find_by_id(e_id, 1)
 
             self.assertIsNotNone(e_by_id)
 

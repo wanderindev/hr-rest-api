@@ -44,7 +44,28 @@ class TestOrganization(BaseTest):
                            data=json.dumps(self.o_dict),
                            headers=self.get_headers())
 
+                r_org = json.loads(r.data)['organization']
+
                 self.assertEqual(r.status_code, 201)
+
+                self.assertEqual(r_org['organization_name'],
+                                 self.o_dict['organization_name'])
+
+                self.assertTrue(r_org['is_active'])
+
+                self.assertIsNotNone(r_org['id'])
+
+                self.assertListEqual(r_org['employment_positions'],
+                                     [])
+
+                self.assertListEqual(r_org['departments'],
+                                     [])
+
+                self.assertListEqual(r_org['shifts'],
+                                     [])
+
+                self.assertListEqual(r_org['app_users'],
+                                     [])
 
                 self.assertIsNotNone(OrganizationModel.find_by_name('test_o'))
 
@@ -157,7 +178,28 @@ class TestOrganization(BaseTest):
                           }),
                           headers=self.get_headers())
 
+                r_org = json.loads(r.data)['organization']
+
                 self.assertEqual(r.status_code, 200)
+
+                self.assertEqual(r_org['organization_name'],
+                                 'new_test_o')
+
+                self.assertTrue(r_org['is_active'])
+
+                self.assertIsNotNone(r_org['id'])
+
+                self.assertListEqual(r_org['employment_positions'],
+                                     [])
+
+                self.assertListEqual(r_org['departments'],
+                                     [])
+
+                self.assertListEqual(r_org['shifts'],
+                                     [])
+
+                self.assertListEqual(r_org['app_users'],
+                                     [])
 
     def test_organization_put_without_authentication(self):
         """
