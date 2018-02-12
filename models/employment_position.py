@@ -28,6 +28,11 @@ class EmploymentPositionModel(ModelsMixin, db.Model):
         self.organization_id = organization_id
 
     @classmethod
+    def find_by_id(cls, _id, organization_id):
+        return cls.query.filter_by(id=_id,
+                                   organization_id=organization_id).first()
+
+    @classmethod
     def find_by_name(cls, position_name, organization_id):
         return cls.query.filter(and_(
             or_(cls.position_name_feminine == position_name,

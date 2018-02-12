@@ -43,7 +43,24 @@ class TestUser(BaseTest):
                            data=json.dumps(self.u_dict),
                            headers=self.get_headers())
 
+                r_user = json.loads(r.data)['user']
+
                 self.assertEqual(r.status_code, 201)
+
+                self.assertEqual(r_user['username'],
+                                 self.u_dict['username'])
+
+                self.assertEqual(r_user['email'],
+                                 self.u_dict['email'])
+
+                self.assertEqual(r_user['organization_id'],
+                                 self.u_dict['organization_id'])
+
+                self.assertTrue(r_user['is_super'])
+
+                self.assertTrue(r_user['is_owner'])
+
+                self.assertTrue(r_user['is_active'])
 
                 self.assertIsNotNone(AppUserModel.find_by_username('test_u'))
 
@@ -159,6 +176,23 @@ class TestUser(BaseTest):
                               'is_owner': True
                           }),
                           headers=self.get_headers())
+
+                r_user = json.loads(r.data)['user']
+
+                self.assertEqual(r_user['username'],
+                                 'new_test_u')
+
+                self.assertEqual(r_user['email'],
+                                 'new_test_u@test_o.com')
+
+                self.assertEqual(r_user['organization_id'],
+                                 self.u_dict['organization_id'])
+
+                self.assertTrue(r_user['is_super'])
+
+                self.assertTrue(r_user['is_owner'])
+
+                self.assertTrue(r_user['is_active'])
 
                 self.assertEqual(r.status_code, 200)
 

@@ -85,6 +85,35 @@ class TestShift(BaseTest):
                            data=json.dumps(self.s_r_dict),
                            headers=self.get_headers())
 
+                r_shift = json.loads(r.data)['shift']
+
+                self.assertTrue(r_shift['is_active'])
+
+                self.assertTrue(r_shift['is_rotating'])
+
+                self.assertEqual(r_shift['payment_period'],
+                                 self.s_r_dict['payment_period'])
+
+                self.assertEqual(r_shift['rotation_start_hour'],
+                                 self.s_r_dict['rotation_start_hour'])
+
+                self.assertEqual(r_shift['rotation_end_hour'],
+                                 self.s_r_dict['rotation_end_hour'])
+
+                self.assertEqual(r_shift['break_length'],
+                                 self.s_r_dict['break_length'])
+
+                self.assertEqual(r_shift['shift_name'],
+                                 self.s_r_dict['shift_name'])
+
+                self.assertEqual(float(r_shift['weekly_hours']),
+                                 self.s_r_dict['weekly_hours'])
+
+                self.assertEqual(r_shift['organization_id'],
+                                 self.s_r_dict['organization_id'])
+
+                self.assertListEqual(r_shift['employees'], [])
+
                 self.assertEqual(r.status_code, 201)
 
                 self.assertIsNotNone(ShiftModel
@@ -96,6 +125,93 @@ class TestShift(BaseTest):
                 r = c.post('/shift',
                            data=json.dumps(self.s_f_dict),
                            headers=self.get_headers())
+
+                r_shift = json.loads(r.data)['shift']
+
+                self.assertEqual(r_shift['rest_day'],
+                                 self.s_f_dict['rest_day'])
+
+                self.assertEqual(r_shift['fixed_start_hour_monday'],
+                                 self.s_f_dict['fixed_start_hour_monday'])
+
+                self.assertEqual(r_shift['fixed_start_hour_tuesday'],
+                                 self.s_f_dict['fixed_start_hour_tuesday'])
+
+                self.assertEqual(r_shift['fixed_start_hour_wednesday'],
+                                 self.s_f_dict['fixed_start_hour_wednesday'])
+
+                self.assertEqual(r_shift['fixed_start_hour_thursday'],
+                                 self.s_f_dict['fixed_start_hour_thursday'])
+
+                self.assertEqual(r_shift['fixed_start_hour_friday'],
+                                 self.s_f_dict['fixed_start_hour_friday'])
+
+                self.assertEqual(r_shift['fixed_start_hour_saturday'],
+                                 self.s_f_dict['fixed_start_hour_saturday'])
+
+                self.assertIsNone(r_shift['fixed_start_hour_sunday'])
+
+                self.assertEqual(r_shift['fixed_start_break_hour_monday'],
+                                 self.s_f_dict['fixed_start_break_hour_monday'])
+
+                self.assertEqual(r_shift['fixed_start_break_hour_tuesday'],
+                                 self.s_f_dict[
+                                     'fixed_start_break_hour_tuesday'])
+
+                self.assertEqual(r_shift['fixed_start_break_hour_wednesday'],
+                                 self.s_f_dict[
+                                     'fixed_start_break_hour_wednesday'])
+
+                self.assertEqual(r_shift['fixed_start_break_hour_thursday'],
+                                 self.s_f_dict[
+                                     'fixed_start_break_hour_thursday'])
+
+                self.assertEqual(r_shift['fixed_start_break_hour_friday'],
+                                 self.s_f_dict['fixed_start_break_hour_friday'])
+
+                self.assertIsNone(r_shift['fixed_start_break_hour_saturday'])
+
+                self.assertIsNone(r_shift['fixed_start_break_hour_sunday'])
+
+                self.assertEqual(r_shift['fixed_end_break_hour_monday'],
+                                 self.s_f_dict['fixed_end_break_hour_monday'])
+
+                self.assertEqual(r_shift['fixed_end_break_hour_tuesday'],
+                                 self.s_f_dict['fixed_end_break_hour_tuesday'])
+
+                self.assertEqual(r_shift['fixed_end_break_hour_wednesday'],
+                                 self.s_f_dict[
+                                     'fixed_end_break_hour_wednesday'])
+
+                self.assertEqual(r_shift['fixed_end_break_hour_thursday'],
+                                 self.s_f_dict['fixed_end_break_hour_thursday'])
+
+                self.assertEqual(r_shift['fixed_end_break_hour_friday'],
+                                 self.s_f_dict['fixed_end_break_hour_friday'])
+
+                self.assertIsNone(r_shift['fixed_end_break_hour_saturday'])
+
+                self.assertIsNone(r_shift['fixed_end_break_hour_sunday'])
+
+                self.assertEqual(r_shift['fixed_end_hour_monday'],
+                                 self.s_f_dict['fixed_end_hour_monday'])
+
+                self.assertEqual(r_shift['fixed_end_hour_tuesday'],
+                                 self.s_f_dict['fixed_end_hour_tuesday'])
+
+                self.assertEqual(r_shift['fixed_end_hour_wednesday'],
+                                 self.s_f_dict['fixed_end_hour_wednesday'])
+
+                self.assertEqual(r_shift['fixed_end_hour_thursday'],
+                                 self.s_f_dict['fixed_end_hour_thursday'])
+
+                self.assertEqual(r_shift['fixed_end_hour_friday'],
+                                 self.s_f_dict['fixed_end_hour_friday'])
+
+                self.assertEqual(r_shift['fixed_end_hour_saturday'],
+                                 self.s_f_dict['fixed_end_hour_saturday'])
+
+                self.assertIsNone(r_shift['fixed_end_hour_sunday'])
 
                 self.assertEqual(r.status_code, 201)
 
@@ -225,6 +341,35 @@ class TestShift(BaseTest):
                           }),
                           headers=self.get_headers())
 
+                r_shift = json.loads(r.data)['shift']
+
+                self.assertTrue(r_shift['is_active'])
+
+                self.assertTrue(r_shift['is_rotating'])
+
+                self.assertEqual(r_shift['payment_period'],
+                                 'Semanal')
+
+                self.assertEqual(r_shift['rotation_start_hour'],
+                                 '00:00:00')
+
+                self.assertEqual(r_shift['rotation_end_hour'],
+                                 '15:00:00')
+
+                self.assertEqual(r_shift['break_length'],
+                                 '01:00:00')
+
+                self.assertEqual(r_shift['shift_name'],
+                                 'new_test_s_r')
+
+                self.assertEqual(float(r_shift['weekly_hours']),
+                                 44)
+
+                self.assertEqual(r_shift['organization_id'],
+                                 self.s_r_dict['organization_id'])
+
+                self.assertListEqual(r_shift['employees'], [])
+
                 self.assertEqual(r.status_code, 200)
 
                 # Send PUT request to the endpoint.
@@ -268,6 +413,91 @@ class TestShift(BaseTest):
                               'rest_day': 'Sábado'
                           }),
                           headers=self.get_headers())
+
+                r_shift = json.loads(r.data)['shift']
+
+                self.assertEqual(r_shift['rest_day'],
+                                 'Sábado')
+
+                self.assertEqual(r_shift['fixed_start_hour_monday'],
+                                 '09:00:00')
+
+                self.assertEqual(r_shift['fixed_start_hour_tuesday'],
+                                 '09:00:00')
+
+                self.assertEqual(r_shift['fixed_start_hour_wednesday'],
+                                 '09:00:00')
+
+                self.assertEqual(r_shift['fixed_start_hour_thursday'],
+                                 '09:00:00')
+
+                self.assertEqual(r_shift['fixed_start_hour_friday'],
+                                 '09:00:00')
+
+                self.assertIsNone(r_shift['fixed_start_hour_saturday'])
+
+                self.assertEqual(r_shift['fixed_start_hour_sunday'],
+                                 '09:00:00')
+
+                self.assertEqual(r_shift['fixed_start_break_hour_monday'],
+                                 '13:00:00')
+
+                self.assertEqual(r_shift['fixed_start_break_hour_tuesday'],
+                                 '13:00:00')
+
+                self.assertEqual(r_shift['fixed_start_break_hour_wednesday'],
+                                 '13:00:00')
+
+                self.assertEqual(r_shift['fixed_start_break_hour_thursday'],
+                                 '13:00:00')
+
+                self.assertEqual(r_shift['fixed_start_break_hour_friday'],
+                                 '13:00:00')
+
+                self.assertIsNone(r_shift['fixed_start_break_hour_saturday'])
+
+                self.assertEqual(r_shift['fixed_start_break_hour_sunday'],
+                                 '13:00:00')
+
+                self.assertEqual(r_shift['fixed_end_break_hour_monday'],
+                                 '13:30:00')
+
+                self.assertEqual(r_shift['fixed_end_break_hour_tuesday'],
+                                 '13:30:00')
+
+                self.assertEqual(r_shift['fixed_end_break_hour_wednesday'],
+                                 '13:30:00')
+
+                self.assertEqual(r_shift['fixed_end_break_hour_thursday'],
+                                 '13:30:00')
+
+                self.assertEqual(r_shift['fixed_end_break_hour_friday'],
+                                 '13:30:00')
+
+                self.assertIsNone(r_shift['fixed_end_break_hour_saturday'])
+
+                self.assertEqual(r_shift['fixed_end_break_hour_sunday'],
+                                 '13:30:00')
+
+                self.assertEqual(r_shift['fixed_end_hour_monday'],
+                                 '17:30:00')
+
+                self.assertEqual(r_shift['fixed_end_hour_tuesday'],
+                                 '17:30:00')
+
+                self.assertEqual(r_shift['fixed_end_hour_wednesday'],
+                                 '17:30:00')
+
+                self.assertEqual(r_shift['fixed_end_hour_thursday'],
+                                 '17:30:00')
+
+                self.assertEqual(r_shift['fixed_end_hour_friday'],
+                                 '17:30:00')
+
+                self.assertIsNone(r_shift['fixed_end_hour_saturday'])
+
+                self.assertEqual(r_shift['fixed_end_hour_sunday'],
+                                 '17:30:00')
 
                 self.assertEqual(r.status_code, 200)
 

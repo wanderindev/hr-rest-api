@@ -22,7 +22,7 @@ class TestShift(BaseTest):
 
     def test_find_shift(self):
         """
-        Test the find_by_name method of ShiftModel.
+        Test the find_by_name and find_by_id methods of ShiftModel.
         """
         with self.app_context():
             self.o.save_to_db()
@@ -32,7 +32,14 @@ class TestShift(BaseTest):
             s_by_name = ShiftModel.find_by_name('test_s_r',
                                                 self.s.organization_id)
 
+            s_by_id = ShiftModel.find_by_id(self.s.id,
+                                            self.s.organization_id)
+
             self.assertIsNotNone(s_by_name)
+
+            self.assertIsNotNone(s_by_id)
+
+            self.assertEqual(s_by_name, s_by_id)
 
     def test_shift_list_in_organization(self):
         """Test that the org object contains a shift list."""

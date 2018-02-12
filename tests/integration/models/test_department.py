@@ -17,7 +17,8 @@ class TestDepartment(BaseTest):
 
     def test_find_department(self):
         """
-        Test the find_by_name method of DepartmentModel.
+        Test the find_by_name and find_by_id
+        methods of DepartmentModel.
         """
         with self.app_context():
             self.o.save_to_db()
@@ -27,7 +28,14 @@ class TestDepartment(BaseTest):
             d_by_name = DepartmentModel.find_by_name('test_d',
                                                      self.d.organization_id)
 
+            d_by_id = DepartmentModel.find_by_id(self.d.id,
+                                                 self.d.organization_id)
+
             self.assertIsNotNone(d_by_name)
+
+            self.assertIsNotNone(d_by_name)
+
+            self.assertEqual(d_by_name, d_by_id)
 
     def test_department_list_in_organization(self):
         """Test that the org object contains a department list."""

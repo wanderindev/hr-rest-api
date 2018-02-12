@@ -18,7 +18,7 @@ class TestEmploymentPosition(BaseTest):
 
     def test_find_employment_position(self):
         """
-        Test the find_by_name method of EmploymentPositionModel.
+        Test the find_by_name and find_by_id methods of EmploymentPositionModel.
         """
         with self.app_context():
             self.o.save_to_db()
@@ -30,13 +30,15 @@ class TestEmploymentPosition(BaseTest):
                 .find_by_name('test_e_p_f',
                               self.e_p.organization_id)
 
-            self.assertIsNotNone(e_p_by_name)
-
-            e_p_by_name = EmploymentPositionModel \
-                .find_by_name('test_e_p_m',
-                              self.e_p.organization_id)
+            e_p_by_id = EmploymentPositionModel \
+                .find_by_id(self.e_p.id,
+                            self.e_p.organization_id)
 
             self.assertIsNotNone(e_p_by_name)
+
+            self.assertIsNotNone(e_p_by_id)
+
+            self.assertEqual(e_p_by_name, e_p_by_id)
 
     def test_employment_position_list_in_organization(self):
         """Test that the org object contains a employment_position list."""

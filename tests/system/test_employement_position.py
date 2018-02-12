@@ -40,7 +40,25 @@ class TestEmploymentPosition(BaseTest):
                            data=json.dumps(self.e_p_dict),
                            headers=self.get_headers())
 
+                r_e_p = json.loads(r.data)['employment_position']
+
                 self.assertEqual(r.status_code, 201)
+
+                self.assertTrue(r_e_p['is_active'])
+
+                self.assertEqual(r_e_p['position_name_feminine'],
+                                 self.e_p_dict['position_name_feminine'])
+
+                self.assertEqual(r_e_p['position_name_masculine'],
+                                 self.e_p_dict['position_name_masculine'])
+
+                self.assertEqual(float(r_e_p['minimum_hourly_wage']),
+                                 self.e_p_dict['minimum_hourly_wage'])
+
+                self.assertEqual(r_e_p['organization_id'],
+                                 self.e_p_dict['organization_id'])
+
+                self.assertListEqual(r_e_p['employees'], [])
 
                 self.assertIsNotNone(EmploymentPositionModel
                                      .find_by_name('test_e_p_f',
@@ -161,6 +179,26 @@ class TestEmploymentPosition(BaseTest):
                               'is_active': True
                           }),
                           headers=self.get_headers())
+
+                r_e_p = json.loads(r.data)['employment_position']
+
+                self.assertEqual(r.status_code, 200)
+
+                self.assertTrue(r_e_p['is_active'])
+
+                self.assertEqual(r_e_p['position_name_feminine'],
+                                 'new_test_e_p_f')
+
+                self.assertEqual(r_e_p['position_name_masculine'],
+                                 'new_test_e_p_m')
+
+                self.assertEqual(float(r_e_p['minimum_hourly_wage']),
+                                 2.00)
+
+                self.assertEqual(r_e_p['organization_id'],
+                                 self.e_p_dict['organization_id'])
+
+                self.assertListEqual(r_e_p['employees'], [])
 
                 self.assertEqual(r.status_code, 200)
 

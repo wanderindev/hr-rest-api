@@ -228,7 +228,12 @@ class Shift(Resource):
             return {'message': 'An error occurred creating '
                                'the shift.'}, 500
 
-        return {'message': 'Shift created successfully.'}, 201
+        return {
+                   'message': 'Shift created successfully.',
+                   'shift': ShiftModel.find_by_id(
+                       shift.id, current_identity.organization_id
+                   ).to_dict()
+               }, 201
 
     @jwt_required()
     def put(self,  shift_name):
@@ -298,7 +303,12 @@ class Shift(Resource):
 
             try:
                 shift.save_to_db()
-                return {'message': 'Shift updated successfully.'}, 200
+                return {
+                   'message': 'Shift updated successfully.',
+                   'shift': ShiftModel.find_by_id(
+                       shift.id, current_identity.organization_id
+                   ).to_dict()
+               }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the shift.'}, 500

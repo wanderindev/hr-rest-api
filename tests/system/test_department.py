@@ -37,7 +37,19 @@ class TestDepartment(BaseTest):
                            data=json.dumps(self.d_dict),
                            headers=self.get_headers())
 
+                r_dept = json.loads(r.data)['department']
+
                 self.assertEqual(r.status_code, 201)
+
+                self.assertTrue(r_dept['is_active'])
+
+                self.assertEqual(r_dept['department_name'],
+                                 self.d_dict['department_name'])
+
+                self.assertEqual(r_dept['organization_id'],
+                                 self.d_dict['organization_id'])
+
+                self.assertListEqual(r_dept['employees'], [])
 
                 self.assertIsNotNone(DepartmentModel
                                      .find_by_name('test_d',
@@ -152,6 +164,16 @@ class TestDepartment(BaseTest):
                               'organization_id': self.d_dict['organization_id'],
                           }),
                           headers=self.get_headers())
+
+                r_dept = json.loads(r.data)['department']
+
+                self.assertTrue(r_dept['is_active'])
+
+                self.assertEqual(r_dept['department_name'],
+                                 'new_test_d')
+
+                self.assertEqual(r_dept['organization_id'],
+                                 self.d_dict['organization_id'])
 
                 self.assertEqual(r.status_code, 200)
 

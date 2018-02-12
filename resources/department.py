@@ -49,7 +49,12 @@ class Department(Resource):
             return {'message': 'An error occurred creating '
                                'the department.'}, 500
 
-        return {'message': 'Department created successfully.'}, 201
+        return {
+                   'message': 'Department created successfully.',
+                   'department': DepartmentModel.find_by_id(
+                       dept.id, current_identity.organization_id
+                   ).to_dict()
+               }, 201
 
     @jwt_required()
     def put(self,  department_name):
@@ -63,7 +68,12 @@ class Department(Resource):
 
             try:
                 dept.save_to_db()
-                return {'message': 'Department updated successfully.'}, 200
+                return {
+                   'message': 'Department updated successfully.',
+                   'department': DepartmentModel.find_by_id(
+                       dept.id, current_identity.organization_id
+                   ).to_dict()
+                }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the department.'}, 500

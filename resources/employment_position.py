@@ -63,7 +63,13 @@ class EmploymentPosition(Resource):
             return {'message': 'An error occurred creating '
                                'the employment position.'}, 500
 
-        return {'message': 'Employment position created successfully.'}, 201
+        return {
+                   'message': 'Employment position created successfully.',
+                   'employment_position': EmploymentPositionModel
+                   .find_by_id(
+                       e_p.id,
+                       current_identity.organization_id).to_dict()
+               }, 201
 
     @jwt_required()
     def put(self,  position_name):
@@ -79,8 +85,14 @@ class EmploymentPosition(Resource):
 
             try:
                 e_p.save_to_db()
-                return {'message': 'Employment position updated '
-                                   'successfully.'}, 200
+                return {
+                           'message': 'Employment position updated '
+                                      'successfully.',
+                           'employment_position': EmploymentPositionModel
+                           .find_by_id(
+                               e_p.id,
+                               current_identity.organization_id).to_dict()
+                       }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the employment position.'}, 500

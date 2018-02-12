@@ -22,7 +22,7 @@ class TestOrganization(BaseTest):
 
             org_by_name = OrganizationModel.find_by_name('test_o')
 
-            org_by_id = OrganizationModel.find_by_id(org_by_name.id)
+            org_by_id = OrganizationModel.find_by_id(self.o.id)
 
             self.assertIsNotNone(org_by_name)
 

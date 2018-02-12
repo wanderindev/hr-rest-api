@@ -65,7 +65,12 @@ class User(Resource):
             return {'message': 'An error occurred creating '
                                'the user.'}, 500
 
-        return {'message': 'User created successfully.'}, 201
+        return {
+                   'message': 'User created successfully.',
+                   'user': AppUserModel.find_by_id(
+                       user.id
+                   ).to_dict()
+               }, 201
 
     @jwt_required()
     def put(self, username):
@@ -82,7 +87,12 @@ class User(Resource):
 
             try:
                 user.save_to_db()
-                return {'message': 'User updated successfully.'}, 200
+                return {
+                           'message': 'User updated successfully.',
+                           'user': AppUserModel.find_by_id(
+                               user.id
+                           ).to_dict()
+                       }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the user.'}, 500
