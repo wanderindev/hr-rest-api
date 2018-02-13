@@ -29,13 +29,11 @@ class TestEmploymentPosition(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Check that 'test_e_p_f' is not in the database.
                 self.assertIsNone(EmploymentPositionModel
                                   .find_by_name('test_e_p_f',
                                                 self.e_p_dict[
                                                     'organization_id']))
 
-                # Send POST request to the /employment_position endpoint.
                 r = c.post('/employment_position',
                            data=json.dumps(self.e_p_dict),
                            headers=self.get_headers())
@@ -43,23 +41,16 @@ class TestEmploymentPosition(BaseTest):
                 r_e_p = json.loads(r.data)['employment_position']
 
                 self.assertEqual(r.status_code, 201)
-
                 self.assertTrue(r_e_p['is_active'])
-
                 self.assertEqual(r_e_p['position_name_feminine'],
                                  self.e_p_dict['position_name_feminine'])
-
                 self.assertEqual(r_e_p['position_name_masculine'],
                                  self.e_p_dict['position_name_masculine'])
-
                 self.assertEqual(float(r_e_p['minimum_hourly_wage']),
                                  self.e_p_dict['minimum_hourly_wage'])
-
                 self.assertEqual(r_e_p['organization_id'],
                                  self.e_p_dict['organization_id'])
-
                 self.assertListEqual(r_e_p['employees'], [])
-
                 self.assertIsNotNone(EmploymentPositionModel
                                      .find_by_name('test_e_p_f',
                                                    self.e_p_dict[
@@ -86,7 +77,7 @@ class TestEmploymentPosition(BaseTest):
     def test_emp_pos_post_duplicate(self):
         """
         Test that status code 400 is returned when trying to
-        POST duplicate data to the /employment_position endpoint.
+        POST duplicated data to the /employment_position endpoint.
         """
         with self.app() as c:
             with self.app_context():
@@ -113,14 +104,12 @@ class TestEmploymentPosition(BaseTest):
                        data=json.dumps(self.e_p_dict),
                        headers=self.get_headers())
 
-                # Send GET request to the endpoint.
                 r = c.get(f'employment_position/test_e_p_f',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
 
                 self.assertEqual(r.status_code, 200)
-
                 self.assertEqual(r_dict['position_name_feminine'],
                                  self.e_p_dict['position_name_feminine'])
 
@@ -133,7 +122,6 @@ class TestEmploymentPosition(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Send the GET request to the endpoint.
                 r = c.get(f'/employment_position/test_e_p_f',
                           headers=self.get_headers())
 
@@ -168,7 +156,6 @@ class TestEmploymentPosition(BaseTest):
                        data=json.dumps(self.e_p_dict),
                        headers=self.get_headers())
 
-                # Send PUT request to the endpoint.
                 r = c.put(f'/employment_position/test_e_p_f',
                           data=json.dumps({
                               'position_name_feminine': 'new_test_e_p_f',
@@ -183,23 +170,16 @@ class TestEmploymentPosition(BaseTest):
                 r_e_p = json.loads(r.data)['employment_position']
 
                 self.assertEqual(r.status_code, 200)
-
                 self.assertTrue(r_e_p['is_active'])
-
                 self.assertEqual(r_e_p['position_name_feminine'],
                                  'new_test_e_p_f')
-
                 self.assertEqual(r_e_p['position_name_masculine'],
                                  'new_test_e_p_m')
-
                 self.assertEqual(float(r_e_p['minimum_hourly_wage']),
                                  2.00)
-
                 self.assertEqual(r_e_p['organization_id'],
                                  self.e_p_dict['organization_id'])
-
                 self.assertListEqual(r_e_p['employees'], [])
-
                 self.assertEqual(r.status_code, 200)
 
     def test_emp_pos_put_without_authentication(self):
@@ -260,7 +240,6 @@ class TestEmploymentPosition(BaseTest):
                        data=json.dumps(self.e_p_dict),
                        headers=self.get_headers())
 
-                # Send DELETE request to the endpoint.
                 r = c.delete(f'/employment_position/test_e_p_f',
                              headers=self.get_headers())
 
@@ -300,7 +279,7 @@ class TestEmploymentPosition(BaseTest):
                 c.delete(f'/employment_position/test_e_p_f',
                          headers=self.get_headers())
 
-                # Try DELETE on inactive employment_position.
+                # Send DELETE request on inactive employment_position.
                 r = c.delete(f'/employment_position/test_e_p_f',
                              headers=self.get_headers())
 
@@ -330,11 +309,9 @@ class TestEmploymentPosition(BaseTest):
                        data=json.dumps(self.e_p_dict),
                        headers=self.get_headers())
 
-                # Make employment_position inactive.
                 c.delete(f'/employment_position/test_e_p_f',
                          headers=self.get_headers())
 
-                # Send PUT request to /activate_employment_position
                 r = c.put(f'/activate_employment_position/test_e_p_f',
                           headers=self.get_headers())
 
@@ -370,7 +347,6 @@ class TestEmploymentPosition(BaseTest):
                        data=json.dumps(self.e_p_dict),
                        headers=self.get_headers())
 
-                # Send PUT request to /activate_employment_position
                 r = c.put(f'/activate_employment_position/test_e_p_f',
                           headers=self.get_headers())
 

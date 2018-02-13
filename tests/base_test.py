@@ -37,7 +37,10 @@ class BaseTest(TestCase):
         self.app_context = app.app_context
 
     def tearDown(self):
-        """Drop all db tables after each test."""
+        """
+        Delete all rows in all tables, except for the seed organization
+        and seed user, after every test.
+        """
         with app.app_context():
             db.session.remove()
             AppUserModel.query.filter(AppUserModel.id != 1).delete()

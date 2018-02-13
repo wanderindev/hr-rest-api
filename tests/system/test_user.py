@@ -10,18 +10,15 @@ class TestUser(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by creating a dict representing
-        a user and instantiating an OrganizationModel object and saving it
-        to the db so they are available for the different tests.
+        a user so it is available for the different tests.
         """
         super(TestUser, self).setUp()
         with self.app_context():
-            OrganizationModel('test_o', True).save_to_db()
-
             self.u_dict = {
                 'username': 'test_u',
                 'password': 'test_p',
                 'email': 'test_u@test_o.com',
-                'organization_id': OrganizationModel.find_by_name('test_o').id,
+                'organization_id': 1,
                 'is_super': True,
                 'is_owner': True,
                 'is_active': True
@@ -35,10 +32,8 @@ class TestUser(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Check that 'test_u' is not in the database.
                 self.assertIsNone(AppUserModel.find_by_username('test_u'))
 
-                # Send POST request to the /user endpoint.
                 r = c.post('/user',
                            data=json.dumps(self.u_dict),
                            headers=self.get_headers())
@@ -46,22 +41,15 @@ class TestUser(BaseTest):
                 r_user = json.loads(r.data)['user']
 
                 self.assertEqual(r.status_code, 201)
-
                 self.assertEqual(r_user['username'],
                                  self.u_dict['username'])
-
                 self.assertEqual(r_user['email'],
                                  self.u_dict['email'])
-
                 self.assertEqual(r_user['organization_id'],
                                  self.u_dict['organization_id'])
-
                 self.assertTrue(r_user['is_super'])
-
                 self.assertTrue(r_user['is_owner'])
-
                 self.assertTrue(r_user['is_active'])
-
                 self.assertIsNotNone(AppUserModel.find_by_username('test_u'))
 
     def test_user_post_without_authentication(self):
@@ -85,7 +73,7 @@ class TestUser(BaseTest):
     def test_user_post_duplicate(self):
         """
         Test that status code 400 is returned when trying to
-        POST duplicate data to the /user endpoint.
+        POST duplicated data to the /user endpoint.
         """
         with self.app() as c:
             with self.app_context():
@@ -93,7 +81,6 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                # Send duplicated POST request.
                 r = c.post('/user',
                            data=json.dumps(self.u_dict),
                            headers=self.get_headers())
@@ -112,26 +99,22 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                # Send GET request to the endpoint.
                 r = c.get('/user/test_u',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
 
                 self.assertEqual(r.status_code, 200)
-
                 self.assertEqual(r_dict['username'],
                                  self.u_dict['username'])
 
     def test_user_get_not_found(self):
         """
-        Test that a GET request to the /user/<string:username>
-        endpoint returns status code 404 if the user is not found
-        in the database table.
+        Test that a GET request to the /user/<string:username> endpoint
+        returns status code 404 if the user is not found in the database table.
         """
         with self.app() as c:
             with self.app_context():
-                # Send the GET request to the endpoint.
                 r = c.get('/user/test_u',
                           headers=self.get_headers())
 
@@ -165,7 +148,6 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                # Send PUT request to the /user/test_u endpoint.
                 r = c.put('/user/test_u',
                           data=json.dumps({
                               'username': 'new_test_u',
@@ -178,28 +160,21 @@ class TestUser(BaseTest):
                           headers=self.get_headers())
 
                 r_user = json.loads(r.data)['user']
-
                 self.assertEqual(r_user['username'],
                                  'new_test_u')
-
                 self.assertEqual(r_user['email'],
                                  'new_test_u@test_o.com')
-
                 self.assertEqual(r_user['organization_id'],
                                  self.u_dict['organization_id'])
-
                 self.assertTrue(r_user['is_super'])
-
                 self.assertTrue(r_user['is_owner'])
-
                 self.assertTrue(r_user['is_active'])
-
                 self.assertEqual(r.status_code, 200)
 
     def test_user_put_without_authentication(self):
         """
-        Test that a PUT request to the /user/<string:username>
-        endpoint returns status code 401 if the user is not authenticated.
+        Test that a PUT request to the /user/<string:username> endpoint returns
+        status code 401 if the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
@@ -223,9 +198,8 @@ class TestUser(BaseTest):
 
     def test_user_put_not_found(self):
         """
-        Test that a PUT request to the /user/<string:username>
-        endpoint returns status code 404 if the user is not
-        in the database.
+        Test that a PUT request to the /user/<string:username> endpoint returns
+        status code 404 if the user is not in the database.
         """
         with self.app() as c:
             with self.app_context():
@@ -253,7 +227,6 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                # Send DELETE request to the /user/test_u endpoint.
                 r = c.delete('/user/test_u',
                              headers=self.get_headers())
 
@@ -261,8 +234,8 @@ class TestUser(BaseTest):
 
     def test_user_delete_without_authentication(self):
         """
-        Test that a DELETE request to the /user/<string:username>
-        endpoint returns status code 401 if user is not authenticated.
+        Test that a DELETE request to the /user/<string:username> endpoint
+        returns status code 401 if user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
@@ -278,8 +251,8 @@ class TestUser(BaseTest):
 
     def test_user_delete_inactive(self):
         """
-        Test that a DELETE request to the /user/<string:username>
-        endpoint returns status code 400 if the user is already inactive.
+        Test that a DELETE request to the /user/<string:username> endpoint
+        returns status code 400 if the user is already inactive.
         """
         with self.app() as c:
             with self.app_context():
@@ -291,7 +264,7 @@ class TestUser(BaseTest):
                 c.delete('/user/test_u',
                          headers=self.get_headers())
 
-                # Try DELETE on inactive user.
+                # Send DELETE request on inactive user.
                 r = c.delete('/user/test_u',
                              headers=self.get_headers())
 
@@ -320,11 +293,9 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                # Make user inactive.
                 c.delete('/user/test_u',
                          headers=self.get_headers())
 
-                # Send PUT request to /activate_user/test_u
                 r = c.put('/activate_user/test_u',
                           headers=self.get_headers())
 
@@ -358,7 +329,6 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                # Send PUT request to /activate_user/test_u
                 r = c.put('/activate_user/test_u',
                           headers=self.get_headers())
 
@@ -371,7 +341,6 @@ class TestUser(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Send PUT request to /activate_user/test_u
                 r = c.put('/activate_user/test_u',
                           headers=self.get_headers())
 

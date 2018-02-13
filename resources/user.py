@@ -9,16 +9,13 @@ class User(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('username',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('password',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('email',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('is_super',
                         default=False,
                         type=bool,
@@ -33,15 +30,15 @@ class User(Resource):
                         required=False)
     parser.add_argument('organization_id',
                         type=int,
-                        required=True,
-                        help='A user must belong to an organization')
+                        required=True)
 
     @jwt_required()
     def get(self, username):
         user = AppUserModel.find_by_username(username)
         if user:
             return user.to_dict()
-        return {'message': 'User not found'}, 404
+
+        return {'message': 'User not found.'}, 404
 
     @staticmethod
     @jwt_required()
@@ -49,7 +46,7 @@ class User(Resource):
         data = User.parser.parse_args()
 
         if AppUserModel.find_by_username(data['username']):
-            return {'message': 'A user with that username already exists'}, 400
+            return {'message': 'A user with that username already exists.'}, 400
 
         user = AppUserModel(data['username'],
                             data['password'],
@@ -96,8 +93,8 @@ class User(Resource):
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the user.'}, 500
-        else:
-            return {'message': 'User not found'}, 404
+
+        return {'message': 'User not found.'}, 404
 
     @jwt_required()
     def delete(self, username):
@@ -113,8 +110,8 @@ class User(Resource):
                                        'the user.'}, 500
             else:
                 return {'message': 'User was already inactive.'}, 400
-        else:
-            return {'message': 'User not found'}, 404
+
+        return {'message': 'User not found.'}, 404
 
 
 class ActivateUser(Resource):
@@ -133,4 +130,4 @@ class ActivateUser(Resource):
             else:
                 return {'message': 'User was already active.'}, 400
         else:
-            return {'message': 'User not found'}, 404
+            return {'message': 'User not found.'}, 404

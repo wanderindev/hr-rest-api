@@ -2,10 +2,10 @@ from db import db
 from models.enum import GENDER, PAYMENT_METHOD, TERMINATION_REASON, \
     TYPE_OF_CONTRACT
 from models.department import DepartmentModel
-from models.mixin import ModelsMixin
+from models.mixin import ModelMixin
 
 
-class EmployeeModel(ModelsMixin, db.Model):
+class EmployeeModel(ModelMixin, db.Model):
     __tablename__ = 'employee'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -83,12 +83,10 @@ class EmployeeModel(ModelsMixin, db.Model):
         empl = cls.query.filter_by(id=_id).first()
 
         if empl:
-            if DepartmentModel\
-                    .find_by_id(empl.department_id, organization_id)\
-                    .organization_id == organization_id:
+            if DepartmentModel.find_by_id(
+                    empl.department_id,
+                    organization_id).organization_id == organization_id:
                 return empl
-
-        return None
 
     @classmethod
     def find_by_name(cls, first_name, second_name, first_surname,
@@ -100,9 +98,7 @@ class EmployeeModel(ModelsMixin, db.Model):
                                    is_active=True).first()
 
         if empl:
-            if DepartmentModel\
-                    .find_by_id(empl.department_id, organization_id)\
-                    .organization_id == organization_id:
+            if DepartmentModel.find_by_id(
+                    empl.department_id,
+                    organization_id).organization_id == organization_id:
                 return empl
-
-        return None

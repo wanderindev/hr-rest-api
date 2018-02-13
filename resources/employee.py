@@ -10,108 +10,84 @@ class Employee(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('first_name',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('second_name',
                         type=str,
-                        required=False,
-                        help='This field must be a string.')
+                        required=False)
     parser.add_argument('first_surname',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')    
+                        required=True)
     parser.add_argument('second_surname',
                         type=str,
-                        required=False,
-                        help='This field must be a string.')
+                        required=False)
     parser.add_argument('national_id_number',
                         type=str,
-                        required=False,
-                        help='This field must be a string.')
+                        required=False)
     parser.add_argument('is_panamanian',
                         type=bool,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('date_of_birth',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('gender',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('address',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('is_active',
                         default=True,
                         type=bool,
                         required=False)
     parser.add_argument('home_phone',
                         type=str,
-                        required=False,
-                        help='This field must be a string.')
+                        required=False)
     parser.add_argument('mobile_phone',
                         type=str,
-                        required=False,
-                        help='This field must be a string.')
+                        required=False)
     parser.add_argument('email',
                         type=str,
-                        required=False,
-                        help='This field must be a string.')
+                        required=False)
     parser.add_argument('type_of_contract',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('employment_date',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('contract_expiration_date',
                         type=str,
-                        required=False,
-                        help='This field must be a string.')
+                        required=False)
     parser.add_argument('termination_date',
                         type=str,
-                        required=False,
-                        help='This field must be a string.')
+                        required=False)
     parser.add_argument('termination_reason',
                         type=str,
-                        required=False,
-                        help='This field must be a string.')
+                        required=False)
     parser.add_argument('salary_per_payment_period',
                         type=float,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('representation_expenses_per_payment_period',
                         type=float,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('payment_method',
                         type=str,
-                        required=False,
-                        help='This field must be a string.')
+                        required=False)
     parser.add_argument('is_active',
                         default=True,
                         type=bool,
                         required=False)
     parser.add_argument('marital_status_id',
                         type=int,
-                        required=True,
-                        help='An employee must have to a marital status.')
+                        required=True)
     parser.add_argument('department_id',
                         type=int,
-                        required=True,
-                        help='An employee must belong to a department.')
+                        required=True)
     parser.add_argument('position_id',
                         type=int,
-                        required=True,
-                        help='An employee must have to a position.')
+                        required=True)
     parser.add_argument('shift_id',
                         type=int,
-                        required=True,
-                        help='An employee must have to a shift.')
+                        required=True)
 
     @jwt_required()
     def get(self, employee_id):
@@ -121,7 +97,8 @@ class Employee(Resource):
 
         if empl:
             return empl.to_dict()
-        return {'message': 'Employee not found'}, 404
+
+        return {'message': 'Employee not found.'}, 404
 
     @staticmethod
     @jwt_required()
@@ -176,7 +153,9 @@ class Employee(Resource):
 
         return {
                    'message': 'Employee created successfully.',
-                   'id': empl.id
+                   'employee': EmployeeModel.find_by_id(
+                       empl.id, current_identity.organization_id
+                   ).to_dict()
                }, 201
 
     @jwt_required()
@@ -221,12 +200,17 @@ class Employee(Resource):
 
             try:
                 empl.save_to_db()
-                return {'message': 'Employee updated successfully.'}, 200
+                return {
+                           'message': 'Employee updated successfully.',
+                           'employee': EmployeeModel.find_by_id(
+                               empl.id, current_identity.organization_id
+                           ).to_dict()
+                       }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the employee.'}, 500
-        else:
-            return {'message': 'Employee not found.'}, 404
+
+        return {'message': 'Employee not found.'}, 404
 
     @jwt_required()
     def delete(self, employee_id):
@@ -243,8 +227,8 @@ class Employee(Resource):
                                        'the employee.'}, 500
             else:
                 return {'message': 'Employee was already inactive.'}, 400
-        else:
-            return {'message': 'Employee not found.'}, 404
+
+        return {'message': 'Employee not found.'}, 404
 
 
 class ActivateEmployee(Resource):
@@ -263,5 +247,5 @@ class ActivateEmployee(Resource):
                                        'the employee.'}, 500
             else:
                 return {'message': 'Employee was already active.'}, 400
-        else:
-            return {'message': 'Employee not found.'}, 404
+
+        return {'message': 'Employee not found.'}, 404

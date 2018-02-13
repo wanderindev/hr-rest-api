@@ -9,16 +9,14 @@ class Department(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('department_name',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('is_active',
                         default=True,
                         type=bool,
                         required=False)
     parser.add_argument('organization_id',
                         type=int,
-                        required=True,
-                        help='A deparment must belong to an organization')
+                        required=True)
 
     @jwt_required()
     def get(self, department_name):
@@ -27,7 +25,8 @@ class Department(Resource):
                                             current_identity.organization_id)
         if dept:
             return dept.to_dict()
-        return {'message': 'Department not found'}, 404
+
+        return {'message': 'Department not found.'}, 404
 
     @staticmethod
     @jwt_required()
@@ -37,7 +36,7 @@ class Department(Resource):
         if DepartmentModel.find_by_name(data['department_name'],
                                         data['organization_id']):
             return {'message': 'A department with that name already '
-                               'exists in the organization'}, 400
+                               'exists in the organization.'}, 400
 
         dept = DepartmentModel(data['department_name'],
                                data['organization_id'],
@@ -77,8 +76,8 @@ class Department(Resource):
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the department.'}, 500
-        else:
-            return {'message': 'Department not found'}, 404
+
+        return {'message': 'Department not found.'}, 404
 
     @jwt_required()
     def delete(self, department_name):
@@ -95,8 +94,8 @@ class Department(Resource):
                                        'the department.'}, 500
             else:
                 return {'message': 'Department was already inactive.'}, 400
-        else:
-            return {'message': 'Department not found'}, 404
+
+        return {'message': 'Department not found.'}, 404
 
 
 class ActivateDepartment(Resource):
@@ -115,5 +114,5 @@ class ActivateDepartment(Resource):
                                        'the department.'}, 500
             else:
                 return {'message': 'Department was already active.'}, 400
-        else:
-            return {'message': 'Department not found'}, 404
+
+        return {'message': 'Department not found.'}, 404

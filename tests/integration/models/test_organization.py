@@ -25,7 +25,5 @@ class TestOrganization(BaseTest):
             org_by_id = OrganizationModel.find_by_id(self.o.id)
 
             self.assertIsNotNone(org_by_name)
-
             self.assertIsNotNone(org_by_id)
-
             self.assertEqual(org_by_name, org_by_id)

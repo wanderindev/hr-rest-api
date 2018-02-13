@@ -9,47 +9,43 @@ class EmploymentPosition(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('position_name_feminine',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('position_name_masculine',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('minimum_hourly_wage',
                         type=float,
-                        required=False,
-                        help='This field must be a number.')
+                        required=False)
     parser.add_argument('is_active',
                         default=True,
                         type=bool,
                         required=False)
     parser.add_argument('organization_id',
                         type=int,
-                        required=True,
-                        help='An employment postion must belong '
-                             'to an organization')
+                        required=True)
 
     @jwt_required()
     def get(self, position_name):
-        e_p = EmploymentPositionModel\
-            .find_by_name(position_name, current_identity.organization_id)
+        e_p = EmploymentPositionModel.find_by_name(
+            position_name, current_identity.organization_id)
         if e_p:
             return e_p.to_dict()
-        return {'message': 'Employment position not found'}, 404
+
+        return {'message': 'Employment position not found.'}, 404
 
     @staticmethod
     @jwt_required()
     def post():
         data = EmploymentPosition.parser.parse_args()
 
-        if EmploymentPositionModel\
-                .find_by_name(data['position_name_feminine'],
-                              data['organization_id']) or \
-           EmploymentPositionModel\
-                .find_by_name(data['position_name_masculine'],
-                              data['organization_id']):
+        if EmploymentPositionModel.find_by_name(
+                data['position_name_feminine'],
+                data['organization_id']) or \
+           EmploymentPositionModel.find_by_name(
+               data['position_name_masculine'],
+               data['organization_id']):
             return {'message': 'An employment position with that name already '
-                               'exists in the organization'}, 400
+                               'exists in the organization.'}, 400
 
         e_p = EmploymentPositionModel(data['position_name_feminine'],
                                       data['position_name_masculine'],
@@ -75,8 +71,8 @@ class EmploymentPosition(Resource):
     def put(self,  position_name):
         data = EmploymentPosition.parser.parse_args()
 
-        e_p = EmploymentPositionModel\
-            .find_by_name(position_name, current_identity.organization_id)
+        e_p = EmploymentPositionModel.find_by_name(
+            position_name, current_identity.organization_id)
 
         if e_p:
             e_p.position_name_feminine = data['position_name_feminine']
@@ -96,13 +92,13 @@ class EmploymentPosition(Resource):
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the employment position.'}, 500
-        else:
-            return {'message': 'Employment position not found'}, 404
+
+        return {'message': 'Employment position not found.'}, 404
 
     @jwt_required()
     def delete(self, position_name):
-        e_p = EmploymentPositionModel\
-            .find_by_name(position_name, current_identity.organization_id)
+        e_p = EmploymentPositionModel.find_by_name(
+            position_name, current_identity.organization_id)
 
         if e_p:
             if e_p.is_active:
@@ -116,15 +112,15 @@ class EmploymentPosition(Resource):
             else:
                 return {'message': 'Employment position was '
                                    'already inactive.'}, 400
-        else:
-            return {'message': 'Employment position not found'}, 404
+
+        return {'message': 'Employment position not found.'}, 404
 
 
 class ActivateEmploymentPosition(Resource):
     @jwt_required()
     def put(self, position_name):
-        e_p = EmploymentPositionModel\
-            .find_by_name(position_name, current_identity.organization_id)
+        e_p = EmploymentPositionModel.find_by_name(
+            position_name, current_identity.organization_id)
 
         if e_p:
             if not e_p.is_active:
@@ -138,5 +134,5 @@ class ActivateEmploymentPosition(Resource):
             else:
                 return {'message': 'Employment position was '
                                    'already active.'}, 400
-        else:
-            return {'message': 'Employment position not found'}, 404
+
+        return {'message': 'Employment position not found.'}, 404

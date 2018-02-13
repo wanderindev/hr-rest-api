@@ -69,8 +69,6 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Check that 'test_s_r'  and 'test_s_f'
-                # are not in the database.
                 self.assertIsNone(ShiftModel
                                   .find_by_name('test_s_r',
                                                 self.s_r_dict[
@@ -80,7 +78,7 @@ class TestShift(BaseTest):
                                                 self.s_f_dict[
                                                     'organization_id']))
 
-                # Send POST request to the /shift endpoint.
+                # Send POST request with rotating shift.
                 r = c.post('/shift',
                            data=json.dumps(self.s_r_dict),
                            headers=self.get_headers())
@@ -88,40 +86,29 @@ class TestShift(BaseTest):
                 r_shift = json.loads(r.data)['shift']
 
                 self.assertTrue(r_shift['is_active'])
-
                 self.assertTrue(r_shift['is_rotating'])
-
                 self.assertEqual(r_shift['payment_period'],
                                  self.s_r_dict['payment_period'])
-
                 self.assertEqual(r_shift['rotation_start_hour'],
                                  self.s_r_dict['rotation_start_hour'])
-
                 self.assertEqual(r_shift['rotation_end_hour'],
                                  self.s_r_dict['rotation_end_hour'])
-
                 self.assertEqual(r_shift['break_length'],
                                  self.s_r_dict['break_length'])
-
                 self.assertEqual(r_shift['shift_name'],
                                  self.s_r_dict['shift_name'])
-
                 self.assertEqual(float(r_shift['weekly_hours']),
                                  self.s_r_dict['weekly_hours'])
-
                 self.assertEqual(r_shift['organization_id'],
                                  self.s_r_dict['organization_id'])
-
                 self.assertListEqual(r_shift['employees'], [])
-
                 self.assertEqual(r.status_code, 201)
-
                 self.assertIsNotNone(ShiftModel
                                      .find_by_name('test_s_r',
                                                    self.s_r_dict[
                                                        'organization_id']))
 
-                # Send POST request to the /shift endpoint.
+                # Send POST request with fixed shift.
                 r = c.post('/shift',
                            data=json.dumps(self.s_f_dict),
                            headers=self.get_headers())
@@ -130,91 +117,61 @@ class TestShift(BaseTest):
 
                 self.assertEqual(r_shift['rest_day'],
                                  self.s_f_dict['rest_day'])
-
                 self.assertEqual(r_shift['fixed_start_hour_monday'],
                                  self.s_f_dict['fixed_start_hour_monday'])
-
                 self.assertEqual(r_shift['fixed_start_hour_tuesday'],
                                  self.s_f_dict['fixed_start_hour_tuesday'])
-
                 self.assertEqual(r_shift['fixed_start_hour_wednesday'],
                                  self.s_f_dict['fixed_start_hour_wednesday'])
-
                 self.assertEqual(r_shift['fixed_start_hour_thursday'],
                                  self.s_f_dict['fixed_start_hour_thursday'])
-
                 self.assertEqual(r_shift['fixed_start_hour_friday'],
                                  self.s_f_dict['fixed_start_hour_friday'])
-
                 self.assertEqual(r_shift['fixed_start_hour_saturday'],
                                  self.s_f_dict['fixed_start_hour_saturday'])
-
                 self.assertIsNone(r_shift['fixed_start_hour_sunday'])
-
                 self.assertEqual(r_shift['fixed_start_break_hour_monday'],
                                  self.s_f_dict['fixed_start_break_hour_monday'])
-
                 self.assertEqual(r_shift['fixed_start_break_hour_tuesday'],
                                  self.s_f_dict[
                                      'fixed_start_break_hour_tuesday'])
-
                 self.assertEqual(r_shift['fixed_start_break_hour_wednesday'],
                                  self.s_f_dict[
                                      'fixed_start_break_hour_wednesday'])
-
                 self.assertEqual(r_shift['fixed_start_break_hour_thursday'],
                                  self.s_f_dict[
                                      'fixed_start_break_hour_thursday'])
-
                 self.assertEqual(r_shift['fixed_start_break_hour_friday'],
                                  self.s_f_dict['fixed_start_break_hour_friday'])
-
                 self.assertIsNone(r_shift['fixed_start_break_hour_saturday'])
-
                 self.assertIsNone(r_shift['fixed_start_break_hour_sunday'])
-
                 self.assertEqual(r_shift['fixed_end_break_hour_monday'],
                                  self.s_f_dict['fixed_end_break_hour_monday'])
-
                 self.assertEqual(r_shift['fixed_end_break_hour_tuesday'],
                                  self.s_f_dict['fixed_end_break_hour_tuesday'])
-
                 self.assertEqual(r_shift['fixed_end_break_hour_wednesday'],
                                  self.s_f_dict[
                                      'fixed_end_break_hour_wednesday'])
-
                 self.assertEqual(r_shift['fixed_end_break_hour_thursday'],
                                  self.s_f_dict['fixed_end_break_hour_thursday'])
-
                 self.assertEqual(r_shift['fixed_end_break_hour_friday'],
                                  self.s_f_dict['fixed_end_break_hour_friday'])
-
                 self.assertIsNone(r_shift['fixed_end_break_hour_saturday'])
-
                 self.assertIsNone(r_shift['fixed_end_break_hour_sunday'])
-
                 self.assertEqual(r_shift['fixed_end_hour_monday'],
                                  self.s_f_dict['fixed_end_hour_monday'])
-
                 self.assertEqual(r_shift['fixed_end_hour_tuesday'],
                                  self.s_f_dict['fixed_end_hour_tuesday'])
-
                 self.assertEqual(r_shift['fixed_end_hour_wednesday'],
                                  self.s_f_dict['fixed_end_hour_wednesday'])
-
                 self.assertEqual(r_shift['fixed_end_hour_thursday'],
                                  self.s_f_dict['fixed_end_hour_thursday'])
-
                 self.assertEqual(r_shift['fixed_end_hour_friday'],
                                  self.s_f_dict['fixed_end_hour_friday'])
-
                 self.assertEqual(r_shift['fixed_end_hour_saturday'],
                                  self.s_f_dict['fixed_end_hour_saturday'])
-
                 self.assertIsNone(r_shift['fixed_end_hour_sunday'])
-
                 self.assertEqual(r.status_code, 201)
-
                 self.assertIsNotNone(ShiftModel
                                      .find_by_name('test_s_f',
                                                    self.s_f_dict[
@@ -241,7 +198,7 @@ class TestShift(BaseTest):
     def test_shift_post_duplicate(self):
         """
         Test that status code 400 is returned when trying to
-        POST duplicate data to the /shift endpoint.
+        POST duplicated data to the /shift endpoint.
         """
         with self.app() as c:
             with self.app_context():
@@ -267,14 +224,12 @@ class TestShift(BaseTest):
                        data=json.dumps(self.s_r_dict),
                        headers=self.get_headers())
 
-                # Send GET request to the endpoint.
                 r = c.get(f'/shift/test_s_r',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
 
                 self.assertEqual(r.status_code, 200)
-
                 self.assertEqual(r_dict['shift_name'],
                                  self.s_r_dict['shift_name'])
 
@@ -286,7 +241,6 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Send the GET request to the endpoint.
                 r = c.get(f'/shift/test_s_r',
                           headers=self.get_headers())
 
@@ -324,7 +278,7 @@ class TestShift(BaseTest):
                        data=json.dumps(self.s_f_dict),
                        headers=self.get_headers())
 
-                # Send PUT request to the endpoint.
+                # Send PUT request modifying the rotating shift.
                 r = c.put(f'/shift/test_s_r',
                           data=json.dumps({
                               'shift_name': 'new_test_s_r',
@@ -344,35 +298,25 @@ class TestShift(BaseTest):
                 r_shift = json.loads(r.data)['shift']
 
                 self.assertTrue(r_shift['is_active'])
-
                 self.assertTrue(r_shift['is_rotating'])
-
                 self.assertEqual(r_shift['payment_period'],
                                  'Semanal')
-
                 self.assertEqual(r_shift['rotation_start_hour'],
                                  '00:00:00')
-
                 self.assertEqual(r_shift['rotation_end_hour'],
                                  '15:00:00')
-
                 self.assertEqual(r_shift['break_length'],
                                  '01:00:00')
-
                 self.assertEqual(r_shift['shift_name'],
                                  'new_test_s_r')
-
                 self.assertEqual(float(r_shift['weekly_hours']),
                                  44)
-
                 self.assertEqual(r_shift['organization_id'],
                                  self.s_r_dict['organization_id'])
-
                 self.assertListEqual(r_shift['employees'], [])
-
                 self.assertEqual(r.status_code, 200)
 
-                # Send PUT request to the endpoint.
+                # Send PUT request modifying the fixed shift.
                 r = c.put(f'/shift/test_s_f',
                           data=json.dumps({
                               'shift_name': 'test_s_f',
@@ -418,87 +362,59 @@ class TestShift(BaseTest):
 
                 self.assertEqual(r_shift['rest_day'],
                                  'Sábado')
-
                 self.assertEqual(r_shift['fixed_start_hour_monday'],
                                  '09:00:00')
-
                 self.assertEqual(r_shift['fixed_start_hour_tuesday'],
                                  '09:00:00')
-
                 self.assertEqual(r_shift['fixed_start_hour_wednesday'],
                                  '09:00:00')
-
                 self.assertEqual(r_shift['fixed_start_hour_thursday'],
                                  '09:00:00')
-
                 self.assertEqual(r_shift['fixed_start_hour_friday'],
                                  '09:00:00')
-
                 self.assertIsNone(r_shift['fixed_start_hour_saturday'])
-
                 self.assertEqual(r_shift['fixed_start_hour_sunday'],
                                  '09:00:00')
-
                 self.assertEqual(r_shift['fixed_start_break_hour_monday'],
                                  '13:00:00')
-
                 self.assertEqual(r_shift['fixed_start_break_hour_tuesday'],
                                  '13:00:00')
-
                 self.assertEqual(r_shift['fixed_start_break_hour_wednesday'],
                                  '13:00:00')
-
                 self.assertEqual(r_shift['fixed_start_break_hour_thursday'],
                                  '13:00:00')
-
                 self.assertEqual(r_shift['fixed_start_break_hour_friday'],
                                  '13:00:00')
-
                 self.assertIsNone(r_shift['fixed_start_break_hour_saturday'])
 
                 self.assertEqual(r_shift['fixed_start_break_hour_sunday'],
                                  '13:00:00')
-
                 self.assertEqual(r_shift['fixed_end_break_hour_monday'],
                                  '13:30:00')
-
                 self.assertEqual(r_shift['fixed_end_break_hour_tuesday'],
                                  '13:30:00')
-
                 self.assertEqual(r_shift['fixed_end_break_hour_wednesday'],
                                  '13:30:00')
-
                 self.assertEqual(r_shift['fixed_end_break_hour_thursday'],
                                  '13:30:00')
-
                 self.assertEqual(r_shift['fixed_end_break_hour_friday'],
                                  '13:30:00')
-
                 self.assertIsNone(r_shift['fixed_end_break_hour_saturday'])
-
                 self.assertEqual(r_shift['fixed_end_break_hour_sunday'],
                                  '13:30:00')
-
                 self.assertEqual(r_shift['fixed_end_hour_monday'],
                                  '17:30:00')
-
                 self.assertEqual(r_shift['fixed_end_hour_tuesday'],
                                  '17:30:00')
-
                 self.assertEqual(r_shift['fixed_end_hour_wednesday'],
                                  '17:30:00')
-
                 self.assertEqual(r_shift['fixed_end_hour_thursday'],
                                  '17:30:00')
-
                 self.assertEqual(r_shift['fixed_end_hour_friday'],
                                  '17:30:00')
-
                 self.assertIsNone(r_shift['fixed_end_hour_saturday'])
-
                 self.assertEqual(r_shift['fixed_end_hour_sunday'],
                                  '17:30:00')
-
                 self.assertEqual(r.status_code, 200)
 
     def test_shift_put_without_authentication(self):
@@ -533,8 +449,8 @@ class TestShift(BaseTest):
 
     def test_shift_put_not_found(self):
         """
-        Test that a PUT request to the /shift/<string:shift_name>
-        endpoint returns status code 404 if the shift is not in the database.
+        Test that a PUT request to the /shift/<string:shift_name> endpoint
+        returns status code 404 if the shift is not in the database.
         """
         with self.app() as c:
             with self.app_context():
@@ -567,7 +483,6 @@ class TestShift(BaseTest):
                        data=json.dumps(self.s_r_dict),
                        headers=self.get_headers())
 
-                # Send DELETE request to the endpoint.
                 r = c.delete(f'/shift/test_s_r',
                              headers=self.get_headers())
 
@@ -593,8 +508,7 @@ class TestShift(BaseTest):
     def test_shift_delete_inactive(self):
         """
         Test that a DELETE request to the /shift/<string:shift_name>
-        endpoint returns status code 400 if the shift
-        is already inactive.
+        endpoint returns status code 400 if the shift is already inactive.
         """
         with self.app() as c:
             with self.app_context():
@@ -606,7 +520,7 @@ class TestShift(BaseTest):
                 c.delete(f'/shift/test_s_r',
                          headers=self.get_headers())
 
-                # Try DELETE on inactive shift.
+                # Send DELETE request on inactive shift.
                 r = c.delete(f'/shift/test_s_r',
                              headers=self.get_headers())
 
@@ -635,11 +549,9 @@ class TestShift(BaseTest):
                        data=json.dumps(self.s_r_dict),
                        headers=self.get_headers())
 
-                # Make shift inactive.
                 c.delete(f'/shift/test_s_r',
                          headers=self.get_headers())
 
-                # Send PUT request to /activate_shift
                 r = c.put(f'/activate_shift/test_s_r',
                           headers=self.get_headers())
 
@@ -673,7 +585,6 @@ class TestShift(BaseTest):
                        data=json.dumps(self.s_r_dict),
                        headers=self.get_headers())
 
-                # Send PUT request to /activate_shift
                 r = c.put(f'/activate_shift/test_s_r',
                           headers=self.get_headers())
 
@@ -686,7 +597,6 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Send PUT request to /activate_shift
                 r = c.put(f'/activate_shift/test_s_r',
                           headers=self.get_headers())
 

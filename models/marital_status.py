@@ -1,8 +1,8 @@
 from db import db
-from models.mixin import ModelsMixin
+from models.mixin import ModelMixin
 
 
-class MaritalStatusModel(ModelsMixin, db.Model):
+class MaritalStatusModel(ModelMixin, db.Model):
     __tablename__ = 'marital_status'
 
     id = db.Column(db.Integer, primary_key=True)

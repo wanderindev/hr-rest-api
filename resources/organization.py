@@ -20,7 +20,8 @@ class Organization(Resource):
         organization = OrganizationModel.find_by_name(organization_name)
         if organization:
             return organization.to_dict(), 200
-        return {'message': 'Organization not found'}, 404
+
+        return {'message': 'Organization not found.'}, 404
 
     @staticmethod
     @jwt_required()
@@ -28,9 +29,8 @@ class Organization(Resource):
         data = Organization.parser.parse_args()
 
         if OrganizationModel.find_by_name(data['organization_name']):
-            return {'message': 'An organization with name {}'
-                               ' already exists.'.format(
-                                 data['organization_name'])}, 400
+            return {'message': 'An organization with that'
+                               ' name already exists.'}, 400
 
         organization = OrganizationModel(
             data['organization_name'],
@@ -68,8 +68,8 @@ class Organization(Resource):
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the organization.'}, 500
-        else:
-            return {'message': 'Organization not found'}, 404
+
+        return {'message': 'Organization not found'}, 404
 
     @jwt_required()
     def delete(self, organization_name):
@@ -85,8 +85,8 @@ class Organization(Resource):
                                        'the organization.'}, 500
             else:
                 return {'message': 'Organization was already inactive.'}, 400
-        else:
-            return {'message': 'Organization not found'}, 404
+
+        return {'message': 'Organization not found.'}, 404
 
 
 class ActivateOrganization(Resource):
@@ -104,8 +104,8 @@ class ActivateOrganization(Resource):
                                        'the organization.'}, 500
             else:
                 return {'message': 'Organization was already active.'}, 400
-        else:
-            return {'message': 'Organization not found'}, 404
+
+        return {'message': 'Organization not found.'}, 404
 
 
 class OrganizationList(Resource):

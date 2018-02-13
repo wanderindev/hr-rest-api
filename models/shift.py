@@ -2,10 +2,10 @@ from datetime import time
 
 from db import db
 from models.enum import DAYS_OF_WEEK, PAYMENT_PERIOD
-from models.mixin import ModelsMixin
+from models.mixin import ModelMixin
 
 
-class ShiftModel(ModelsMixin, db.Model):
+class ShiftModel(ModelMixin, db.Model):
     __tablename__ = 'shift'
 
     id = db.Column(db.Integer, primary_key=True)

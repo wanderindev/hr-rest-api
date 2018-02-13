@@ -2,10 +2,10 @@ from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from db import db
-from models.mixin import ModelsMixin
+from models.mixin import ModelMixin
 
 
-class AppUserModel(ModelsMixin, db.Model):
+class AppUserModel(ModelMixin, db.Model):
     __tablename__ = 'app_user'
 
     id = db.Column(db.Integer, primary_key=True)

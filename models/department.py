@@ -1,8 +1,8 @@
 from db import db
-from models.mixin import ModelsMixin
+from models.mixin import ModelMixin
 
 
-class DepartmentModel(ModelsMixin, db.Model):
+class DepartmentModel(ModelMixin, db.Model):
     __tablename__ = 'department'
 
     id = db.Column(db.Integer, primary_key=True)

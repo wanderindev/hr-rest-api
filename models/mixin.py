@@ -7,7 +7,7 @@ from db import db
 
 
 # noinspection PyAttributeOutsideInit
-class ModelsMixin(object):
+class ModelMixin(object):
     def __iter__(self):
         return ((k, v) for k, v in vars(self).items() if not k.startswith('_'))
 

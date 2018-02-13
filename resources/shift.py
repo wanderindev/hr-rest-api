@@ -10,36 +10,29 @@ class Shift(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('shift_name',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('weekly_hours',
                         type=float,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('is_rotating',
                         type=bool,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('payment_period',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('break_length',
                         type=str,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('is_break_included_in_shift',
                         type=bool,
-                        required=True,
-                        help='This field cannot be blank.')
+                        required=True)
     parser.add_argument('is_active',
                         default=True,
                         type=bool,
                         required=False)
     parser.add_argument('organization_id',
                         type=int,
-                        required=True,
-                        help='A deparment must belong to an organization')
+                        required=True)
     parser.add_argument('rotation_start_hour',
                         type=str,
                         required=False)
@@ -140,7 +133,8 @@ class Shift(Resource):
                                         current_identity.organization_id)
         if shift:
             return shift.to_dict()
-        return {'message': 'Shift not found'}, 404
+
+        return {'message': 'Shift not found.'}, 404
 
     @staticmethod
     @jwt_required()
@@ -150,7 +144,7 @@ class Shift(Resource):
         if ShiftModel.find_by_name(data['shift_name'],
                                    data['organization_id']):
             return {'message': 'A shift with that name already '
-                               'exists in the organization'}, 400
+                               'exists in the organization.'}, 400
 
         shift = ShiftModel(data['shift_name'],
                            data['weekly_hours'],
@@ -304,16 +298,16 @@ class Shift(Resource):
             try:
                 shift.save_to_db()
                 return {
-                   'message': 'Shift updated successfully.',
-                   'shift': ShiftModel.find_by_id(
-                       shift.id, current_identity.organization_id
-                   ).to_dict()
-               }, 200
+                           'message': 'Shift updated successfully.',
+                           'shift': ShiftModel.find_by_id(
+                               shift.id, current_identity.organization_id
+                           ).to_dict()
+                       }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred updating '
                                    'the shift.'}, 500
-        else:
-            return {'message': 'Shift not found'}, 404
+
+        return {'message': 'Shift not found.'}, 404
 
     @jwt_required()
     def delete(self, shift_name):
@@ -330,8 +324,8 @@ class Shift(Resource):
                                        'the shift.'}, 500
             else:
                 return {'message': 'Shift was already inactive.'}, 400
-        else:
-            return {'message': 'Shift not found'}, 404
+
+        return {'message': 'Shift not found.'}, 404
 
 
 class ActivateShift(Resource):
@@ -350,5 +344,5 @@ class ActivateShift(Resource):
                                        'the shift.'}, 500
             else:
                 return {'message': 'Shift was already active.'}, 400
-        else:
-            return {'message': 'Shift not found'}, 404
+
+        return {'message': 'Shift not found.'}, 404

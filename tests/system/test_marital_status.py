@@ -13,7 +13,6 @@ class TestMaritalStatus(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Get the marital_statuses list from the endpoint.
                 r = c.get('/marital_statuses',
                           headers=self.get_headers())
 

@@ -1,9 +1,9 @@
 from sqlalchemy import and_, or_
 from db import db
-from models.mixin import ModelsMixin
+from models.mixin import ModelMixin
 
 
-class EmploymentPositionModel(ModelsMixin, db.Model):
+class EmploymentPositionModel(ModelMixin, db.Model):
     __tablename__ = 'employment_position'
 
     id = db.Column(db.Integer, primary_key=True)

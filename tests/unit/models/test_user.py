@@ -15,21 +15,14 @@ class TestUser(TestCase):
         of the AppUserModel class.
         """
         self.assertEqual(self.u.username, 'test_u')
-
         self.assertTrue(self.u.check_password('test_p'))
-
         self.assertEqual(self.u.email, 'test_u@test_o.com')
-
         self.assertEqual(self.u.organization_id, 1)
-
         self.assertTrue(self.u.is_super)
-
         self.assertTrue(self.u.is_owner)
-
         self.assertTrue(self.u.is_active)
 
     def test_set_password_hash(self):
         """Test the set_password_hash method of the AppUserModel class."""
         self.u.set_password_hash('new_password')
-
         self.assertTrue(self.u.check_password('new_password'))
