@@ -116,7 +116,7 @@ class Employee(Resource):
         if not DepartmentModel.find_by_id(data['department_id'],
                                           current_identity.organization_id):
             return {'message': 'You are not allowed to add an employee to a '
-                               'department that does not belong to your'
+                               'department that does not belong to your '
                                'organization.'}, 403
 
         empl = EmployeeModel(data['first_name'],
