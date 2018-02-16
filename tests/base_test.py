@@ -9,6 +9,7 @@ from models.department import DepartmentModel
 from models.emergency_contact import EmergencyContactModel
 from models.employee import EmployeeModel
 from models.employment_position import EmploymentPositionModel
+from models.health_permit import HealthPermitModel
 from models.organization import OrganizationModel
 from models.shift import ShiftModel
 from models.user import AppUserModel
@@ -47,6 +48,7 @@ class BaseTest(TestCase):
             db.session.remove()
             AppUserModel.query.filter(AppUserModel.id != 1).delete()
             EmergencyContactModel.query.delete()
+            HealthPermitModel.query.delete()
             EmployeeModel.query.delete()
             DepartmentModel.query.delete()
             EmploymentPositionModel.query.delete()
@@ -140,3 +142,11 @@ class BaseTest(TestCase):
             e_c.save_to_db()
 
             return EmergencyContactModel.find_by_id(e_c.id, organization_id)
+
+    def get_health_permit(self, employee_id, organization_id):
+        with self.app_context():
+            h_p = HealthPermitModel('Verde', date(2018, 1, 1),
+                                    date(2019, 1, 1), employee_id)
+            h_p.save_to_db()
+
+            return HealthPermitModel.find_by_id(h_p.id, organization_id)

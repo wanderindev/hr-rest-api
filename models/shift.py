@@ -1,6 +1,7 @@
 from datetime import time
 
 from db import db
+from models.employee import EmployeeModel
 from models.enum import DAYS_OF_WEEK, PAYMENT_PERIOD
 from models.mixin import ModelMixin
 
@@ -51,7 +52,7 @@ class ShiftModel(ModelMixin, db.Model):
                                 db.ForeignKey('organization.id'),
                                 nullable=False, index=True)
 
-    employees = db.relationship('EmployeeModel',
+    employees = db.relationship(EmployeeModel,
                                 backref='shift',
                                 lazy='joined')
 

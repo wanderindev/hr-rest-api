@@ -1,7 +1,8 @@
 from db import db
 from models.enum import GENDER, PAYMENT_METHOD, TERMINATION_REASON, \
     TYPE_OF_CONTRACT
-from models.department import DepartmentModel
+from models.emergency_contact import EmergencyContactModel
+from models.health_permit import HealthPermitModel
 from models.mixin import ModelMixin
 
 
@@ -43,9 +44,12 @@ class EmployeeModel(ModelMixin, db.Model):
     shift_id = db.Column(db.Integer,
                          db.ForeignKey('shift.id'), nullable=False)
 
-    emergency_contacts = db.relationship('EmergencyContactModel',
+    emergency_contacts = db.relationship(EmergencyContactModel,
                                          backref='employee',
                                          lazy='joined')
+    health_permits = db.relationship(HealthPermitModel,
+                                     backref='employee',
+                                     lazy='joined')
 
     def __init__(self, first_name, second_name, first_surname, second_surname,
                  national_id_number, is_panamanian, date_of_birth, gender,
@@ -84,6 +88,8 @@ class EmployeeModel(ModelMixin, db.Model):
 
     @classmethod
     def find_by_id(cls, _id, organization_id):
+        from models.department import DepartmentModel
+
         empl = cls.query.filter_by(id=_id).first()
 
         if empl:
@@ -95,6 +101,8 @@ class EmployeeModel(ModelMixin, db.Model):
     @classmethod
     def find_by_name(cls, first_name, second_name, first_surname,
                      second_surname, organization_id):
+        from models.department import DepartmentModel
+
         empl = cls.query.filter_by(first_name=first_name,
                                    second_name=second_name,
                                    first_surname=first_surname,

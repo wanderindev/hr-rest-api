@@ -12,6 +12,7 @@ class TestDepartment(BaseTest):
         a department so it is available for the different tests.
         """
         super(TestDepartment, self).setUp()
+
         with self.app_context():
             self.d_dict = {
                 'department_name': 'test_d',

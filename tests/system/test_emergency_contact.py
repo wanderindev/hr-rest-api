@@ -8,11 +8,12 @@ class TestEmergencyContact(BaseTest):
     """System tests for the emergency contact resource."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by setting up a emergency contact, an
-        employment position, a shift, and employee and a dict representing 
-        an emergency contact.
+        Extend the BaseTest setUp method by setting up a department,
+        an employment  position, a shift, an employee and a
+        dict representing an emergency contact.
         """
         super(TestEmergencyContact, self).setUp()
+
         with self.app_context():
             self.d = self.get_department(1)
             self.e_p = self.get_employment_position(1)
@@ -221,7 +222,7 @@ class TestEmergencyContact(BaseTest):
                               'home_phone': '333-3333',
                               'work_phone': '444-4444',
                               'mobile_phone': '6666-7777',
-                              'employee_id': self.e.id + 1
+                              'employee_id': self.e.id
                           }),
                           headers={
                               'Content-Type': 'application/json',
@@ -245,7 +246,7 @@ class TestEmergencyContact(BaseTest):
                               'home_phone': '333-3333',
                               'work_phone': '444-4444',
                               'mobile_phone': '6666-7777',
-                              'employee_id': self.e.id + 1
+                              'employee_id': self.e.id
                           }),
                           headers=self.get_headers())
 

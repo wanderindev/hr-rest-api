@@ -1,4 +1,5 @@
 from db import db
+from models.employee import EmployeeModel
 from models.mixin import ModelMixin
 
 
@@ -12,7 +13,7 @@ class DepartmentModel(ModelMixin, db.Model):
                                 db.ForeignKey('organization.id'),
                                 nullable=False, index=True)
 
-    employees = db.relationship('EmployeeModel',
+    employees = db.relationship(EmployeeModel,
                                 backref='department',
                                 lazy='joined')
 

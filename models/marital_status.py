@@ -1,4 +1,5 @@
 from db import db
+from models.employee import EmployeeModel
 from models.mixin import ModelMixin
 
 
@@ -9,7 +10,7 @@ class MaritalStatusModel(ModelMixin, db.Model):
     status_feminine = db.Column(db.String(25), nullable=False)
     status_masculine = db.Column(db.String(25), nullable=False)
 
-    employees = db.relationship('EmployeeModel',
+    employees = db.relationship(EmployeeModel,
                                 backref='marital_status',
                                 lazy='joined')
 

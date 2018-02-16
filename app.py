@@ -7,6 +7,7 @@ from resources.emergency_contact import EmergencyContact
 from resources.employee import ActivateEmployee, Employee
 from resources.employment_position import ActivateEmploymentPosition, \
     EmploymentPosition
+from resources.health_permit import HealthPermit
 from resources.marital_status import MaritalStatusList
 from resources.organization import ActivateOrganization, Organization, \
     OrganizationList
@@ -90,5 +91,9 @@ def create_app(config_file=None):
     api.add_resource(EmergencyContact,
                      '/emergency_contact',
                      '/emergency_contact/<int:contact_id>')
+
+    api.add_resource(HealthPermit,
+                     '/health_permit',
+                     '/health_permit/<int:permit_id>')
 
     return app

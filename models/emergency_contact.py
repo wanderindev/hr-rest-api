@@ -1,5 +1,4 @@
 from db import db
-from models.employee import EmployeeModel
 from models.mixin import ModelMixin
 
 
@@ -27,6 +26,8 @@ class EmergencyContactModel(ModelMixin, db.Model):
 
     @classmethod
     def find_by_id(cls, _id, organization_id):
+        from models.employee import EmployeeModel
+
         e_cont = cls.query.filter_by(id=_id).first()
 
         if e_cont:

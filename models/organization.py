@@ -1,6 +1,9 @@
 from db import db
+from models.department import DepartmentModel
+from models.employment_position import EmploymentPositionModel
 from models.mixin import ModelMixin
-
+from models.shift import ShiftModel
+from models.user import AppUserModel
 
 class OrganizationModel(ModelMixin, db.Model):
     __tablename__ = 'organization'
@@ -9,19 +12,19 @@ class OrganizationModel(ModelMixin, db.Model):
     organization_name = db.Column(db.String(80), nullable=False)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
-    app_users = db.relationship('AppUserModel',
+    app_users = db.relationship(AppUserModel,
                                 backref='organization',
                                 lazy='joined')
 
-    employment_positions = db.relationship('EmploymentPositionModel',
+    employment_positions = db.relationship(EmploymentPositionModel,
                                            backref='organization',
                                            lazy='joined')
 
-    departments = db.relationship('DepartmentModel',
+    departments = db.relationship(DepartmentModel,
                                   backref='organization',
                                   lazy='joined')
 
-    shifts = db.relationship('ShiftModel',
+    shifts = db.relationship(ShiftModel,
                              backref='organization',
                              lazy='joined')
 

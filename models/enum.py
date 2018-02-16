@@ -18,3 +18,5 @@ TERMINATION_REASON = db.Enum('Renuncia', 'Período de Prueba',
                              name='termination_reason')
 
 TYPE_OF_CONTRACT = db.Enum('Definido', 'Indefinido', name='type_of_contract')
+
+HEALTH_PERMIT_TYPE = db.Enum('Blanco', 'Verde', name='health_permit_type')

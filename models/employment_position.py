@@ -1,5 +1,6 @@
 from sqlalchemy import and_, or_
 from db import db
+from models.employee import EmployeeModel
 from models.mixin import ModelMixin
 
 
@@ -15,7 +16,7 @@ class EmploymentPositionModel(ModelMixin, db.Model):
                                 db.ForeignKey('organization.id'),
                                 nullable=False, index=True)
 
-    employees = db.relationship('EmployeeModel',
+    employees = db.relationship(EmployeeModel,
                                 backref='employment_position',
                                 lazy='joined')
 
