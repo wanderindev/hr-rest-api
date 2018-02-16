@@ -7,31 +7,22 @@ class TestDepartment(BaseTest):
     """Integration tests for the DepartmentModel."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by instantiating an organization and a
-        department, saving them to the database, and getting their ids.
+        Extend the BaseTest setUp method by setting up an
+        organization and a department.
         """
         super(TestDepartment, self).setUp()
 
         with self.app_context():
-            # Instantiate an organization, save it to the database,
-            # and get its id.
-            self.o = OrganizationModel('test_o', True)
-            self.o.save_to_db()
-            self.organization_id = self.o.id
-
-            # Instantiate a department, save it to the database,
-            # and get its id.
-            self.d = DepartmentModel('test_d', self.organization_id, True)
-            self.d.save_to_db()
-            self.department_id = self.d.id
+            self.o = self.get_organization()
+            self.d = self.get_department(self.o.id)
 
     def test_find_department(self):
         """Test the find_by_name and find_by_id methods of DepartmentModel."""
         with self.app_context():
-            d_by_name = DepartmentModel.find_by_name('test_d',
-                                                     self.organization_id)
-            d_by_id = DepartmentModel.find_by_id(self.department_id,
-                                                 self.organization_id)
+            d_by_name = DepartmentModel.find_by_name(self.d.department_name,
+                                                     self.o.id)
+            d_by_id = DepartmentModel.find_by_id(self.d.id,
+                                                 self.o.id)
 
             self.assertIsNotNone(d_by_name)
             self.assertIsNotNone(d_by_name)
@@ -41,7 +32,8 @@ class TestDepartment(BaseTest):
         """Test that the organization object contains a department list."""
         with self.app_context():
             d_list = DepartmentModel.query.filter_by(
-                organization_id=self.organization_id).all()
-            o_d_list = OrganizationModel.find_by_name('test_o').departments
+                organization_id=self.o.id).all()
+            o_d_list = OrganizationModel.find_by_name(
+                self.o.organization_name).departments
 
             self.assertListEqual(d_list, o_d_list)

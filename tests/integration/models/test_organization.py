@@ -6,11 +6,12 @@ class TestOrganization(BaseTest):
     """Integration tests for the OrganizationModel."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by instantiating
-        an OrganizationModel object
+        Extend the BaseTest setUp method by setting up
+        a new organization.
         """
         super(TestOrganization, self).setUp()
-        self.o = OrganizationModel('test_o', True)
+
+        self.o = self.get_organization()
 
     def test_find_organization(self):
         """
@@ -18,9 +19,8 @@ class TestOrganization(BaseTest):
         of the OrganizationModel class.
         """
         with self.app_context():
-            self.o.save_to_db()
-
-            org_by_name = OrganizationModel.find_by_name('test_o')
+            org_by_name = OrganizationModel.find_by_name(
+                self.o.organization_name)
 
             org_by_id = OrganizationModel.find_by_id(self.o.id)
 

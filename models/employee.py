@@ -43,6 +43,10 @@ class EmployeeModel(ModelMixin, db.Model):
     shift_id = db.Column(db.Integer,
                          db.ForeignKey('shift.id'), nullable=False)
 
+    emergency_contacts = db.relationship('EmergencyContactModel',
+                                         backref='employee',
+                                         lazy='joined')
+
     def __init__(self, first_name, second_name, first_surname, second_surname,
                  national_id_number, is_panamanian, date_of_birth, gender,
                  address, home_phone, mobile_phone, email, type_of_contract,

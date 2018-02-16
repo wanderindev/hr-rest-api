@@ -3,6 +3,7 @@ from flask_jwt import JWT
 from flask_restful import Api
 
 from resources.department import ActivateDepartment, Department
+from resources.emergency_contact import EmergencyContact
 from resources.employee import ActivateEmployee, Employee
 from resources.employment_position import ActivateEmploymentPosition, \
     EmploymentPosition
@@ -85,5 +86,9 @@ def create_app(config_file=None):
                      '/employee/<int:employee_id>')
     api.add_resource(ActivateEmployee,
                      '/activate_employee/<int:employee_id>')
+
+    api.add_resource(EmergencyContact,
+                     '/emergency_contact',
+                     '/emergency_contact/<int:contact_id>')
 
     return app

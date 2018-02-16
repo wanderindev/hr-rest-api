@@ -1,10 +1,7 @@
-from datetime import time
 import json
 
-from models.department import DepartmentModel
+
 from models.employee import EmployeeModel
-from models.employment_position import EmploymentPositionModel
-from models.shift import ShiftModel
 from tests.base_test import BaseTest
 
 
@@ -12,38 +9,15 @@ class TestEmployee(BaseTest):
     """System tests for the employee resource."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by instantiating adepartment,
-        an employment position, and a shift, saving them to the database
-        and getting their respectives ids, then creating a dict representing
-        a employee so it is available for the different tests.
+        Extend the BaseTest setUp method by setting up a department, an
+        employment position, a shift, and a dict representing an employee.
         """
         super(TestEmployee, self).setUp()
 
         with self.app_context():
-            # Add every object to the seed organization.
-            self.organization_id = 1
-
-            # Instantiate a department, save it to the database,
-            # and get its id.
-            self.d = DepartmentModel('test_d', self.organization_id, True)
-            self.d.save_to_db()
-            self.department_id = self.d.id
-
-            # Instantiate an employment position, save it to the database,
-            # and get its id.
-            self.e_p = EmploymentPositionModel('test_e_p_f', 'test_e_p_m',
-                                               1.00, True, self.organization_id)
-            self.e_p.save_to_db()
-            self.position_id = self.e_p.id
-
-            # Instantiate a shift, save it to the database,
-            # and get its id.
-            self.s = ShiftModel('test_s_r', 48, True, 'Quincenal',
-                                time(0, 30), False, True, self.organization_id,
-                                rotation_start_hour=time(6),
-                                rotation_end_hour=time(21))
-            self.s.save_to_db()
-            self.shift_id = self.s.id   
+            self.d = self.get_department(1)
+            self.e_p = self.get_employment_position(1)
+            self.s = self.get_shift(1)
 
             self.e_dict = {
                 'first_name': 'f_n',
@@ -68,9 +42,9 @@ class TestEmployee(BaseTest):
                 'payment_method': 'ACH',
                 'is_active': True,
                 'marital_status_id': 1,
-                'department_id': self.department_id,
-                'position_id': self.position_id,
-                'shift_id': self.shift_id
+                'department_id': self.d.id,
+                'position_id': self.e_p.id,
+                'shift_id': self.s.id
             }
 
     def test_empl_post_with_authentication(self):
@@ -81,13 +55,6 @@ class TestEmployee(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                self.assertIsNone(EmployeeModel
-                                  .find_by_name(self.e_dict['first_name'],
-                                                self.e_dict['second_name'],
-                                                self.e_dict['first_surname'],
-                                                self.e_dict['second_surname'],
-                                                self.organization_id))
-
                 r = c.post('/employee',
                            data=json.dumps(self.e_dict),
                            headers=self.get_headers())
@@ -145,12 +112,8 @@ class TestEmployee(BaseTest):
                                  self.e_dict['marital_status_id'])
                 self.assertEqual(r_empl['shift_id'],
                                  self.e_dict['shift_id'])
-                self.assertIsNotNone(EmployeeModel.find_by_name(
-                    self.e_dict['first_name'],
-                    self.e_dict['second_name'],
-                    self.e_dict['first_surname'],
-                    self.e_dict['second_surname'],
-                    self.organization_id))
+                self.assertIsNotNone(EmployeeModel.find_by_id(r_empl['id'],
+                                                              1))
 
     def test_empl_post_without_authentication(self):
         """
@@ -279,9 +242,9 @@ class TestEmployee(BaseTest):
                               'payment_method': 'Cheque',
                               'is_active': True,
                               'marital_status_id': 2,
-                              'department_id': self.department_id,
-                              'position_id': self.position_id,
-                              'shift_id': self.shift_id
+                              'department_id': self.d.id,
+                              'position_id': self.e_p.id,
+                              'shift_id': self.s.id
                             }),
                           headers=self.get_headers())
 
@@ -329,13 +292,13 @@ class TestEmployee(BaseTest):
                 self.assertEqual(r_empl['termination_reason'],
                                  'Renuncia')
                 self.assertEqual(r_empl['position_id'],
-                                 self.position_id)
+                                 self.e_p.id)
                 self.assertEqual(r_empl['department_id'],
-                                 self.department_id)
+                                 self.d.id)
                 self.assertEqual(r_empl['marital_status_id'],
                                  2)
                 self.assertEqual(r_empl['shift_id'],
-                                 self.shift_id)
+                                 self.s.id)
                 self.assertEqual(r.status_code, 200)
 
     def test_empl_put_without_authentication(self):
@@ -372,9 +335,9 @@ class TestEmployee(BaseTest):
                               'payment_method': 'Cheque',
                               'is_active': True,
                               'marital_status_id': 2,
-                              'department_id': self.department_id,
-                              'position_id': self.position_id,
-                              'shift_id': self.shift_id
+                              'department_id': self.d.id,
+                              'position_id': self.e_p.id,
+                              'shift_id': self.s.id
                           }),
                           headers={
                               'Content-Type': 'application/json',
@@ -416,9 +379,9 @@ class TestEmployee(BaseTest):
                               'payment_method': 'Cheque',
                               'is_active': True,
                               'marital_status_id': 2,
-                              'department_id': self.department_id,
-                              'position_id': self.position_id,
-                              'shift_id': self.shift_id
+                              'department_id': self.d.id,
+                              'position_id': self.e_p.id,
+                              'shift_id': self.s.id
                           }),
                           headers=self.get_headers())
 

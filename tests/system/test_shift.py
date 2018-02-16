@@ -70,11 +70,11 @@ class TestShift(BaseTest):
         with self.app() as c:
             with self.app_context():
                 self.assertIsNone(ShiftModel
-                                  .find_by_name('test_s_r',
+                                  .find_by_name(self.s_r_dict['shift_name'],
                                                 self.s_r_dict[
                                                     'organization_id']))
                 self.assertIsNone(ShiftModel
-                                  .find_by_name('test_s_f',
+                                  .find_by_name(self.s_f_dict['shift_name'],
                                                 self.s_f_dict[
                                                     'organization_id']))
 
@@ -104,7 +104,7 @@ class TestShift(BaseTest):
                 self.assertListEqual(r_shift['employees'], [])
                 self.assertEqual(r.status_code, 201)
                 self.assertIsNotNone(ShiftModel
-                                     .find_by_name('test_s_r',
+                                     .find_by_name(self.s_r_dict['shift_name'],
                                                    self.s_r_dict[
                                                        'organization_id']))
 
@@ -173,7 +173,7 @@ class TestShift(BaseTest):
                 self.assertIsNone(r_shift['fixed_end_hour_sunday'])
                 self.assertEqual(r.status_code, 201)
                 self.assertIsNotNone(ShiftModel
-                                     .find_by_name('test_s_f',
+                                     .find_by_name(self.s_f_dict['shift_name'],
                                                    self.s_f_dict[
                                                        'organization_id']))
 

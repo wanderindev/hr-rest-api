@@ -1,6 +1,5 @@
 import json
 
-from models.organization import OrganizationModel
 from models.user import AppUserModel
 from tests.base_test import BaseTest
 

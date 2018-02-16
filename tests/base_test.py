@@ -1,3 +1,4 @@
+from datetime import date, time
 import json
 
 from unittest import TestCase
@@ -5,6 +6,7 @@ from unittest import TestCase
 from app import create_app
 from db import db
 from models.department import DepartmentModel
+from models.emergency_contact import EmergencyContactModel
 from models.employee import EmployeeModel
 from models.employment_position import EmploymentPositionModel
 from models.organization import OrganizationModel
@@ -44,6 +46,7 @@ class BaseTest(TestCase):
         with app.app_context():
             db.session.remove()
             AppUserModel.query.filter(AppUserModel.id != 1).delete()
+            EmergencyContactModel.query.delete()
             EmployeeModel.query.delete()
             DepartmentModel.query.delete()
             EmploymentPositionModel.query.delete()
@@ -75,3 +78,65 @@ class BaseTest(TestCase):
                     'Content-Type': 'application/json',
                     'Authorization': 'JWT ' + json.loads(r.data)['access_token']
                 }
+
+    def get_organization(self):
+        with self.app_context():
+            o = OrganizationModel('test_o', True)
+            o.save_to_db()
+
+            return OrganizationModel.find_by_id(o.id)
+
+    def get_user(self, organization_id):
+        with self.app_context():
+            u = AppUserModel('test_u', 'test_p', 'test_u@test_o.com',
+                             organization_id, True, True, True)
+            u.save_to_db()
+
+            return AppUserModel.find_by_id(u.id)
+
+    def get_department(self, organization_id):
+        with self.app_context():
+            d = DepartmentModel('test_d', organization_id, True)
+            d.save_to_db()
+
+            return DepartmentModel.find_by_id(d.id, organization_id)
+
+    def get_shift(self, organization_id):
+        with self.app_context():
+            s = ShiftModel('test_s_r', 48, True, 'Quincenal',
+                           time(0, 30), False, True, organization_id,
+                           rotation_start_hour=time(6),
+                           rotation_end_hour=time(21))
+            s.save_to_db()
+
+            return ShiftModel.find_by_id(s.id, organization_id)
+
+    def get_employment_position(self, organization_id):
+        with self.app_context():
+            e_p = EmploymentPositionModel('test_e_p_f', 'test_e_p_m',
+                                          1.00, True, organization_id)
+            e_p.save_to_db()
+
+            return EmploymentPositionModel.find_by_id(e_p.id, organization_id)
+
+    def get_employee(self, department_id, position_id,
+                     shift_id, organization_id):
+        with self.app_context():
+            e = EmployeeModel('f_n', 's_n', 'f_sn', 's_sn', '1-11-111',
+                              True, date(2000, 1, 31), 'Hombre', 'Panamá',
+                              '222-2222', '6666-6666', 'f_n@f_sn.com',
+                              'Definido', date(2018, 1, 1),
+                              date(2018, 1, 31), date(2018, 1, 15),
+                              'Período de Prueba', 104.00, 0, 'ACH', True,
+                              1, department_id, position_id, shift_id)
+            e.save_to_db()
+
+            return EmployeeModel.find_by_id(e.id, organization_id)
+
+    def get_emergency_contact(self, employee_id, organization_id):
+        with self.app_context():
+            e_c = EmergencyContactModel('f_n', 'l_n', '111-1111', '222-2222',
+                                        '6666-6666', employee_id)
+            e_c.save_to_db()
+
+            return EmergencyContactModel.find_by_id(e_c.id, organization_id)

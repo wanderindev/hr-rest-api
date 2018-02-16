@@ -6,8 +6,8 @@ class TestOrganization(BaseTest):
     """Integration tests for the ModelsMixin."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by instantiating
-        an OrganizationModel object
+        Extend the BaseTest setUp method by setting up
+        an OrganizationModel object.
         """
         super(TestOrganization, self).setUp()
         self.o = OrganizationModel('test_o', True)

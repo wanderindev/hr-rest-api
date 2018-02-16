@@ -307,7 +307,7 @@ class TestDepartment(BaseTest):
     def test_activate_dept_active(self):
         """
         Test that a PUT request to the /activate_department
-        /<string:department>_name endpoint returns status code 400
+        /<string:department_name>_name endpoint returns status code 400
         if the department is already active.
         """
         with self.app() as c:

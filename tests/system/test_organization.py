@@ -363,7 +363,8 @@ class TestOrganization(BaseTest):
                     OrganizationModel.find_by_name('Nuvanz').to_dict(),
                     org_list)
                 self.assertIn(
-                    OrganizationModel.find_by_name('test_o').to_dict(),
+                    OrganizationModel.find_by_name(
+                        self.o_dict['organization_name']).to_dict(),
                     org_list)
 
     def test_organization_list_without_authentication(self):
