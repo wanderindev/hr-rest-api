@@ -2,6 +2,7 @@ from flask import Flask
 from flask_jwt import JWT
 from flask_restful import Api
 
+from resources.country import CountryList
 from resources.department import ActivateDepartment, Department
 from resources.emergency_contact import EmergencyContact
 from resources.employee import ActivateEmployee, Employee
@@ -95,5 +96,8 @@ def create_app(config_file=None):
     api.add_resource(HealthPermit,
                      '/health_permit',
                      '/health_permit/<int:permit_id>')
+
+    api.add_resource(CountryList,
+                     '/countries')
 
     return app

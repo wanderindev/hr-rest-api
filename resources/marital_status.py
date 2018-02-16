@@ -9,4 +9,4 @@ class MaritalStatusList(Resource):
     @jwt_required()
     def get(self):
         return {'marital_statuses': list(map(lambda x: x.to_dict(),
-                                             MaritalStatusModel.query.all()))}
+                                             MaritalStatusModel.find_all()))}
