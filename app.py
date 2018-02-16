@@ -12,6 +12,7 @@ from resources.health_permit import HealthPermit
 from resources.marital_status import MaritalStatusList
 from resources.organization import ActivateOrganization, Organization, \
     OrganizationList
+from resources.passport import Passport
 from resources.shift import ActivateShift, Shift
 from resources.user import ActivateUser, User
 from security import authenticate, identity
@@ -99,5 +100,9 @@ def create_app(config_file=None):
 
     api.add_resource(CountryList,
                      '/countries')
+
+    api.add_resource(Passport,
+                     '/passport',
+                     '/passport/<int:passport_id>')
 
     return app

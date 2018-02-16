@@ -30,7 +30,7 @@ class TestEmergencyContact(BaseTest):
 
     def test_emergency_contact_list_in_employee(self):
         """
-        Test that the employee object object contains an
+        Test that the employee object contains an
         emergency_contacts list.
         """
         with self.app_context():

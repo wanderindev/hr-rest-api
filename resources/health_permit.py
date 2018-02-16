@@ -23,10 +23,10 @@ class HealthPermit(Resource):
     @jwt_required()
     def get(self, permit_id):
 
-        e_cont = HealthPermitModel.find_by_id(
+        h_p = HealthPermitModel.find_by_id(
             permit_id, current_identity.organization_id)
-        if e_cont:
-            return e_cont.to_dict()
+        if h_p:
+            return h_p.to_dict()
 
         return {'message': 'Health permit not found.'}, 404
 
@@ -35,13 +35,13 @@ class HealthPermit(Resource):
     def post():
         data = HealthPermit.parser.parse_args()
 
-        e_cont = HealthPermitModel(data['health_permit_type'],
+        h_p = HealthPermitModel(data['health_permit_type'],
                                    data['issue_date'],
                                    data['expiration_date'],
                                    data['employee_id'])
 
         try:
-            e_cont.save_to_db()
+            h_p.save_to_db()
         except exc.SQLAlchemyError:
             return {'message': 'An error occurred creating '
                                'the health permit.'}, 500
@@ -49,7 +49,7 @@ class HealthPermit(Resource):
         return {
                    'message': 'Health permit created successfully.',
                    'health_permit': HealthPermitModel.find_by_id(
-                       e_cont.id, current_identity.organization_id
+                       h_p.id, current_identity.organization_id
                    ).to_dict()
                }, 201
 
@@ -57,21 +57,21 @@ class HealthPermit(Resource):
     def put(self,  permit_id):
         data = HealthPermit.parser.parse_args()
 
-        e_cont = HealthPermitModel.find_by_id(
+        h_p = HealthPermitModel.find_by_id(
             permit_id, current_identity.organization_id)
 
-        if e_cont:
-            e_cont.health_permit_type = data['health_permit_type']
-            e_cont.issue_date = data['issue_date']
-            e_cont.expiration_date = data['expiration_date']
-            e_cont.employee_id = data['employee_id']
+        if h_p:
+            h_p.health_permit_type = data['health_permit_type']
+            h_p.issue_date = data['issue_date']
+            h_p.expiration_date = data['expiration_date']
+            h_p.employee_id = data['employee_id']
 
             try:
-                e_cont.save_to_db()
+                h_p.save_to_db()
                 return {
                    'message': 'Health permit updated successfully.',
                    'health_permit': HealthPermitModel.find_by_id(
-                       e_cont.id, current_identity.organization_id
+                       h_p.id, current_identity.organization_id
                    ).to_dict()
                 }, 200
             except exc.SQLAlchemyError:
@@ -82,12 +82,12 @@ class HealthPermit(Resource):
 
     @jwt_required()
     def delete(self, permit_id):
-        e_cont = HealthPermitModel.find_by_id(
+        h_p = HealthPermitModel.find_by_id(
             permit_id, current_identity.organization_id)
 
-        if e_cont:
+        if h_p:
             try:
-                e_cont.delete_from_db()
+                h_p.delete_from_db()
                 return {'message': 'Health permit deleted.'}, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while deleting'

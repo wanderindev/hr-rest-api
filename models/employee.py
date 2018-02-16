@@ -4,6 +4,7 @@ from models.enum import GENDER, PAYMENT_METHOD, TERMINATION_REASON, \
 from models.emergency_contact import EmergencyContactModel
 from models.health_permit import HealthPermitModel
 from models.mixin import ModelMixin
+from models.passport import PassportModel
 
 
 class EmployeeModel(ModelMixin, db.Model):
@@ -50,6 +51,9 @@ class EmployeeModel(ModelMixin, db.Model):
     health_permits = db.relationship(HealthPermitModel,
                                      backref='employee',
                                      lazy='joined')
+    passports = db.relationship(PassportModel,
+                                backref='employee',
+                                lazy='joined')
 
     def __init__(self, first_name, second_name, first_surname, second_surname,
                  national_id_number, is_panamanian, date_of_birth, gender,

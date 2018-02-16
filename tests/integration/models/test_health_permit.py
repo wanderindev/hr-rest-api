@@ -19,20 +19,18 @@ class TestHealthPermit(BaseTest):
         self.s = self.get_shift(self.o.id)
         self.e = self.get_employee(self.d.id, self.e_p.id, self.s.id, self.o.id)
         self.h_p = self.get_health_permit(self.e.id,  self.o.id)
-        print(self.h_p)
 
     def test_find_id(self):
         """Test the find_by_id methods of HealthPermitModel."""
         with self.app_context():
             h_p = HealthPermitModel.find_by_id(self.h_p.id,
                                                self.o.id)
-            print(h_p)
 
             self.assertIsNotNone(h_p)
 
     def test_health_permit_list_in_employee(self):
         """
-        Test that the employee object object contains an
+        Test that the employee object contains an
         health_permit list.
         """
         with self.app_context():
