@@ -82,6 +82,7 @@ class UniformItem(Resource):
 
         if u_i:
             try:
+                u_i.delete_from_db()
                 return {'message': 'Uniform item deleted.'}, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while deleting '

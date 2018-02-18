@@ -1,5 +1,6 @@
 from db import db
 from models.mixin import ModelMixin
+from models.uniform_size import UniformSizeModel
 
 
 class UniformItemModel(ModelMixin, db.Model):
@@ -10,6 +11,10 @@ class UniformItemModel(ModelMixin, db.Model):
     organization_id = db.Column(db.Integer,
                                 db.ForeignKey('organization.id'),
                                 nullable=False, index=True)
+
+    uniform_sizes = db.relationship(UniformSizeModel,
+                                    backref='uniform_item',
+                                    lazy='joined')
 
     def __init__(self, item_name, organization_id):
         self.item_name = item_name

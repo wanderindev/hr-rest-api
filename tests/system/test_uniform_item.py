@@ -84,7 +84,7 @@ class TestUniformItem(BaseTest):
 
     def test_u_item_get_with_authentication(self):
         """
-        Test that a GET request to the /uniform_item/<string:item_id>
+        Test that a GET request to the /uniform_item/<int:item_id>
         endpoint returns the correct uniform item and status code 200 if the
         user is authenticated.
         """
@@ -107,7 +107,7 @@ class TestUniformItem(BaseTest):
 
     def test_u_item_get_not_found(self):
         """
-        Test that a GET request to the /uniform_item/<string:item_id>
+        Test that a GET request to the /uniform_item/<int:item_id>
         endpoint returns status code 404 if the uniform item is not found in
         the database table.
         """
@@ -120,7 +120,7 @@ class TestUniformItem(BaseTest):
 
     def test_u_item_get_without_authentication(self):
         """
-        Test that a GET request to the /uniform_item/<string:item_id>
+        Test that a GET request to the /uniform_item/<int:item_id>
         returns status code 401 if the user is not authenticated.
         """
         with self.app() as c:
@@ -137,7 +137,7 @@ class TestUniformItem(BaseTest):
 
     def test_u_item_put_with_authentication(self):
         """
-        Test that a PUT request to the /uniform_item/<string:item_id>
+        Test that a PUT request to the /uniform_item/<int:item_id>
         endpoint returns status code 200.
         """
         with self.app() as c:
@@ -166,7 +166,7 @@ class TestUniformItem(BaseTest):
 
     def test_u_item_put_without_authentication(self):
         """
-        Test that a PUT request to the /uniform_item/<string:item_id>
+        Test that a PUT request to the /uniform_item/<int:item_id>
         endpoint returns status code 401 if the user is not authenticated.
         """
         with self.app() as c:
@@ -188,7 +188,7 @@ class TestUniformItem(BaseTest):
 
     def test_u_item_put_not_found(self):
         """
-        Test that a PUT request to the /uniform_item/<string:item_id>
+        Test that a PUT request to the /uniform_item/<int:item_id>
         endpoint returns status code 404 if the uniform item is not
         in the database.
         """
@@ -206,7 +206,7 @@ class TestUniformItem(BaseTest):
 
     def test_u_item_delete_with_authentication(self):
         """
-        Test that a DELETE request to the /uniform_item/<string:item_id>
+        Test that a DELETE request to the /uniform_item/<int:item_id>
         endpoint returns status code 200.
         """
         with self.app() as c:
@@ -224,7 +224,7 @@ class TestUniformItem(BaseTest):
 
     def test_u_item_delete_without_authentication(self):
         """
-        Test that a DELETE request to the /uniform_item/<string:item_id>
+        Test that a DELETE request to the /uniform_item/<int:item_id>
         endpoint returns status code 401 if user is not authenticated.
         """
         with self.app() as c:
@@ -241,7 +241,7 @@ class TestUniformItem(BaseTest):
 
     def test_u_item_delete_not_found(self):
         """
-        Test that a DELETE request to the /uniform_item/<string:item_id>
+        Test that a DELETE request to the /uniform_item/<int:item_id>
         endpoint returns status code 404 if the uniform item is not found.
         """
         with self.app() as c:
