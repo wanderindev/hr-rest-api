@@ -29,7 +29,7 @@ class TestDepartment(BaseTest):
         with self.app() as c:
             with self.app_context():
                 self.assertIsNone(DepartmentModel
-                                  .find_by_name('test_d',
+                                  .find_by_name(self.d_dict['department_name'],
                                                 self.d_dict['organization_id']))
 
                 r = c.post('/department',
@@ -45,10 +45,9 @@ class TestDepartment(BaseTest):
                 self.assertEqual(r_dept['organization_id'],
                                  self.d_dict['organization_id'])
                 self.assertListEqual(r_dept['employees'], [])
-                self.assertIsNotNone(DepartmentModel
-                                     .find_by_name('test_d',
-                                                   self.d_dict[
-                                                       'organization_id']))
+                self.assertIsNotNone(DepartmentModel.find_by_name(
+                    self.d_dict['department_name'],
+                    self.d_dict['organization_id']))
 
     def test_dept_post_without_authentication(self):
         """
@@ -98,7 +97,7 @@ class TestDepartment(BaseTest):
                        data=json.dumps(self.d_dict),
                        headers=self.get_headers())
 
-                r = c.get(f'/department/test_d',
+                r = c.get(f'/department/{self.d_dict["department_name"]}',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
@@ -115,7 +114,7 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.get(f'/department/test_d',
+                r = c.get(f'/department/{self.d_dict["department_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
@@ -129,7 +128,7 @@ class TestDepartment(BaseTest):
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/department/test_d',
+                r = c.get(f'/department/{self.d_dict["department_name"]}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -173,7 +172,7 @@ class TestDepartment(BaseTest):
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/department/test_d',
+                r = c.put(f'/department/{self.d_dict["department_name"]}',
                           data=json.dumps({
                               'department_name': 'new_test_d',
                               'organization_id': self.d_dict['organization_id'],
@@ -193,7 +192,7 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/department/test_d',
+                r = c.put(f'/department/{self.d_dict["department_name"]}',
                           data=json.dumps({
                               'department_name': 'new_test_d',
                               'organization_id': self.d_dict['organization_id'],
@@ -213,7 +212,7 @@ class TestDepartment(BaseTest):
                        data=json.dumps(self.d_dict),
                        headers=self.get_headers())
 
-                r = c.delete(f'/department/test_d',
+                r = c.delete(f'/department/{self.d_dict["department_name"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -227,7 +226,7 @@ class TestDepartment(BaseTest):
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/department/test_d',
+                r = c.delete(f'/department/{self.d_dict["department_name"]}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -247,11 +246,11 @@ class TestDepartment(BaseTest):
                        headers=self.get_headers())
 
                 # Make department inactive.
-                c.delete(f'/department/test_d',
+                c.delete(f'/department/{self.d_dict["department_name"]}',
                          headers=self.get_headers())
 
                 # Send DELETE request on inactive department.
-                r = c.delete(f'/department/test_d',
+                r = c.delete(f'/department/{self.d_dict["department_name"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
@@ -263,7 +262,7 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete(f'/department/test_d',
+                r = c.delete(f'/department/{self.d_dict["department_name"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
@@ -279,10 +278,11 @@ class TestDepartment(BaseTest):
                        data=json.dumps(self.d_dict),
                        headers=self.get_headers())
 
-                c.delete(f'/department/test_d',
+                c.delete(f'/department/{self.d_dict["department_name"]}',
                          headers=self.get_headers())
 
-                r = c.put(f'/activate_department/test_d',
+                r = c.put(f'/activate_department/'
+                          f'{self.d_dict["department_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -297,7 +297,8 @@ class TestDepartment(BaseTest):
             with self.app_context():
                 # Send PUT request to /activate_department with
                 # wrong authorization header.
-                r = c.put(f'/activate_department/test_d',
+                r = c.put(f'/activate_department/'
+                          f'{self.d_dict["department_name"]}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -317,7 +318,8 @@ class TestDepartment(BaseTest):
                        data=json.dumps(self.d_dict),
                        headers=self.get_headers())
 
-                r = c.put(f'/activate_department/test_d',
+                r = c.put(f'/activate_department/'
+                          f'{self.d_dict["department_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
@@ -330,7 +332,8 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/activate_department/test_d',
+                r = c.put(f'/activate_department/'
+                          f'{self.d_dict["department_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)

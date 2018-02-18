@@ -224,7 +224,7 @@ class TestShift(BaseTest):
                        data=json.dumps(self.s_r_dict),
                        headers=self.get_headers())
 
-                r = c.get(f'/shift/test_s_r',
+                r = c.get(f'/shift/{self.s_r_dict["shift_name"]}',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
@@ -241,7 +241,7 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.get(f'/shift/test_s_r',
+                r = c.get(f'/shift/{self.s_r_dict["shift_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
@@ -255,7 +255,7 @@ class TestShift(BaseTest):
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/shift/test_s_r',
+                r = c.get(f'/shift/{self.s_r_dict["shift_name"]}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -279,7 +279,7 @@ class TestShift(BaseTest):
                        headers=self.get_headers())
 
                 # Send PUT request modifying the rotating shift.
-                r = c.put(f'/shift/test_s_r',
+                r = c.put(f'/shift/{self.s_r_dict["shift_name"]}',
                           data=json.dumps({
                               'shift_name': 'new_test_s_r',
                               'weekly_hours': 44,
@@ -317,7 +317,7 @@ class TestShift(BaseTest):
                 self.assertEqual(r.status_code, 200)
 
                 # Send PUT request modifying the fixed shift.
-                r = c.put(f'/shift/test_s_f',
+                r = c.put(f'/shift/{self.s_f_dict["shift_name"]}',
                           data=json.dumps({
                               'shift_name': 'test_s_f',
                               'weekly_hours': 48,
@@ -426,7 +426,7 @@ class TestShift(BaseTest):
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/shift/test_s_r',
+                r = c.put(f'/shift/{self.s_r_dict["shift_name"]}',
                           data=json.dumps({
                               'shift_name': 'new_test_s_r',
                               'weekly_hours': 44,
@@ -454,7 +454,7 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/shift/test_s_r',
+                r = c.put(f'/shift/{self.s_r_dict["shift_name"]}',
                           data=json.dumps({
                               'shift_name': 'new_test_s_r',
                               'weekly_hours': 44,
@@ -483,7 +483,7 @@ class TestShift(BaseTest):
                        data=json.dumps(self.s_r_dict),
                        headers=self.get_headers())
 
-                r = c.delete(f'/shift/test_s_r',
+                r = c.delete(f'/shift/{self.s_r_dict["shift_name"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -497,7 +497,7 @@ class TestShift(BaseTest):
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/shift/test_s_r',
+                r = c.delete(f'/shift/{self.s_r_dict["shift_name"]}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -517,11 +517,11 @@ class TestShift(BaseTest):
                        headers=self.get_headers())
 
                 # Make shift inactive.
-                c.delete(f'/shift/test_s_r',
+                c.delete(f'/shift/{self.s_r_dict["shift_name"]}',
                          headers=self.get_headers())
 
                 # Send DELETE request on inactive shift.
-                r = c.delete(f'/shift/test_s_r',
+                r = c.delete(f'/shift/{self.s_r_dict["shift_name"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
@@ -533,7 +533,7 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete(f'/shift/test_s_r',
+                r = c.delete(f'/shift/{self.s_r_dict["shift_name"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
@@ -549,10 +549,10 @@ class TestShift(BaseTest):
                        data=json.dumps(self.s_r_dict),
                        headers=self.get_headers())
 
-                c.delete(f'/shift/test_s_r',
+                c.delete(f'/shift/{self.s_r_dict["shift_name"]}',
                          headers=self.get_headers())
 
-                r = c.put(f'/activate_shift/test_s_r',
+                r = c.put(f'/activate_shift/{self.s_r_dict["shift_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -566,7 +566,7 @@ class TestShift(BaseTest):
             with self.app_context():
                 # Send PUT request to /activate_shift with
                 # wrong authorization header.
-                r = c.put(f'/activate_shift/test_s_r',
+                r = c.put(f'/activate_shift/{self.s_r_dict["shift_name"]}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -585,7 +585,7 @@ class TestShift(BaseTest):
                        data=json.dumps(self.s_r_dict),
                        headers=self.get_headers())
 
-                r = c.put(f'/activate_shift/test_s_r',
+                r = c.put(f'/activate_shift/{self.s_r_dict["shift_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
@@ -597,7 +597,7 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/activate_shift/test_s_r',
+                r = c.put(f'/activate_shift/{self.s_r_dict["shift_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)

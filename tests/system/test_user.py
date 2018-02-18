@@ -31,7 +31,8 @@ class TestUser(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                self.assertIsNone(AppUserModel.find_by_username('test_u'))
+                self.assertIsNone(AppUserModel.find_by_username(
+                    self.u_dict['username']))
 
                 r = c.post('/user',
                            data=json.dumps(self.u_dict),
@@ -98,7 +99,7 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                r = c.get('/user/test_u',
+                r = c.get(f'/user/{self.u_dict["username"]}',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
@@ -114,7 +115,7 @@ class TestUser(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.get('/user/test_u',
+                r = c.get(f'/user/{self.u_dict["username"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
@@ -128,7 +129,7 @@ class TestUser(BaseTest):
             with self.app_context():
                 # Send the GET request to the /user endpoint with
                 # wrong authentication header.
-                r = c.get('/user/test_u',
+                r = c.get(f'/user/{self.u_dict["username"]}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -147,7 +148,7 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                r = c.put('/user/test_u',
+                r = c.put(f'/user/{self.u_dict["username"]}',
                           data=json.dumps({
                               'username': 'new_test_u',
                               'password': 'new_test_p',
@@ -179,7 +180,7 @@ class TestUser(BaseTest):
             with self.app_context():
                 # Send PUT request to the /user/test_u endpoint with
                 # wrong authentication header.
-                r = c.put('/user/test_u',
+                r = c.put(f'/user/{self.u_dict["username"]}',
                           data=json.dumps({
                               'username': 'new_test_u',
                               'password': 'new_test_p',
@@ -202,7 +203,7 @@ class TestUser(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put('/user/test_u',
+                r = c.put(f'/user/{self.u_dict["username"]}',
                           data=json.dumps({
                               'username': 'new_test_u',
                               'password': 'new_test_p',
@@ -226,7 +227,7 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                r = c.delete('/user/test_u',
+                r = c.delete(f'/user/{self.u_dict["username"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -240,7 +241,7 @@ class TestUser(BaseTest):
             with self.app_context():
                 # Send DELETE request to the /user/test_u endpoint
                 # with wrong authorization header.
-                r = c.delete('/user/test_u',
+                r = c.delete(f'/user/{self.u_dict["username"]}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -260,11 +261,11 @@ class TestUser(BaseTest):
                        headers=self.get_headers())
 
                 # Make user inactive.
-                c.delete('/user/test_u',
+                c.delete(f'/user/{self.u_dict["username"]}',
                          headers=self.get_headers())
 
                 # Send DELETE request on inactive user.
-                r = c.delete('/user/test_u',
+                r = c.delete(f'/user/{self.u_dict["username"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
@@ -276,7 +277,7 @@ class TestUser(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete('/user/test_u',
+                r = c.delete(f'/user/{self.u_dict["username"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
@@ -292,10 +293,10 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                c.delete('/user/test_u',
+                c.delete(f'/user/{self.u_dict["username"]}',
                          headers=self.get_headers())
 
-                r = c.put('/activate_user/test_u',
+                r = c.put(f'/activate_user/{self.u_dict["username"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -309,7 +310,7 @@ class TestUser(BaseTest):
             with self.app_context():
                 # Send PUT request to /activate_user/test_u with
                 # wrong authorization header.
-                r = c.put('/activate_user/test_u',
+                r = c.put(f'/activate_user/{self.u_dict["username"]}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -328,7 +329,7 @@ class TestUser(BaseTest):
                        data=json.dumps(self.u_dict),
                        headers=self.get_headers())
 
-                r = c.put('/activate_user/test_u',
+                r = c.put(f'/activate_user/{self.u_dict["username"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
@@ -340,7 +341,7 @@ class TestUser(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put('/activate_user/test_u',
+                r = c.put(f'/activate_user/{self.u_dict["username"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)

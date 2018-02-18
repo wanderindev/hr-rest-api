@@ -14,6 +14,7 @@ from resources.organization import ActivateOrganization, Organization, \
     OrganizationList
 from resources.passport import Passport
 from resources.shift import ActivateShift, Shift
+from resources.uniform_item import UniformItem
 from resources.user import ActivateUser, User
 from security import authenticate, identity
 
@@ -104,5 +105,9 @@ def create_app(config_file=None):
     api.add_resource(Passport,
                      '/passport',
                      '/passport/<int:passport_id>')
+
+    api.add_resource(UniformItem,
+                     '/uniform_item',
+                     '/uniform_item/<int:item_id>')
 
     return app

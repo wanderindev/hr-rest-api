@@ -3,7 +3,9 @@ from models.department import DepartmentModel
 from models.employment_position import EmploymentPositionModel
 from models.mixin import ModelMixin
 from models.shift import ShiftModel
+from models.uniform_item import UniformItemModel
 from models.user import AppUserModel
+
 
 class OrganizationModel(ModelMixin, db.Model):
     __tablename__ = 'organization'
@@ -27,6 +29,10 @@ class OrganizationModel(ModelMixin, db.Model):
     shifts = db.relationship(ShiftModel,
                              backref='organization',
                              lazy='joined')
+
+    uniform_items = db.relationship(UniformItemModel,
+                                    backref='organization',
+                                    lazy='joined')
 
     def __init__(self, organization_name, is_active):
         self.organization_name = organization_name

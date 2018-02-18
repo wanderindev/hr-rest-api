@@ -26,7 +26,8 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                self.assertIsNone(OrganizationModel.find_by_name('test_o'))
+                self.assertIsNone(OrganizationModel.find_by_name(
+                    self.o_dict["organization_name"]))
 
                 r = c.post('/organization',
                            data=json.dumps(self.o_dict),
@@ -47,7 +48,8 @@ class TestOrganization(BaseTest):
                                      [])
                 self.assertListEqual(r_org['app_users'],
                                      [])
-                self.assertIsNotNone(OrganizationModel.find_by_name('test_o'))
+                self.assertIsNotNone(OrganizationModel.find_by_name(
+                    self.o_dict["organization_name"]))
 
     def test_organization_post_without_authentication(self):
         """
@@ -98,7 +100,7 @@ class TestOrganization(BaseTest):
                        data=json.dumps(self.o_dict),
                        headers=self.get_headers())
 
-                r = c.get('/organization/test_o',
+                r = c.get(f'/organization/{self.o_dict["organization_name"]}',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
@@ -115,7 +117,7 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.get('/organization/test_o',
+                r = c.get(f'/organization/{self.o_dict["organization_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
@@ -129,7 +131,7 @@ class TestOrganization(BaseTest):
             with self.app_context():
                 # Send the GET request to the /organization endpoint with
                 # wrong authentication header.
-                r = c.get('/organization/Test%20Org',
+                r = c.get(f'/organization/{self.o_dict["organization_name"]}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -148,7 +150,7 @@ class TestOrganization(BaseTest):
                        data=json.dumps(self.o_dict),
                        headers=self.get_headers())
 
-                r = c.put('/organization/test_o',
+                r = c.put(f'/organization/{self.o_dict["organization_name"]}',
                           data=json.dumps({
                               'organization_name': 'new_test_o'
                           }),
@@ -179,7 +181,7 @@ class TestOrganization(BaseTest):
             with self.app_context():
                 # Send PUT request to the /organization/
                 # <string:organization_name>  endpoint.
-                r = c.put('/organization/test_o',
+                r = c.put(f'/organization/{self.o_dict["organization_name"]}',
                           data=json.dumps({
                               'organization_name': 'new_test_o'
                           }),
@@ -198,7 +200,7 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put('/organization/test_o',
+                r = c.put(f'/organization/{self.o_dict["organization_name"]}',
                           data=json.dumps({
                               'organization_name': 'new_test_o'
                           }),
@@ -217,7 +219,8 @@ class TestOrganization(BaseTest):
                        data=json.dumps(self.o_dict),
                        headers=self.get_headers())
 
-                r = c.delete('/organization/test_o',
+                r = c.delete(f'/organization/'
+                             f'{self.o_dict["organization_name"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -230,9 +233,11 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                # Send DELETE request to the /organization/test_o endpoint
+                # Send DELETE request to the /organization/
+                # <string:organization_name> endpoint
                 # with wrong authorization header.
-                r = c.delete('/organization/test_o',
+                r = c.delete(f'/organization/'
+                             f'{self.o_dict["organization_name"]}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -253,11 +258,13 @@ class TestOrganization(BaseTest):
                        headers=self.get_headers())
 
                 # Make organization inactive.
-                c.delete('/organization/test_o',
+                c.delete(f'/organization/'
+                         f'{self.o_dict["organization_name"]}',
                          headers=self.get_headers())
 
                 # Send DELETE request on inactive organization.
-                r = c.delete('/organization/test_o',
+                r = c.delete(f'/organization/'
+                             f'{self.o_dict["organization_name"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
@@ -270,7 +277,8 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete('/organization/test_o',
+                r = c.delete(f'/organization/'
+                             f'{self.o_dict["organization_name"]}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
@@ -286,10 +294,11 @@ class TestOrganization(BaseTest):
                        data=json.dumps(self.o_dict),
                        headers=self.get_headers())
 
-                c.delete('/organization/test_o',
+                c.delete(f'/organization/{self.o_dict["organization_name"]}',
                          headers=self.get_headers())
 
-                r = c.put('/activate_organization/test_o',
+                r = c.put(f'/activate_organization/'
+                          f'{self.o_dict["organization_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -304,7 +313,8 @@ class TestOrganization(BaseTest):
             with self.app_context():
                 # Send PUT request to /activate_organization with
                 # wrong authorization header.
-                r = c.put('/activate_organization/test_o',
+                r = c.put(f'/activate_organization/'
+                          f'{self.o_dict["organization_name"]}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -324,7 +334,8 @@ class TestOrganization(BaseTest):
                        data=json.dumps(self.o_dict),
                        headers=self.get_headers())
 
-                r = c.put('/activate_organization/test_o',
+                r = c.put(f'/activate_organization/'
+                          f'{self.o_dict["organization_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
@@ -337,7 +348,8 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put('/activate_organization/test_o',
+                r = c.put(f'/activate_organization/'
+                          f'{self.o_dict["organization_name"]}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)

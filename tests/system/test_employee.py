@@ -182,7 +182,7 @@ class TestEmployee(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.get(f'/employee/test_d',
+                r = c.get(f'/employee/1',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
