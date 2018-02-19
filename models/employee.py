@@ -5,6 +5,7 @@ from models.emergency_contact import EmergencyContactModel
 from models.health_permit import HealthPermitModel
 from models.mixin import ModelMixin
 from models.passport import PassportModel
+from models.uniform_requirement import UniformRequirementModel
 
 
 class EmployeeModel(ModelMixin, db.Model):
@@ -54,6 +55,9 @@ class EmployeeModel(ModelMixin, db.Model):
     passports = db.relationship(PassportModel,
                                 backref='employee',
                                 lazy='joined')
+    uniform_requirements = db.relationship(UniformRequirementModel,
+                                           backref='employee',
+                                           lazy='joined')
 
     def __init__(self, first_name, second_name, first_surname, second_surname,
                  national_id_number, is_panamanian, date_of_birth, gender,

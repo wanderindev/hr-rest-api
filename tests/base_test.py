@@ -14,6 +14,7 @@ from models.organization import OrganizationModel
 from models.passport import PassportModel
 from models.shift import ShiftModel
 from models.uniform_item import UniformItemModel
+from models.uniform_requirement import UniformRequirementModel
 from models.uniform_size import UniformSizeModel
 from models.user import AppUserModel
 
@@ -53,6 +54,7 @@ class BaseTest(TestCase):
             EmergencyContactModel.query.delete()
             HealthPermitModel.query.delete()
             PassportModel.query.delete()
+            UniformRequirementModel.query.delete()
             EmployeeModel.query.delete()
             EmploymentPositionModel.query.delete()
             ShiftModel.query.delete()
@@ -178,3 +180,11 @@ class BaseTest(TestCase):
             u_s.save_to_db()
 
             return UniformSizeModel.find_by_id(u_s.id, organization_id)
+
+    def get_uniform_requirement(self, employee_id, item_id,
+                                size_id, organization_id):
+        with self.app_context():
+            u_r = UniformRequirementModel(employee_id, item_id, size_id)
+            u_r.save_to_db()
+
+            return UniformRequirementModel.find_by_id(u_r.id, organization_id)
