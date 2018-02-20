@@ -43,7 +43,7 @@ class HealthPermit(Resource):
         try:
             h_p.save_to_db()
         except exc.SQLAlchemyError:
-            return {'message': 'An error occurred creating '
+            return {'message': 'An error occurred while creating '
                                'the health permit.'}, 500
 
         return {
@@ -75,7 +75,7 @@ class HealthPermit(Resource):
                    ).to_dict()
                 }, 200
             except exc.SQLAlchemyError:
-                return {'message': 'An error occurred updating '
+                return {'message': 'An error occurred while updating '
                                    'the health permit.'}, 500
 
         return {'message': 'Health permit not found.'}, 404

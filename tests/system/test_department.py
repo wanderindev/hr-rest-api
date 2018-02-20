@@ -147,7 +147,7 @@ class TestDepartment(BaseTest):
                        data=json.dumps(self.d_dict),
                        headers=self.get_headers())
 
-                r = c.put(f'/department/test_d',
+                r = c.put(f'/department/{self.d_dict["department_name"]}',
                           data=json.dumps({
                               'department_name': 'new_test_d',
                               'organization_id': self.d_dict['organization_id'],

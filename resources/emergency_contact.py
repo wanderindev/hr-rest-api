@@ -51,7 +51,7 @@ class EmergencyContact(Resource):
         try:
             e_cont.save_to_db()
         except exc.SQLAlchemyError:
-            return {'message': 'An error occurred creating '
+            return {'message': 'An error occurred while creating '
                                'the emergency contact.'}, 500
 
         return {
@@ -85,7 +85,7 @@ class EmergencyContact(Resource):
                    ).to_dict()
                 }, 200
             except exc.SQLAlchemyError:
-                return {'message': 'An error occurred updating '
+                return {'message': 'An error occurred while updating '
                                    'the emergency contact.'}, 500
 
         return {'message': 'Emergency contact not found.'}, 404

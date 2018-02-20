@@ -5,6 +5,7 @@ from unittest import TestCase
 
 from app import create_app
 from db import db
+from models.bank_account import BankAccountModel
 from models.department import DepartmentModel
 from models.emergency_contact import EmergencyContactModel
 from models.employee import EmployeeModel
@@ -51,6 +52,7 @@ class BaseTest(TestCase):
         with app.app_context():
             db.session.remove()
             AppUserModel.query.filter(AppUserModel.id != 1).delete()
+            BankAccountModel.query.delete()
             EmergencyContactModel.query.delete()
             HealthPermitModel.query.delete()
             PassportModel.query.delete()
@@ -188,3 +190,12 @@ class BaseTest(TestCase):
             u_r.save_to_db()
 
             return UniformRequirementModel.find_by_id(u_r.id, organization_id)
+
+    def get_bank_account(self, account_number, account_type, is_active,
+                         employee_id, bank_id, organization_id):
+        with self.app_context():
+            b_a = BankAccountModel(account_number, account_type,
+                                   is_active, employee_id, bank_id)
+            b_a.save_to_db()
+
+            return BankAccountModel.find_by_id(b_a.id, organization_id)

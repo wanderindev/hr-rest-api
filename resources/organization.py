@@ -38,7 +38,7 @@ class Organization(Resource):
         try:
             organization.save_to_db()
         except exc.SQLAlchemyError:
-            return {'message': 'An error occurred creating '
+            return {'message': 'An error occurred while creating '
                                'the organization.'}, 500
 
         return {
@@ -66,7 +66,7 @@ class Organization(Resource):
                            ).to_dict()
                        }, 200
             except exc.SQLAlchemyError:
-                return {'message': 'An error occurred updating '
+                return {'message': 'An error occurred while updating '
                                    'the organization.'}, 500
 
         return {'message': 'Organization not found'}, 404

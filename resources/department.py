@@ -45,7 +45,7 @@ class Department(Resource):
         try:
             dept.save_to_db()
         except exc.SQLAlchemyError:
-            return {'message': 'An error occurred creating '
+            return {'message': 'An error occurred while creating '
                                'the department.'}, 500
 
         return {
@@ -74,7 +74,7 @@ class Department(Resource):
                    ).to_dict()
                 }, 200
             except exc.SQLAlchemyError:
-                return {'message': 'An error occurred updating '
+                return {'message': 'An error occurred while updating '
                                    'the department.'}, 500
 
         return {'message': 'Department not found.'}, 404

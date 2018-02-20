@@ -40,7 +40,7 @@ class UniformItem(Resource):
         try:
             u_i.save_to_db()
         except exc.SQLAlchemyError:
-            return {'message': 'An error occurred creating '
+            return {'message': 'An error occurred while creating '
                                'the uniform item.'}, 500
 
         return {
@@ -70,7 +70,7 @@ class UniformItem(Resource):
                    ).to_dict()
                 }, 200
             except exc.SQLAlchemyError:
-                return {'message': 'An error occurred updating '
+                return {'message': 'An error occurred while updating '
                                    'the uniform item.'}, 500
 
         return {'message': 'Uniform item not found.'}, 404

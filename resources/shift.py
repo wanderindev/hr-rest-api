@@ -219,7 +219,7 @@ class Shift(Resource):
         try:
             shift.save_to_db()
         except exc.SQLAlchemyError:
-            return {'message': 'An error occurred creating '
+            return {'message': 'An error occurred while creating '
                                'the shift.'}, 500
 
         return {
@@ -304,7 +304,7 @@ class Shift(Resource):
                            ).to_dict()
                        }, 200
             except exc.SQLAlchemyError:
-                return {'message': 'An error occurred updating '
+                return {'message': 'An error occurred while updating '
                                    'the shift.'}, 500
 
         return {'message': 'Shift not found.'}, 404

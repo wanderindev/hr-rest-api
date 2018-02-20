@@ -1,6 +1,7 @@
 from db import db
 from models.enum import GENDER, PAYMENT_METHOD, TERMINATION_REASON, \
     TYPE_OF_CONTRACT
+from models.bank_account import BankAccountModel
 from models.emergency_contact import EmergencyContactModel
 from models.health_permit import HealthPermitModel
 from models.mixin import ModelMixin
@@ -58,6 +59,9 @@ class EmployeeModel(ModelMixin, db.Model):
     uniform_requirements = db.relationship(UniformRequirementModel,
                                            backref='employee',
                                            lazy='joined')
+    bank_accounts = db.relationship(BankAccountModel,
+                                    backref='employee',
+                                    lazy='joined')
 
     def __init__(self, first_name, second_name, first_surname, second_surname,
                  national_id_number, is_panamanian, date_of_birth, gender,

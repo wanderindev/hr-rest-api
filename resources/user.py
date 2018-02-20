@@ -59,7 +59,7 @@ class User(Resource):
         try:
             user.save_to_db()
         except exc.SQLAlchemyError:
-            return {'message': 'An error occurred creating '
+            return {'message': 'An error occurred while creating '
                                'the user.'}, 500
 
         return {
@@ -91,7 +91,7 @@ class User(Resource):
                            ).to_dict()
                        }, 200
             except exc.SQLAlchemyError:
-                return {'message': 'An error occurred updating '
+                return {'message': 'An error occurred while updating '
                                    'the user.'}, 500
 
         return {'message': 'User not found.'}, 404

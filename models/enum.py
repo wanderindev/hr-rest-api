@@ -1,5 +1,7 @@
 from db import db
 
+ACCOUNT_TYPE = db.Enum('Ahorro', 'Corriente', name='account_type')
+
 DAYS_OF_WEEK = db.Enum('Lunes', 'Martes', 'Miércoles', 'Jueves',
                        'Viernes', 'Sábado', 'Domingo',
                        name='days_of_week')

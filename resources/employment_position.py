@@ -56,7 +56,7 @@ class EmploymentPosition(Resource):
         try:
             e_p.save_to_db()
         except exc.SQLAlchemyError:
-            return {'message': 'An error occurred creating '
+            return {'message': 'An error occurred while creating '
                                'the employment position.'}, 500
 
         return {
@@ -90,7 +90,7 @@ class EmploymentPosition(Resource):
                                current_identity.organization_id).to_dict()
                        }, 200
             except exc.SQLAlchemyError:
-                return {'message': 'An error occurred updating '
+                return {'message': 'An error occurred while updating '
                                    'the employment position.'}, 500
 
         return {'message': 'Employment position not found.'}, 404

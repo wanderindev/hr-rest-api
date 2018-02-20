@@ -2,6 +2,8 @@ from flask import Flask
 from flask_jwt import JWT
 from flask_restful import Api
 
+from resources.bank import BankList
+from resources.bank_account import ActivateBankAccount, BankAccount
 from resources.country import CountryList
 from resources.department import ActivateDepartment, Department
 from resources.emergency_contact import EmergencyContact
@@ -119,5 +121,14 @@ def create_app(config_file=None):
     api.add_resource(UniformRequirement,
                      '/uniform_requirement',
                      '/uniform_requirement/<int:requirement_id>')
+
+    api.add_resource(BankList,
+                     '/banks')
+
+    api.add_resource(BankAccount,
+                     '/bank_account',
+                     '/bank_account/<int:account_id>')
+    api.add_resource(ActivateBankAccount,
+                     '/activate_bank_account/<int:account_id>')
 
     return app

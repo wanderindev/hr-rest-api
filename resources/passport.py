@@ -47,7 +47,7 @@ class Passport(Resource):
         try:
             passp.save_to_db()
         except exc.SQLAlchemyError:
-            return {'message': 'An error occurred creating '
+            return {'message': 'An error occurred while creating '
                                'the passport.'}, 500
 
         return {
@@ -80,7 +80,7 @@ class Passport(Resource):
                    ).to_dict()
                 }, 200
             except exc.SQLAlchemyError:
-                return {'message': 'An error occurred updating '
+                return {'message': 'An error occurred while updating '
                                    'the passport.'}, 500
 
         return {'message': 'Passport not found.'}, 404

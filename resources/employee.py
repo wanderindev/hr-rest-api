@@ -148,7 +148,7 @@ class Employee(Resource):
         try:
             empl.save_to_db()
         except exc.SQLAlchemyError:
-            return {'message': 'An error occurred creating '
+            return {'message': 'An error occurred while creating '
                                'the employee.'}, 500
 
         return {
@@ -207,7 +207,7 @@ class Employee(Resource):
                            ).to_dict()
                        }, 200
             except exc.SQLAlchemyError:
-                return {'message': 'An error occurred updating '
+                return {'message': 'An error occurred while updating '
                                    'the employee.'}, 500
 
         return {'message': 'Employee not found.'}, 404

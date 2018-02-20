@@ -1,7 +1,6 @@
 from flask_jwt import jwt_required
 from flask_restful import Resource
 
-
 from models.country import CountryModel
 
 

@@ -41,7 +41,7 @@ class UniformSize(Resource):
         try:
             u_s.save_to_db()
         except exc.SQLAlchemyError:
-            return {'message': 'An error occurred creating '
+            return {'message': 'An error occurred while creating '
                                'the uniform size.'}, 500
 
         return {
@@ -71,7 +71,7 @@ class UniformSize(Resource):
                    ).to_dict()
                 }, 200
             except exc.SQLAlchemyError:
-                return {'message': 'An error occurred updating '
+                return {'message': 'An error occurred while updating '
                                    'the uniform size.'}, 500
 
         return {'message': 'Uniform size not found.'}, 404
