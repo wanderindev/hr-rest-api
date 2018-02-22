@@ -6,6 +6,7 @@ from resources.bank import BankList
 from resources.bank_account import ActivateBankAccount, BankAccount
 from resources.country import CountryList
 from resources.department import ActivateDepartment, Department
+from resources.dependent import Dependent
 from resources.emergency_contact import EmergencyContact
 from resources.employee import ActivateEmployee, Employee
 from resources.employment_position import ActivateEmploymentPosition, \
@@ -134,5 +135,9 @@ def create_app(config_file=None):
 
     api.add_resource(FamilyRelationList,
                      '/family_relations')
+
+    api.add_resource(Dependent,
+                     '/dependent',
+                     '/dependent/<int:dependent_id>')
 
     return app

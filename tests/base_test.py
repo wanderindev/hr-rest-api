@@ -7,6 +7,7 @@ from app import create_app
 from db import db
 from models.bank_account import BankAccountModel
 from models.department import DepartmentModel
+from models.dependent import DependentModel
 from models.emergency_contact import EmergencyContactModel
 from models.employee import EmployeeModel
 from models.employment_position import EmploymentPositionModel
@@ -54,6 +55,7 @@ class BaseTest(TestCase):
             AppUserModel.query.filter(AppUserModel.id != 1).delete()
             BankAccountModel.query.delete()
             EmergencyContactModel.query.delete()
+            DependentModel.query.delete()
             HealthPermitModel.query.delete()
             PassportModel.query.delete()
             UniformRequirementModel.query.delete()
@@ -199,3 +201,11 @@ class BaseTest(TestCase):
             b_a.save_to_db()
 
             return BankAccountModel.find_by_id(b_a.id, organization_id)
+
+    def get_dependent(self, employee_id, organization_id):
+        with self.app_context():
+            depen = DependentModel('f_n', 's_n', 'f_sn', 's_sn', 'Mujer',
+                                   date(2018, 1, 1), employee_id, 1)
+            depen.save_to_db()
+
+            return DependentModel.find_by_id(depen.id, organization_id)
