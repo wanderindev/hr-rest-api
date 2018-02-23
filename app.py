@@ -17,6 +17,7 @@ from resources.marital_status import MaritalStatusList
 from resources.organization import ActivateOrganization, Organization, \
     OrganizationList
 from resources.passport import Passport
+from resources.schedule import Schedule
 from resources.shift import ActivateShift, Shift
 from resources.uniform_item import UniformItem
 from resources.uniform_requirement import UniformRequirement
@@ -139,5 +140,9 @@ def create_app(config_file=None):
     api.add_resource(Dependent,
                      '/dependent',
                      '/dependent/<int:dependent_id>')
+
+    api.add_resource(Schedule,
+                     '/schedule',
+                     '/schedule/<int:schedule_id>')
 
     return app

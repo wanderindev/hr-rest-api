@@ -14,6 +14,7 @@ from models.employment_position import EmploymentPositionModel
 from models.health_permit import HealthPermitModel
 from models.organization import OrganizationModel
 from models.passport import PassportModel
+from models.schedule import ScheduleModel
 from models.shift import ShiftModel
 from models.uniform_item import UniformItemModel
 from models.uniform_requirement import UniformRequirementModel
@@ -59,6 +60,7 @@ class BaseTest(TestCase):
             HealthPermitModel.query.delete()
             PassportModel.query.delete()
             UniformRequirementModel.query.delete()
+            ScheduleModel.query.delete()
             EmployeeModel.query.delete()
             EmploymentPositionModel.query.delete()
             ShiftModel.query.delete()
@@ -209,3 +211,11 @@ class BaseTest(TestCase):
             depen.save_to_db()
 
             return DependentModel.find_by_id(depen.id, organization_id)
+
+    def get_schedule(self, department_id, organization_id):
+        with self.app_context():
+            sch = ScheduleModel(date(2018, 1, 1), department_id)
+
+            sch.save_to_db()
+
+            return ScheduleModel.find_by_id(sch.id, organization_id)

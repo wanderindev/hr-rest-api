@@ -150,7 +150,7 @@ class TestDepartment(BaseTest):
                 r = c.put(f'/department/{self.d_dict["department_name"]}',
                           data=json.dumps({
                               'department_name': 'new_test_d',
-                              'organization_id': self.d_dict['organization_id'],
+                              'organization_id': self.d_dict['organization_id']
                           }),
                           headers=self.get_headers())
 
@@ -175,7 +175,7 @@ class TestDepartment(BaseTest):
                 r = c.put(f'/department/{self.d_dict["department_name"]}',
                           data=json.dumps({
                               'department_name': 'new_test_d',
-                              'organization_id': self.d_dict['organization_id'],
+                              'organization_id': self.d_dict['organization_id']
                           }),
                           headers={
                               'Content-Type': 'application/json',
@@ -195,7 +195,7 @@ class TestDepartment(BaseTest):
                 r = c.put(f'/department/{self.d_dict["department_name"]}',
                           data=json.dumps({
                               'department_name': 'new_test_d',
-                              'organization_id': self.d_dict['organization_id'],
+                              'organization_id': self.d_dict['organization_id']
                           }),
                           headers=self.get_headers())
 
