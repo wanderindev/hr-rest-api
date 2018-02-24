@@ -14,16 +14,8 @@ class TestOrganization(BaseTest):
         self.o = self.get_organization()
 
     def test_find_organization(self):
-        """
-        Test the find_by_name and find_by_id methods
-        of the OrganizationModel class.
-        """
+        """Test the find_by_id method of the OrganizationModel class."""
         with self.app_context():
-            org_by_name = OrganizationModel.find_by_name(
-                self.o.organization_name)
+            o = OrganizationModel.find_by_id(self.o.id)
 
-            org_by_id = OrganizationModel.find_by_id(self.o.id)
-
-            self.assertIsNotNone(org_by_name)
-            self.assertIsNotNone(org_by_id)
-            self.assertEqual(org_by_name, org_by_id)
+            self.assertIsNotNone(o)

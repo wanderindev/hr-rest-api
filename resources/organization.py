@@ -1,4 +1,4 @@
-from flask_jwt import jwt_required
+from flask_jwt import current_identity, jwt_required
 from flask_restful import reqparse, Resource
 from sqlalchemy import exc
 
@@ -16,8 +16,8 @@ class Organization(Resource):
                         required=False)
 
     @jwt_required()
-    def get(self, organization_name):
-        organization = OrganizationModel.find_by_name(organization_name)
+    def get(self, organization_id):
+        organization = OrganizationModel.find_by_id(organization_id)
         if organization:
             return organization.to_dict(), 200
 
@@ -28,13 +28,19 @@ class Organization(Resource):
     def post():
         data = Organization.parser.parse_args()
 
-        if OrganizationModel.find_by_name(data['organization_name']):
-            return {'message': 'An organization with that'
-                               ' name already exists.'}, 400
+        if not current_identity.is_super:
+            return {'message': 'You are not allowed to create '
+                               'new organizations.'}, 401
+
+        if OrganizationModel.query.filter_by(
+                organization_name=data['organization_name']).first():
+            return {'message': 'An organization with that '
+                               'name already exists.'}, 400
 
         organization = OrganizationModel(
             data['organization_name'],
             data['is_active'])
+
         try:
             organization.save_to_db()
         except exc.SQLAlchemyError:
@@ -49,12 +55,12 @@ class Organization(Resource):
                }, 201
 
     @jwt_required()
-    def put(self, organization_name):
+    def put(self, organization_id):
         data = Organization.parser.parse_args()
 
-        organization = OrganizationModel.find_by_name(organization_name)
+        organization = OrganizationModel.find_by_id(organization_id)
 
-        if organization:
+        if organization and organization.id == current_identity.organization_id:
             organization.organization_name = data['organization_name']
 
             try:
@@ -72,8 +78,12 @@ class Organization(Resource):
         return {'message': 'Organization not found'}, 404
 
     @jwt_required()
-    def delete(self, organization_name):
-        organization = OrganizationModel.find_by_name(organization_name)
+    def delete(self, organization_id):
+        if not current_identity.is_super:
+            return {'message': 'You are not allowed to inactivate '
+                               'an organization.'}, 401
+
+        organization = OrganizationModel.find_by_id(organization_id)
 
         if organization:
             if organization.is_active:
@@ -91,8 +101,12 @@ class Organization(Resource):
 
 class ActivateOrganization(Resource):
     @jwt_required()
-    def put(self, organization_name):
-        organization = OrganizationModel.find_by_name(organization_name)
+    def put(self, organization_id):
+        if not current_identity.is_super:
+            return {'message': 'You are not allowed to activate '
+                               'an organization.'}, 401
+
+        organization = OrganizationModel.find_by_id(organization_id)
 
         if organization:
             if not organization.is_active:
@@ -111,5 +125,6 @@ class ActivateOrganization(Resource):
 class OrganizationList(Resource):
     @jwt_required()
     def get(self):
-        return {'organizations': list(map(lambda x: x.to_dict(),
-                                          OrganizationModel.query.all()))}
+        if current_identity.is_super:
+            return {'organizations': list(map(lambda x: x.to_dict(),
+                                              OrganizationModel.query.all()))}

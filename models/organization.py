@@ -41,7 +41,3 @@ class OrganizationModel(ModelMixin, db.Model):
     @classmethod
     def find_by_id(cls, _id):
         return cls.query.filter_by(id=_id).first()
-
-    @classmethod
-    def find_by_name(cls, organization_name):
-        return cls.query.filter_by(organization_name=organization_name).first()

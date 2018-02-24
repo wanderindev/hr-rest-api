@@ -59,9 +59,9 @@ def create_app(config_file=None):
     # Add API resources.
     api.add_resource(Organization,
                      '/organization',
-                     '/organization/<string:organization_name>')
+                     '/organization/<int:organization_id>')
     api.add_resource(ActivateOrganization,
-                     '/activate_organization/<string:organization_name>')
+                     '/activate_organization/<int:organization_id>')
     api.add_resource(OrganizationList,
                      '/organizations')
 

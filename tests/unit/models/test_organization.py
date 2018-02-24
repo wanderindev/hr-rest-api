@@ -1,8 +1,6 @@
 from unittest import TestCase
 
-from models.department import DepartmentModel
 from models.organization import OrganizationModel
-from models.user import AppUserModel
 
 
 class TestOrganization(TestCase):
