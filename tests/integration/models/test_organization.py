@@ -7,15 +7,17 @@ class TestOrganization(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by setting up
-        a new organization.
+        a new organization and user.
         """
         super(TestOrganization, self).setUp()
 
         self.o = self.get_organization()
+        self.u = self.get_user(self.o.id)
 
     def test_find_organization(self):
         """Test the find_by_id method of the OrganizationModel class."""
         with self.app_context():
-            o = OrganizationModel.find_by_id(self.o.id)
+            print(self.u)
+            o = OrganizationModel.find_by_id(self.o.id, self.u)
 
             self.assertIsNotNone(o)

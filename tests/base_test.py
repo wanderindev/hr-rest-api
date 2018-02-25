@@ -70,7 +70,7 @@ class BaseTest(TestCase):
             OrganizationModel.query.filter(OrganizationModel.id != 1).delete()
             db.session.commit()
 
-    def get_headers(self):
+    def get_headers(self, user=None):
         """
         Authenticate user and return request headers that include
         the authorization JWT.
@@ -84,11 +84,11 @@ class BaseTest(TestCase):
         """
         with self.app() as c:
             with self.app_context():
+                u = user or {'username': 'jfeliu', 'password': '1234'}
+
                 # Send request to auth endpoint.
-                r = c.post('/auth', data=json.dumps({
-                    'username': 'jfeliu',
-                    'password': '1234'
-                }), headers={'Content-Type': 'application/json'})
+                r = c.post('/auth', data=json.dumps(u),
+                           headers={'Content-Type': 'application/json'})
 
                 return {
                     'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ class BaseTest(TestCase):
             o = OrganizationModel('test_o', True)
             o.save_to_db()
 
-            return OrganizationModel.find_by_id(o.id)
+            return OrganizationModel.query.filter_by(id=o.id).first()
 
     def get_organization_id(self, o_dict=None):
         with self.app() as c:
@@ -117,20 +117,35 @@ class BaseTest(TestCase):
 
                 return json.loads(r.data)['organization']['id']
 
-    def get_user(self, organization_id):
+    def get_user(self, organization_id, is_super=True):
         with self.app_context():
             u = AppUserModel('test_u', 'test_p', 'test_u@test_o.com',
-                             organization_id, True, True, True)
+                             organization_id, is_super, True, True)
             u.save_to_db()
 
             return AppUserModel.find_by_id(u.id)
 
-    def get_department(self, organization_id):
+    def get_department(self, user):
         with self.app_context():
-            d = DepartmentModel('test_d', organization_id, True)
+            d = DepartmentModel('test_d', user.organization_id, True)
             d.save_to_db()
 
-            return DepartmentModel.find_by_id(d.id, organization_id)
+            return DepartmentModel.find_by_id(d.id, user)
+
+    def get_department_id(self, d_dict=None):
+        with self.app() as c:
+            with self.app_context():
+                d = d_dict or {
+                    'department_name': 'test_d',
+                    'organization_id': 1,
+                    'is_active': True
+                }
+
+                r = c.post('/department',
+                           data=json.dumps(d),
+                           headers=self.get_headers())
+
+                return json.loads(r.data)['department']['id']
 
     def get_shift(self, organization_id):
         with self.app_context():

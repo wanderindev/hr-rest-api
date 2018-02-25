@@ -8,32 +8,29 @@ class TestDepartment(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by setting up an
-        organization and a department.
+        organization, a user, and a department.
         """
         super(TestDepartment, self).setUp()
 
         with self.app_context():
             self.o = self.get_organization()
-            self.d = self.get_department(self.o.id)
+            self.u = self.get_user(self.o.id)
+            self.d = self.get_department(self.u)
 
     def test_find_department(self):
-        """Test the find_by_name and find_by_id methods of DepartmentModel."""
+        """Test the find_by_id method of DepartmentModel."""
         with self.app_context():
-            d_by_name = DepartmentModel.find_by_name(self.d.department_name,
-                                                     self.o.id)
-            d_by_id = DepartmentModel.find_by_id(self.d.id,
-                                                 self.o.id)
+            d = DepartmentModel.find_by_id(self.d.id,
+                                           self.u)
 
-            self.assertIsNotNone(d_by_name)
-            self.assertIsNotNone(d_by_name)
-            self.assertEqual(d_by_name, d_by_id)
+            self.assertIsNotNone(d)
 
     def test_department_list_in_organization(self):
         """Test that the organization object contains a department list."""
         with self.app_context():
-            d_list = DepartmentModel.query.filter_by(
+            dept_list = DepartmentModel.query.filter_by(
                 organization_id=self.o.id).all()
-            o_d_list = OrganizationModel.query.filter_by(
-                organization_name=self.o.organization_name).first().departments
+            dept_list_in_org = OrganizationModel.find_by_id(self.o.id,
+                                                            self.u).departments
 
-            self.assertListEqual(d_list, o_d_list)
+            self.assertListEqual(dept_list, dept_list_in_org)

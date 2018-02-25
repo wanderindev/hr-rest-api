@@ -15,7 +15,7 @@ from resources.family_relation import FamilyRelationList
 from resources.health_permit import HealthPermit
 from resources.marital_status import MaritalStatusList
 from resources.organization import ActivateOrganization, Organization, \
-    OrganizationList
+    Organizations
 from resources.passport import Passport
 from resources.schedule import Schedule
 from resources.shift import ActivateShift, Shift
@@ -62,7 +62,7 @@ def create_app(config_file=None):
                      '/organization/<int:organization_id>')
     api.add_resource(ActivateOrganization,
                      '/activate_organization/<int:organization_id>')
-    api.add_resource(OrganizationList,
+    api.add_resource(Organizations,
                      '/organizations')
 
     api.add_resource(User,
@@ -73,9 +73,9 @@ def create_app(config_file=None):
 
     api.add_resource(Department,
                      '/department',
-                     '/department/<string:department_name>')
+                     '/department/<int:department_id>')
     api.add_resource(ActivateDepartment,
-                     '/activate_department/<string:department_name>')
+                     '/activate_department/<int:department_id>')
 
     api.add_resource(MaritalStatusList,
                      '/marital_statuses')

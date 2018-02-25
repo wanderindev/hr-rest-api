@@ -51,7 +51,8 @@ class TestOrganization(BaseTest):
                                      [])
                 self.assertListEqual(o['uniform_items'],
                                      [])
-                self.assertIsNotNone(OrganizationModel.find_by_id(o['id']))
+                self.assertIsNotNone(OrganizationModel.query.filter_by(
+                    id=o['id']).first())
 
     def test_organization_post_without_authentication(self):
         """
@@ -424,8 +425,8 @@ class TestOrganization(BaseTest):
                 organizations = json.loads(r.data)['organizations']
 
                 self.assertEqual(r.status_code, 200)
-                self.assertIn(OrganizationModel.find_by_id(1).to_dict(),
-                              organizations)
+                self.assertIn(OrganizationModel.query.filter_by(
+                    id=1).first().to_dict(), organizations)
 
     def test_organization_list_without_authentication(self):
         """

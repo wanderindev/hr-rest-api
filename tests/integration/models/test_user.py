@@ -34,7 +34,7 @@ class TestUser(BaseTest):
         with self.app_context():
             u_list = AppUserModel.query.filter_by(
                 organization_id=self.o.id).all()
-            o_u_list = OrganizationModel.find_by_id(
-                self.o.id).app_users
+            o_u_list = OrganizationModel.query.filter_by(
+                id=self.o.id).first().app_users
 
             self.assertListEqual(u_list, o_u_list)

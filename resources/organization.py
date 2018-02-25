@@ -17,11 +17,10 @@ class Organization(Resource):
 
     @jwt_required()
     def get(self, organization_id):
-        if organization_id == current_identity.organization_id or \
-                current_identity.is_super:
-            organization = OrganizationModel.find_by_id(organization_id)
-            if organization:
-                return organization.to_dict(), 200
+        organization = OrganizationModel.find_by_id(organization_id,
+                                                    current_identity)
+        if organization:
+            return organization.to_dict(), 200
 
         return {'message': 'Organization not found.'}, 404
 
@@ -52,7 +51,8 @@ class Organization(Resource):
         return {
                    'message': 'Organization created successfully.',
                    'organization': OrganizationModel.find_by_id(
-                       organization.id
+                       organization.id,
+                       current_identity
                    ).to_dict()
                }, 201
 
@@ -60,11 +60,10 @@ class Organization(Resource):
     def put(self, organization_id):
         data = Organization.parser.parse_args()
 
-        organization = OrganizationModel.find_by_id(organization_id)
+        organization = OrganizationModel.find_by_id(organization_id,
+                                                    current_identity)
 
-        if organization and \
-                (organization.id == current_identity.organization_id or
-                 current_identity.is_super):
+        if organization:
             organization.organization_name = data['organization_name']
 
             try:
@@ -72,7 +71,8 @@ class Organization(Resource):
                 return {
                            'message': 'Organization updated successfully.',
                            'organization': OrganizationModel.find_by_id(
-                               organization.id
+                               organization.id,
+                               current_identity
                            ).to_dict()
                        }, 200
             except exc.SQLAlchemyError:
@@ -87,7 +87,8 @@ class Organization(Resource):
             return {'message': 'You are not allowed to inactivate '
                                'an organization.'}, 401
 
-        organization = OrganizationModel.find_by_id(organization_id)
+        organization = OrganizationModel.find_by_id(organization_id,
+                                                    current_identity)
 
         if organization:
             if organization.is_active:
@@ -110,7 +111,8 @@ class ActivateOrganization(Resource):
             return {'message': 'You are not allowed to activate '
                                'an organization.'}, 401
 
-        organization = OrganizationModel.find_by_id(organization_id)
+        organization = OrganizationModel.find_by_id(organization_id,
+                                                    current_identity)
 
         if organization:
             if not organization.is_active:
@@ -126,12 +128,12 @@ class ActivateOrganization(Resource):
         return {'message': 'Organization not found.'}, 404
 
 
-class OrganizationList(Resource):
+class Organizations(Resource):
     @jwt_required()
     def get(self):
         if current_identity.is_super:
             return {'organizations': list(map(lambda x: x.to_dict(),
                                               OrganizationModel.query.all()))}
 
-        return {'message': 'You are not allowed to view the '
-                           'organization list.'}, 401
+        return {'message': 'You are not allowed to view the list of'
+                           'organizations.'}, 401
