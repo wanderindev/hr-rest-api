@@ -15,13 +15,13 @@ class TestOrganization(BaseTest):
     def test_save_to_db(self):
         """Test the save_to_db method of the ModelsMixin class."""
         with self.app_context():
-            self.assertIsNone(OrganizationModel.
-                              find_by_name(self.o.organization_name))
+            self.assertIsNone(OrganizationModel.query.filter_by(
+                organization_name=self.o.organization_name).first())
 
             self.o.save_to_db()
 
-            self.assertIsNotNone(OrganizationModel.
-                                 find_by_name(self.o.organization_name))
+            self.assertIsNotNone(OrganizationModel.query.filter_by(
+                organization_name=self.o.organization_name).first())
 
     def test_delete_from_db_exc(self):
         """

@@ -35,7 +35,8 @@ class TestEmploymentPosition(BaseTest):
         with self.app_context():
             e_p_list = EmploymentPositionModel.query .filter_by(
                 organization_id=self.o.id).all()
-            o_e_p_list = OrganizationModel.find_by_name(
-                self.o.organization_name).employment_positions
+            o_e_p_list = OrganizationModel.query.filter_by(
+                organization_name=self.o.organization_name).first()\
+                .employment_positions
 
             self.assertListEqual(e_p_list, o_e_p_list)

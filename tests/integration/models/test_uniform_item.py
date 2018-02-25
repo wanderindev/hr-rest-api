@@ -33,7 +33,8 @@ class TestUniformItem(BaseTest):
         with self.app_context():
             u_i_list = UniformItemModel.query.filter_by(
                 organization_id=self.o.id).all()
-            o_u_i_list = OrganizationModel.find_by_name(
-                self.o.organization_name).uniform_items
+            o_u_i_list = OrganizationModel.query.filter_by(
+                organization_name=self.o.organization_name).first()\
+                .uniform_items
 
             self.assertListEqual(u_i_list, o_u_i_list)

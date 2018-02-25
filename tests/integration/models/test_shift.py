@@ -32,7 +32,7 @@ class TestShift(BaseTest):
         with self.app_context():
             s_list = ShiftModel.query.filter_by(
                 organization_id=self.o.id).all()
-            o_s_list = OrganizationModel.find_by_name(
-                self.o.organization_name).shifts
+            o_s_list = OrganizationModel.query.filter_by(
+                organization_name=self.o.organization_name).first().shifts
 
             self.assertListEqual(s_list, o_s_list)

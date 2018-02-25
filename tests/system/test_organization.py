@@ -13,6 +13,7 @@ class TestOrganization(BaseTest):
         the different tests.
         """
         super(TestOrganization, self).setUp()
+
         self.o_dict = {
             'organization_name': 'test_o',
             'is_active': True
@@ -26,30 +27,31 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                self.assertIsNone(OrganizationModel.find_by_name(
-                    self.o_dict["organization_name"]))
+                self.assertIsNone(OrganizationModel.query.filter_by(
+                    organization_name=self.o_dict["organization_name"]).first())
 
                 r = c.post('/organization',
                            data=json.dumps(self.o_dict),
                            headers=self.get_headers())
 
-                r_org = json.loads(r.data)['organization']
+                o = json.loads(r.data)['organization']
 
                 self.assertEqual(r.status_code, 201)
-                self.assertEqual(r_org['organization_name'],
+                self.assertEqual(o['organization_name'],
                                  self.o_dict['organization_name'])
-                self.assertTrue(r_org['is_active'])
-                self.assertIsNotNone(r_org['id'])
-                self.assertListEqual(r_org['employment_positions'],
+                self.assertTrue(o['is_active'])
+                self.assertIsNotNone(o['id'])
+                self.assertListEqual(o['app_users'],
                                      [])
-                self.assertListEqual(r_org['departments'],
+                self.assertListEqual(o['employment_positions'],
                                      [])
-                self.assertListEqual(r_org['shifts'],
+                self.assertListEqual(o['departments'],
                                      [])
-                self.assertListEqual(r_org['app_users'],
+                self.assertListEqual(o['shifts'],
                                      [])
-                self.assertIsNotNone(OrganizationModel.find_by_name(
-                    self.o_dict["organization_name"]))
+                self.assertListEqual(o['uniform_items'],
+                                     [])
+                self.assertIsNotNone(OrganizationModel.find_by_id(o['id']))
 
     def test_organization_post_without_authentication(self):
         """
@@ -88,50 +90,78 @@ class TestOrganization(BaseTest):
 
                 self.assertEqual(r.status_code, 400)
 
-    def test_organization_get_with_authentication(self):
+    def test_organization_post_not_super(self):
         """
-        Test that a GET request to the /organization/<string:organization_name>
-        endpoint returns the correct organization if the user is
-        authenticated.
+        Test that status code 401 is returned when trying to
+        POST data to the /organization endpoint with a user which
+        is not a super-user.
         """
         with self.app() as c:
             with self.app_context():
-                c.post('/organization',
-                       data=json.dumps(self.o_dict),
-                       headers=self.get_headers())
+                self.toggle_is_super()
 
-                r = c.get(f'/organization/{self.o_dict["organization_name"]}',
+                r = c.post('/organization',
+                           data=json.dumps(self.o_dict),
+                           headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 401)
+
+                self.toggle_is_super()
+
+    def test_organization_get_with_authentication(self):
+        """
+        Test that a GET request to the /organization/<int:organization_id>
+        endpoint returns the correct organization if the user is authenticated.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.get(f'/organization/{self.get_organization_id()}',
                           headers=self.get_headers())
 
-                r_dict = json.loads(r.data)
+                o = json.loads(r.data)
 
                 self.assertEqual(r.status_code, 200)
-                self.assertEqual(r_dict['organization_name'],
+                self.assertEqual(o['organization_name'],
                                  self.o_dict['organization_name'])
 
     def test_organization_get_not_found(self):
         """
-        Test that a GET request to the /organization/<string:organization_name>
+        Test that a GET request to the /organization/<int:organization_id>
         endpoint returns status code 404 if the organization is not found
-        in the database table.
+        in the database table or if the user does not belong to the
+        organization and is not a super-user.
         """
         with self.app() as c:
             with self.app_context():
-                r = c.get(f'/organization/{self.o_dict["organization_name"]}',
+                r = c.get(f'/organization/2',
                           headers=self.get_headers())
 
+                # Organization is not in the database.
                 self.assertEqual(r.status_code, 404)
+
+                organization_id = self.get_organization_id()
+
+                self.toggle_is_super()
+
+                r = c.get(f'/organization/{organization_id}',
+                          headers=self.get_headers())
+
+                # Organization is in the database but the user belongs to
+                # another organization and it is not a super-user.
+                self.assertEqual(r.status_code, 404)
+
+                self.toggle_is_super()
 
     def test_organization_get_without_authentication(self):
         """
-        Test that a GET request to the /organization/<string:organization_name>
+        Test that a GET request to the /organization/<int:organization_id>
         endpoint returns status code 401 if the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send the GET request to the /organization endpoint with
                 # wrong authentication header.
-                r = c.get(f'/organization/{self.o_dict["organization_name"]}',
+                r = c.get(f'/organization/1',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -141,47 +171,45 @@ class TestOrganization(BaseTest):
 
     def test_organization_put_with_authentication(self):
         """
-        Test that a PUT request to the /organization/<string:organization_name>
+        Test that a PUT request to the /organization/<int:organization_id>
         endpoint returns status code 200.
         """
         with self.app() as c:
             with self.app_context():
-                c.post('/organization',
-                       data=json.dumps(self.o_dict),
-                       headers=self.get_headers())
-
-                r = c.put(f'/organization/{self.o_dict["organization_name"]}',
+                r = c.put(f'/organization/{self.get_organization_id()}',
                           data=json.dumps({
                               'organization_name': 'new_test_o'
                           }),
                           headers=self.get_headers())
 
-                r_org = json.loads(r.data)['organization']
+                o = json.loads(r.data)['organization']
 
                 self.assertEqual(r.status_code, 200)
-                self.assertEqual(r_org['organization_name'],
+                self.assertEqual(o['organization_name'],
                                  'new_test_o')
-                self.assertTrue(r_org['is_active'])
-                self.assertIsNotNone(r_org['id'])
-                self.assertListEqual(r_org['employment_positions'],
+                self.assertTrue(o['is_active'])
+                self.assertIsNotNone(o['id'])
+                self.assertListEqual(o['employment_positions'],
                                      [])
-                self.assertListEqual(r_org['departments'],
+                self.assertListEqual(o['departments'],
                                      [])
-                self.assertListEqual(r_org['shifts'],
+                self.assertListEqual(o['shifts'],
                                      [])
-                self.assertListEqual(r_org['app_users'],
+                self.assertListEqual(o['app_users'],
+                                     [])
+                self.assertListEqual(o['uniform_items'],
                                      [])
 
     def test_organization_put_without_authentication(self):
         """
-        Test that a PUT request to the /organization/<string:organization_name>
+        Test that a PUT request to the /organization/<int:organization_id>
         endpoint returns status code 401 if the user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
-                # Send PUT request to the /organization/
-                # <string:organization_name>  endpoint.
-                r = c.put(f'/organization/{self.o_dict["organization_name"]}',
+                # Send PUT request to the /organization/<int:organization_id>
+                # endpoint with wrong authorization header.
+                r = c.put(f'/organization/1',
                           data=json.dumps({
                               'organization_name': 'new_test_o'
                           }),
@@ -194,50 +222,60 @@ class TestOrganization(BaseTest):
 
     def test_organization_put_not_found(self):
         """
-        Test that a PUT request to the /organization/<string:organization_name>
+        Test that a PUT request to the /organization/<int:organization_id>
         endpoint returns status code 404 if the organization is not in the
-        database.
+        database or if the user does not belong to the organization and
+        is not a super-user.
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/organization/{self.o_dict["organization_name"]}',
+                r = c.put(f'/organization/2',
                           data=json.dumps({
                               'organization_name': 'new_test_o'
                           }),
                           headers=self.get_headers())
 
+                # Organization is not in the database.
                 self.assertEqual(r.status_code, 404)
+
+                organization_id = self.get_organization_id()
+
+                self.toggle_is_super()
+
+                r = c.put(f'/organization/{organization_id}',
+                          data=json.dumps({
+                              'organization_name': 'new_test_o'
+                          }),
+                          headers=self.get_headers())
+
+                # Organization is in the database but the user belongs to
+                # another organization and it is not a super-user.
+                self.assertEqual(r.status_code, 404)
+
+                self.toggle_is_super()
 
     def test_organization_delete_with_authentication(self):
         """
-        Test that a DELETE request to the /organization
-        /<string:organization_name> endpoint returns status code 200.
+        Test that a DELETE request to the /organization/<int:organization_id>
+        endpoint returns status code 200.
         """
         with self.app() as c:
             with self.app_context():
-                c.post('/organization',
-                       data=json.dumps(self.o_dict),
-                       headers=self.get_headers())
-
-                r = c.delete(f'/organization/'
-                             f'{self.o_dict["organization_name"]}',
+                r = c.delete(f'/organization/{self.get_organization_id()}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
 
     def test_organization_delete_without_authentication(self):
         """
-        Test that a DELETE request to the /organization
-        /<string:organization_name> endpoint returns status code
-        401 if user is not authenticated.
+        Test that a DELETE request to the /organization/<int:organization_id>
+        endpoint returns status code 401 if user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
-                # Send DELETE request to the /organization/
-                # <string:organization_name> endpoint
-                # with wrong authorization header.
-                r = c.delete(f'/organization/'
-                             f'{self.o_dict["organization_name"]}',
+                # Send DELETE request to the /organization/<int:organization_id>
+                # endpoint with wrong authorization header.
+                r = c.delete(f'/organization/1',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -247,58 +285,63 @@ class TestOrganization(BaseTest):
 
     def test_organization_delete_inactive(self):
         """
-        Test that a DELETE request to the /organization
-        /<string:organization_name> endpoint returns status code
-        400 if the organization is already inactive.
+        Test that a DELETE request to the /organization/<int:organization_id>
+        endpoint returns status code 400 if the organization is not active.
         """
         with self.app() as c:
             with self.app_context():
-                c.post('/organization',
-                       data=json.dumps(self.o_dict),
-                       headers=self.get_headers())
+                organization_id = self.get_organization_id()
 
-                # Make organization inactive.
-                c.delete(f'/organization/'
-                         f'{self.o_dict["organization_name"]}',
+                c.delete(f'/organization/{organization_id}',
                          headers=self.get_headers())
 
-                # Send DELETE request on inactive organization.
-                r = c.delete(f'/organization/'
-                             f'{self.o_dict["organization_name"]}',
+                # Repeat DELETE request.
+                r = c.delete(f'/organization/{organization_id}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
 
     def test_organization_delete_not_found(self):
         """
-        Test that a DELETE request to the /organization
-        /<string:organization_name> endpoint returns status code
-        404 if the organization is not found.
+        Test that a DELETE request to the /organization/<int:organization_id>
+        endpoint returns status code 404 if the organization is not found.
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete(f'/organization/'
-                             f'{self.o_dict["organization_name"]}',
+                r = c.delete(f'/organization/2',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
 
-    def test_activate_organization_with_authentication(self):
+    def test_organization_delete_not_super(self):
         """
-        Test that a PUT request to the /activate_organization
-        /<string:organization_name> endpoint returns status code 200.
+        Test that a DELETE request to the /organization/<int:organization_id>
+        endpoint returns status code 401 if the user is not a super-user.
         """
         with self.app() as c:
             with self.app_context():
-                c.post('/organization',
-                       data=json.dumps(self.o_dict),
-                       headers=self.get_headers())
+                self.toggle_is_super()
 
-                c.delete(f'/organization/{self.o_dict["organization_name"]}',
+                r = c.delete(f'/organization/1',
+                             headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 401)
+
+                self.toggle_is_super()
+
+    def test_activate_organization_with_authentication(self):
+        """
+        Test that a PUT request to the /activate_organization
+        /<int:organization_id> endpoint returns status code 200.
+        """
+        with self.app() as c:
+            with self.app_context():
+                organization_id = self.get_organization_id()
+
+                c.delete(f'/organization/{organization_id}',
                          headers=self.get_headers())
 
-                r = c.put(f'/activate_organization/'
-                          f'{self.o_dict["organization_name"]}',
+                r = c.put(f'/activate_organization/{organization_id}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -306,15 +349,14 @@ class TestOrganization(BaseTest):
     def test_activate_organization_without_authentication(self):
         """
         Test that a PUT request to the /activate_organization
-        /<string:organization_name> endpoint returns status code
+        /<int:organization_id> endpoint returns status code
         401 if user is not authenticated.
         """
         with self.app() as c:
             with self.app_context():
                 # Send PUT request to /activate_organization with
                 # wrong authorization header.
-                r = c.put(f'/activate_organization/'
-                          f'{self.o_dict["organization_name"]}',
+                r = c.put(f'/activate_organization/1',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -325,17 +367,13 @@ class TestOrganization(BaseTest):
     def test_activate_organization_active(self):
         """
         Test that a PUT request to the /activate_organization
-        /<string:organization_name> endpoint returns status code
+        /<int:organization_id> endpoint returns status code
         400 if the organization is already active.
         """
         with self.app() as c:
             with self.app_context():
-                c.post('/organization',
-                       data=json.dumps(self.o_dict),
-                       headers=self.get_headers())
-
                 r = c.put(f'/activate_organization/'
-                          f'{self.o_dict["organization_name"]}',
+                          f'{self.get_organization_id()}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
@@ -343,16 +381,34 @@ class TestOrganization(BaseTest):
     def test_activate_organization_not_found(self):
         """
         Test that a PUT request to the /activate_organization
-        /<string:organization_name> endpoint returns status code
+        /<int:organization_id> endpoint returns status code
         404 if the organization was not found.
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/activate_organization/'
-                          f'{self.o_dict["organization_name"]}',
+                r = c.put(f'/activate_organization/2',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
+
+    def test_activate_organization_not_super(self):
+        """
+        Test that a PUT request to the /activate_organization
+        /<int:organization_id> endpoint returns status code
+        401 if the user is not a super-user.
+        """
+        with self.app() as c:
+            with self.app_context():
+                organization_id = self.get_organization_id()
+
+                self.toggle_is_super()
+
+                r = c.put(f'/activate_organization/{organization_id}',
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 401)
+
+                self.toggle_is_super()
 
     def test_organization_list_with_authentication(self):
         """
@@ -362,22 +418,14 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                c.post('/organization',
-                       data=json.dumps(self.o_dict),
-                       headers=self.get_headers())
-
                 r = c.get('/organizations',
                           headers=self.get_headers())
-                org_list = json.loads(r.data)['organizations']
+
+                organizations = json.loads(r.data)['organizations']
 
                 self.assertEqual(r.status_code, 200)
-                self.assertIn(
-                    OrganizationModel.find_by_name('Nuvanz').to_dict(),
-                    org_list)
-                self.assertIn(
-                    OrganizationModel.find_by_name(
-                        self.o_dict['organization_name']).to_dict(),
-                    org_list)
+                self.assertIn(OrganizationModel.find_by_id(1).to_dict(),
+                              organizations)
 
     def test_organization_list_without_authentication(self):
         """
@@ -395,3 +443,19 @@ class TestOrganization(BaseTest):
                           })
 
                 self.assertEqual(r.status_code, 401)
+
+    def test_organization_list_not_super(self):
+        """
+        Test that GET requests to the /organizations endpoint
+        returns status code 401 if the user is not a super-user.
+        """
+        with self.app() as c:
+            with self.app_context():
+                self.toggle_is_super()
+
+                r = c.get('/organizations',
+                          headers=self.get_headers())
+
+                self.assertEqual(r.status_code, 401)
+
+                self.toggle_is_super()

@@ -95,12 +95,27 @@ class BaseTest(TestCase):
                     'Authorization': 'JWT ' + json.loads(r.data)['access_token']
                 }
 
+    def toggle_is_super(self, user=None):
+        u = user or AppUserModel.find_by_id(1)
+        u.is_super = not u.is_super
+        u.save_to_db()
+
     def get_organization(self):
         with self.app_context():
             o = OrganizationModel('test_o', True)
             o.save_to_db()
 
             return OrganizationModel.find_by_id(o.id)
+
+    def get_organization_id(self, o_dict=None):
+        with self.app() as c:
+            with self.app_context():
+                o = o_dict or {'organization_name': 'test_o', 'is_active': True}
+                r = c.post('/organization',
+                           data=json.dumps(o),
+                           headers=self.get_headers())
+
+                return json.loads(r.data)['organization']['id']
 
     def get_user(self, organization_id):
         with self.app_context():

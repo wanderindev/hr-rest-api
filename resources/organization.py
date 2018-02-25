@@ -17,9 +17,11 @@ class Organization(Resource):
 
     @jwt_required()
     def get(self, organization_id):
-        organization = OrganizationModel.find_by_id(organization_id)
-        if organization:
-            return organization.to_dict(), 200
+        if organization_id == current_identity.organization_id or \
+                current_identity.is_super:
+            organization = OrganizationModel.find_by_id(organization_id)
+            if organization:
+                return organization.to_dict(), 200
 
         return {'message': 'Organization not found.'}, 404
 
@@ -60,7 +62,9 @@ class Organization(Resource):
 
         organization = OrganizationModel.find_by_id(organization_id)
 
-        if organization and organization.id == current_identity.organization_id:
+        if organization and \
+                (organization.id == current_identity.organization_id or
+                 current_identity.is_super):
             organization.organization_name = data['organization_name']
 
             try:
@@ -128,3 +132,6 @@ class OrganizationList(Resource):
         if current_identity.is_super:
             return {'organizations': list(map(lambda x: x.to_dict(),
                                               OrganizationModel.query.all()))}
+
+        return {'message': 'You are not allowed to view the '
+                           'organization list.'}, 401

@@ -33,7 +33,7 @@ class TestDepartment(BaseTest):
         with self.app_context():
             d_list = DepartmentModel.query.filter_by(
                 organization_id=self.o.id).all()
-            o_d_list = OrganizationModel.find_by_name(
-                self.o.organization_name).departments
+            o_d_list = OrganizationModel.query.filter_by(
+                organization_name=self.o.organization_name).first().departments
 
             self.assertListEqual(d_list, o_d_list)
