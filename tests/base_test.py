@@ -95,7 +95,8 @@ class BaseTest(TestCase):
                     'Authorization': 'JWT ' + json.loads(r.data)['access_token']
                 }
 
-    def toggle_is_super(self, user=None):
+    @staticmethod
+    def toggle_is_super(user=None):
         u = user or AppUserModel.find_by_id(1)
         u.is_super = not u.is_super
         u.save_to_db()
@@ -157,13 +158,30 @@ class BaseTest(TestCase):
 
             return ShiftModel.find_by_id(s.id, organization_id)
 
-    def get_employment_position(self, organization_id):
+    def get_employment_position(self, organization_id, user):
         with self.app_context():
             e_p = EmploymentPositionModel('test_e_p_f', 'test_e_p_m',
                                           1.00, True, organization_id)
             e_p.save_to_db()
 
-            return EmploymentPositionModel.find_by_id(e_p.id, organization_id)
+            return EmploymentPositionModel.find_by_id(e_p.id, user)
+
+    def get_employment_position_id(self, e_p_dict=None):
+        with self.app() as c:
+            with self.app_context():
+                e_p = e_p_dict or {
+                    'position_name_feminine': 'test_e_p_f',
+                    'position_name_masculine': 'test_e_p_m',
+                    'minimum_hourly_wage': 1.00,
+                    'is_active': True,
+                    'organization_id': 1
+                }
+
+                r = c.post('/employment_position',
+                           data=json.dumps(e_p),
+                           headers=self.get_headers())
+
+                return json.loads(r.data)['employment_position']['id']
 
     def get_employee(self, department_id, position_id,
                      shift_id, organization_id):

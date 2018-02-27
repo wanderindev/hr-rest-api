@@ -1,4 +1,3 @@
-from sqlalchemy import and_, or_
 from db import db
 from models.employee import EmployeeModel
 from models.mixin import ModelMixin
@@ -29,13 +28,9 @@ class EmploymentPositionModel(ModelMixin, db.Model):
         self.organization_id = organization_id
 
     @classmethod
-    def find_by_id(cls, _id, organization_id):
-        return cls.query.filter_by(id=_id,
-                                   organization_id=organization_id).first()
+    def find_by_id(cls, _id, user):
+        e_p = cls.query.filter_by(id=_id).first()
 
-    @classmethod
-    def find_by_name(cls, position_name, organization_id):
-        return cls.query.filter(and_(
-            or_(cls.position_name_feminine == position_name,
-                cls.position_name_masculine == position_name),
-            cls.organization_id == organization_id)).first()
+        if e_p:
+            if user.is_super or user.organization_id == e_p.organization_id:
+                return e_p

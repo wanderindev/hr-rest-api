@@ -82,9 +82,9 @@ def create_app(config_file=None):
 
     api.add_resource(EmploymentPosition,
                      '/employment_position',
-                     '/employment_position/<string:position_name>')
+                     '/employment_position/<int:position_id>')
     api.add_resource(ActivateEmploymentPosition,
-                     '/activate_employment_position/<string:position_name>')
+                     '/activate_employment_position/<int:position_id>')
 
     api.add_resource(Shift,
                      '/shift',

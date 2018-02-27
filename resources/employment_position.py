@@ -25,9 +25,8 @@ class EmploymentPosition(Resource):
                         required=True)
 
     @jwt_required()
-    def get(self, position_name):
-        e_p = EmploymentPositionModel.find_by_name(
-            position_name, current_identity.organization_id)
+    def get(self, position_id):
+        e_p = EmploymentPositionModel.find_by_id(position_id, current_identity)
         if e_p:
             return e_p.to_dict()
 
@@ -38,41 +37,46 @@ class EmploymentPosition(Resource):
     def post():
         data = EmploymentPosition.parser.parse_args()
 
-        if EmploymentPositionModel.find_by_name(
-                data['position_name_feminine'],
-                data['organization_id']) or \
-           EmploymentPositionModel.find_by_name(
-               data['position_name_masculine'],
-               data['organization_id']):
+        if EmploymentPositionModel.query.filter_by(
+                position_name_feminine=data['position_name_feminine'],
+                organization_id=data['organization_id']).first() or \
+                EmploymentPositionModel.query.filter_by(
+                    position_name_masculine=data['position_name_masculine'],
+                    organization_id=data['organization_id']).first():
             return {'message': 'An employment position with that name already '
                                'exists in the organization.'}, 400
 
-        e_p = EmploymentPositionModel(data['position_name_feminine'],
-                                      data['position_name_masculine'],
-                                      data['minimum_hourly_wage'],
-                                      data['is_active'],
-                                      data['organization_id'])
+        if current_identity.organization_id == data['organization_id'] or \
+                current_identity.is_super:
+            e_p = EmploymentPositionModel(data['position_name_feminine'],
+                                          data['position_name_masculine'],
+                                          data['minimum_hourly_wage'],
+                                          data['is_active'],
+                                          data['organization_id'])
 
-        try:
-            e_p.save_to_db()
-        except exc.SQLAlchemyError:
-            return {'message': 'An error occurred while creating '
-                               'the employment position.'}, 500
+            try:
+                e_p.save_to_db()
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while creating '
+                                   'the employment position.'}, 500
 
-        return {
-                   'message': 'Employment position created successfully.',
-                   'employment_position': EmploymentPositionModel
-                   .find_by_id(
-                       e_p.id,
-                       current_identity.organization_id).to_dict()
-               }, 201
+            return {
+                       'message': 'Employment position created successfully.',
+                       'employment_position': EmploymentPositionModel
+                       .find_by_id(
+                           e_p.id,
+                           current_identity).to_dict()
+                   }, 201
+
+        return {'message': 'You are not allowed to create an employment '
+                           'position that does not belong to your '
+                           'organization.'}, 401
 
     @jwt_required()
-    def put(self,  position_name):
+    def put(self,  position_id):
         data = EmploymentPosition.parser.parse_args()
 
-        e_p = EmploymentPositionModel.find_by_name(
-            position_name, current_identity.organization_id)
+        e_p = EmploymentPositionModel.find_by_id(position_id, current_identity)
 
         if e_p:
             e_p.position_name_feminine = data['position_name_feminine']
@@ -85,9 +89,7 @@ class EmploymentPosition(Resource):
                            'message': 'Employment position updated '
                                       'successfully.',
                            'employment_position': EmploymentPositionModel
-                           .find_by_id(
-                               e_p.id,
-                               current_identity.organization_id).to_dict()
+                           .find_by_id(e_p.id, current_identity).to_dict()
                        }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while updating '
@@ -96,9 +98,8 @@ class EmploymentPosition(Resource):
         return {'message': 'Employment position not found.'}, 404
 
     @jwt_required()
-    def delete(self, position_name):
-        e_p = EmploymentPositionModel.find_by_name(
-            position_name, current_identity.organization_id)
+    def delete(self, position_id):
+        e_p = EmploymentPositionModel.find_by_id(position_id, current_identity)
 
         if e_p:
             if e_p.is_active:
@@ -118,9 +119,8 @@ class EmploymentPosition(Resource):
 
 class ActivateEmploymentPosition(Resource):
     @jwt_required()
-    def put(self, position_name):
-        e_p = EmploymentPositionModel.find_by_name(
-            position_name, current_identity.organization_id)
+    def put(self, position_id):
+        e_p = EmploymentPositionModel.find_by_id(position_id, current_identity)
 
         if e_p:
             if not e_p.is_active:
