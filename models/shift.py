@@ -140,11 +140,9 @@ class ShiftModel(ModelMixin, db.Model):
             self.rest_day = kwargs.get('rest_day')
 
     @classmethod
-    def find_by_id(cls, _id, organization_id):
-        return cls.query.filter_by(id=_id,
-                                   organization_id=organization_id).first()
+    def find_by_id(cls, _id, user):
+        shift = cls.query.filter_by(id=_id).first()
 
-    @classmethod
-    def find_by_name(cls, shift_name, organization_id):
-        return cls.query.filter_by(shift_name=shift_name,
-                                   organization_id=organization_id).first()
+        if shift:
+            if user.is_super or user.organization_id == shift.organization_id:
+                return shift

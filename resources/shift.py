@@ -128,9 +128,8 @@ class Shift(Resource):
                         required=False)
 
     @jwt_required()
-    def get(self, shift_name):
-        shift = ShiftModel.find_by_name(shift_name,
-                                        current_identity.organization_id)
+    def get(self, shift_id):
+        shift = ShiftModel.find_by_id(shift_id, current_identity)
         if shift:
             return shift.to_dict()
 
@@ -141,100 +140,105 @@ class Shift(Resource):
     def post():
         data = Shift.parser.parse_args()
 
-        if ShiftModel.find_by_name(data['shift_name'],
-                                   data['organization_id']):
+        if ShiftModel.query.filter_by(
+                shift_name=data['shift_name'],
+                organization_id=data['organization_id']).first():
             return {'message': 'A shift with that name already '
                                'exists in the organization.'}, 400
 
-        shift = ShiftModel(data['shift_name'],
-                           data['weekly_hours'],
-                           data['is_rotating'],
-                           data['payment_period'],
-                           data['break_length'],
-                           data['is_break_included_in_shift'],
-                           data['is_active'],
-                           data['organization_id'],
-                           rotation_start_hour=get_time(
-                               data['rotation_start_hour']),
-                           rotation_end_hour=get_time(
-                               data['rotation_end_hour']),
-                           fixed_start_hour_monday=get_time(
-                               data['fixed_start_hour_monday']),
-                           fixed_start_break_hour_monday=get_time(
-                               data['fixed_start_break_hour_monday']),
-                           fixed_end_break_hour_monday=get_time(
-                               data['fixed_end_break_hour_monday']),
-                           fixed_end_hour_monday=get_time(
-                               data['fixed_end_hour_monday']),
-                           fixed_start_hour_tuesday=get_time(
-                               data['fixed_start_hour_tuesday']),
-                           fixed_start_break_hour_tuesday=get_time(
-                               data['fixed_start_break_hour_tuesday']),
-                           fixed_end_break_hour_tuesday=get_time(
-                               data['fixed_end_break_hour_tuesday']),
-                           fixed_end_hour_tuesday=get_time(
-                               data['fixed_end_hour_tuesday']),
-                           fixed_start_hour_wednesday=get_time(
-                               data['fixed_start_hour_wednesday']),
-                           fixed_start_break_hour_wednesday=get_time(
-                               data['fixed_start_break_hour_wednesday']),
-                           fixed_end_break_hour_wednesday=get_time(
-                               data['fixed_end_break_hour_wednesday']),
-                           fixed_end_hour_wednesday=get_time(
-                               data['fixed_end_hour_wednesday']),
-                           fixed_start_hour_thursday=get_time(
-                               data['fixed_start_hour_thursday']),
-                           fixed_start_break_hour_thursday=get_time(
-                               data['fixed_start_break_hour_thursday']),
-                           fixed_end_break_hour_thursday=get_time(
-                               data['fixed_end_break_hour_thursday']),
-                           fixed_end_hour_thursday=get_time(
-                               data['fixed_end_hour_thursday']),
-                           fixed_start_hour_friday=get_time(
-                               data['fixed_start_hour_friday']),
-                           fixed_start_break_hour_friday=get_time(
-                               data['fixed_start_break_hour_friday']),
-                           fixed_end_break_hour_friday=get_time(
-                               data['fixed_end_break_hour_friday']),
-                           fixed_end_hour_friday=get_time(
-                               data['fixed_end_hour_friday']),
-                           fixed_start_hour_saturday=get_time(
-                               data['fixed_start_hour_saturday']),
-                           fixed_start_break_hour_saturday=get_time(
-                               data['fixed_start_break_hour_saturday']),
-                           fixed_end_break_hour_saturday=get_time(
-                               data['fixed_end_break_hour_saturday']),
-                           fixed_end_hour_saturday=get_time(
-                               data['fixed_end_hour_saturday']),
-                           fixed_start_hour_sunday=get_time(
-                               data['fixed_start_hour_sunday']),
-                           fixed_start_break_hour_sunday=get_time(
-                               data['fixed_start_break_hour_sunday']),
-                           fixed_end_break_hour_sunday=get_time(
-                               data['fixed_end_break_hour_sunday']),
-                           fixed_end_hour_sunday=get_time(
-                               data['fixed_end_hour_sunday']),
-                           rest_day=data['rest_day'])
+        if current_identity.organization_id == data['organization_id'] or \
+                current_identity.is_super:
+            shift = ShiftModel(data['shift_name'],
+                               data['weekly_hours'],
+                               data['is_rotating'],
+                               data['payment_period'],
+                               data['break_length'],
+                               data['is_break_included_in_shift'],
+                               data['is_active'],
+                               data['organization_id'],
+                               rotation_start_hour=get_time(
+                                   data['rotation_start_hour']),
+                               rotation_end_hour=get_time(
+                                   data['rotation_end_hour']),
+                               fixed_start_hour_monday=get_time(
+                                   data['fixed_start_hour_monday']),
+                               fixed_start_break_hour_monday=get_time(
+                                   data['fixed_start_break_hour_monday']),
+                               fixed_end_break_hour_monday=get_time(
+                                   data['fixed_end_break_hour_monday']),
+                               fixed_end_hour_monday=get_time(
+                                   data['fixed_end_hour_monday']),
+                               fixed_start_hour_tuesday=get_time(
+                                   data['fixed_start_hour_tuesday']),
+                               fixed_start_break_hour_tuesday=get_time(
+                                   data['fixed_start_break_hour_tuesday']),
+                               fixed_end_break_hour_tuesday=get_time(
+                                   data['fixed_end_break_hour_tuesday']),
+                               fixed_end_hour_tuesday=get_time(
+                                   data['fixed_end_hour_tuesday']),
+                               fixed_start_hour_wednesday=get_time(
+                                   data['fixed_start_hour_wednesday']),
+                               fixed_start_break_hour_wednesday=get_time(
+                                   data['fixed_start_break_hour_wednesday']),
+                               fixed_end_break_hour_wednesday=get_time(
+                                   data['fixed_end_break_hour_wednesday']),
+                               fixed_end_hour_wednesday=get_time(
+                                   data['fixed_end_hour_wednesday']),
+                               fixed_start_hour_thursday=get_time(
+                                   data['fixed_start_hour_thursday']),
+                               fixed_start_break_hour_thursday=get_time(
+                                   data['fixed_start_break_hour_thursday']),
+                               fixed_end_break_hour_thursday=get_time(
+                                   data['fixed_end_break_hour_thursday']),
+                               fixed_end_hour_thursday=get_time(
+                                   data['fixed_end_hour_thursday']),
+                               fixed_start_hour_friday=get_time(
+                                   data['fixed_start_hour_friday']),
+                               fixed_start_break_hour_friday=get_time(
+                                   data['fixed_start_break_hour_friday']),
+                               fixed_end_break_hour_friday=get_time(
+                                   data['fixed_end_break_hour_friday']),
+                               fixed_end_hour_friday=get_time(
+                                   data['fixed_end_hour_friday']),
+                               fixed_start_hour_saturday=get_time(
+                                   data['fixed_start_hour_saturday']),
+                               fixed_start_break_hour_saturday=get_time(
+                                   data['fixed_start_break_hour_saturday']),
+                               fixed_end_break_hour_saturday=get_time(
+                                   data['fixed_end_break_hour_saturday']),
+                               fixed_end_hour_saturday=get_time(
+                                   data['fixed_end_hour_saturday']),
+                               fixed_start_hour_sunday=get_time(
+                                   data['fixed_start_hour_sunday']),
+                               fixed_start_break_hour_sunday=get_time(
+                                   data['fixed_start_break_hour_sunday']),
+                               fixed_end_break_hour_sunday=get_time(
+                                   data['fixed_end_break_hour_sunday']),
+                               fixed_end_hour_sunday=get_time(
+                                   data['fixed_end_hour_sunday']),
+                               rest_day=data['rest_day'])
 
-        try:
-            shift.save_to_db()
-        except exc.SQLAlchemyError:
-            return {'message': 'An error occurred while creating '
-                               'the shift.'}, 500
+            try:
+                shift.save_to_db()
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while creating '
+                                   'the shift.'}, 500
 
-        return {
-                   'message': 'Shift created successfully.',
-                   'shift': ShiftModel.find_by_id(
-                       shift.id, current_identity.organization_id
-                   ).to_dict()
-               }, 201
+            return {
+                       'message': 'Shift created successfully.',
+                       'shift': ShiftModel.find_by_id(
+                           shift.id, current_identity
+                       ).to_dict()
+                   }, 201
+
+        return {'message': 'You are not allowed to create a shift '
+                           'that does not belong to your organization.'}, 401
 
     @jwt_required()
-    def put(self,  shift_name):
+    def put(self,  shift_id):
         data = Shift.parser.parse_args()
 
-        shift = ShiftModel.find_by_name(shift_name,
-                                        current_identity.organization_id)
+        shift = ShiftModel.find_by_id(shift_id, current_identity)
 
         if shift:
             shift.shift_name = data['shift_name']
@@ -300,7 +304,7 @@ class Shift(Resource):
                 return {
                            'message': 'Shift updated successfully.',
                            'shift': ShiftModel.find_by_id(
-                               shift.id, current_identity.organization_id
+                               shift.id, current_identity
                            ).to_dict()
                        }, 200
             except exc.SQLAlchemyError:
@@ -310,9 +314,8 @@ class Shift(Resource):
         return {'message': 'Shift not found.'}, 404
 
     @jwt_required()
-    def delete(self, shift_name):
-        shift = ShiftModel.find_by_name(shift_name,
-                                        current_identity.organization_id)
+    def delete(self, shift_id):
+        shift = ShiftModel.find_by_id(shift_id, current_identity)
 
         if shift:
             if shift.is_active:
@@ -330,9 +333,8 @@ class Shift(Resource):
 
 class ActivateShift(Resource):
     @jwt_required()
-    def put(self, shift_name):
-        shift = ShiftModel.find_by_name(shift_name,
-                                        current_identity.organization_id)
+    def put(self, shift_id):
+        shift = ShiftModel.find_by_id(shift_id, current_identity)
 
         if shift:
             if not shift.is_active:

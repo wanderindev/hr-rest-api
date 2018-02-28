@@ -148,15 +148,37 @@ class BaseTest(TestCase):
 
                 return json.loads(r.data)['department']['id']
 
-    def get_shift(self, organization_id):
+    def get_shift(self, user):
         with self.app_context():
             s = ShiftModel('test_s_r', 48, True, 'Quincenal',
-                           time(0, 30), False, True, organization_id,
+                           time(0, 30), False, True, user.organization_id,
                            rotation_start_hour=time(6),
                            rotation_end_hour=time(21))
             s.save_to_db()
 
-            return ShiftModel.find_by_id(s.id, organization_id)
+            return ShiftModel.find_by_id(s.id, user)
+
+    def get_shift_id(self, s_dict=None):
+        with self.app() as c:
+            with self.app_context():
+                s = s_dict or {
+                    'shift_name': 'test_s_r',
+                    'weekly_hours': 48,
+                    'is_rotating': True,
+                    'payment_period': 'Quincenal',
+                    'break_length': '00:30:00',
+                    'is_break_included_in_shift': False,
+                    'is_active': True,
+                    'organization_id': 1,
+                    'rotation_start_hour': '06:00:00',
+                    'rotation_end_hour': '21:00:00'
+                }
+
+                r = c.post('/shift',
+                           data=json.dumps(s),
+                           headers=self.get_headers())
+
+                return json.loads(r.data)['shift']['id']
 
     def get_employment_position(self, organization_id, user):
         with self.app_context():

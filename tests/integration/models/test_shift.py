@@ -13,26 +13,22 @@ class TestShift(BaseTest):
         super(TestShift, self).setUp()
 
         self.o = self.get_organization()
-        self.s = self.get_shift(self.o.id)
+        self.u = self.get_user(self.o.id)
+        self.s = self.get_shift(self.u)
 
     def test_find_shift(self):
-        """Test the find_by_name and find_by_id methods of ShiftModel."""
+        """Test the find_by_id method of ShiftModel."""
         with self.app_context():
-            s_by_name = ShiftModel.find_by_name(self.s.shift_name,
-                                                self.o.id)
-            s_by_id = ShiftModel.find_by_id(self.s.id,
-                                            self.o.id)
+            shift = ShiftModel.find_by_id(self.s.id, self.u)
 
-            self.assertIsNotNone(s_by_name)
-            self.assertIsNotNone(s_by_id)
-            self.assertEqual(s_by_name, s_by_id)
+            self.assertIsNotNone(shift)
 
     def test_shift_list_in_organization(self):
         """Test that the organization object contains a shift list."""
         with self.app_context():
             s_list = ShiftModel.query.filter_by(
                 organization_id=self.o.id).all()
-            o_s_list = OrganizationModel.query.filter_by(
-                organization_name=self.o.organization_name).first().shifts
+            s_list_in_org = OrganizationModel.find_by_id(
+                self.o.id, self.u).shifts
 
-            self.assertListEqual(s_list, o_s_list)
+            self.assertListEqual(s_list, s_list_in_org)

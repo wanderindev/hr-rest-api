@@ -8,8 +8,9 @@ class TestEmploymentPosition(BaseTest):
     """System tests for the employment_position resource."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by creating a dict representing
-        an employment_position so it is available for the different tests.
+        Extend the BaseTest setUp method by creating an organization, a user,
+        and a dict representing an employment_position so it is available for
+        the different tests.
         """
         super(TestEmploymentPosition, self).setUp()
         with self.app_context():
