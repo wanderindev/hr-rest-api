@@ -59,7 +59,7 @@ class Department(Resource):
                    }, 201
 
         return {'message': 'You are not allowed to create a department that '
-                           'does not belong to your organization.'}, 401
+                           'does not belong to your organization.'}, 403
 
     @jwt_required()
     def put(self,  department_id):

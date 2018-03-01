@@ -103,30 +103,13 @@ class EmployeeModel(ModelMixin, db.Model):
         self.shift_id = shift_id
 
     @classmethod
-    def find_by_id(cls, _id, organization_id):
+    def find_by_id(cls, _id, user):
         from models.department import DepartmentModel
 
         empl = cls.query.filter_by(id=_id).first()
 
         if empl:
-            if DepartmentModel.find_by_id(
-                    empl.department_id,
-                    organization_id).organization_id == organization_id:
-                return empl
+            dept = DepartmentModel.find_by_id(empl.department_id, user)
 
-    @classmethod
-    def find_by_name(cls, first_name, second_name, first_surname,
-                     second_surname, organization_id):
-        from models.department import DepartmentModel
-
-        empl = cls.query.filter_by(first_name=first_name,
-                                   second_name=second_name,
-                                   first_surname=first_surname,
-                                   second_surname=second_surname,
-                                   is_active=True).first()
-
-        if empl:
-            if DepartmentModel.find_by_id(
-                    empl.department_id,
-                    organization_id).organization_id == organization_id:
+            if dept:
                 return empl

@@ -92,8 +92,7 @@ class Employee(Resource):
     @jwt_required()
     def get(self, employee_id):
 
-        empl = EmployeeModel.find_by_id(employee_id,
-                                        current_identity.organization_id)
+        empl = EmployeeModel.find_by_id(employee_id, current_identity)
 
         if empl:
             return empl.to_dict()
@@ -105,117 +104,105 @@ class Employee(Resource):
     def post():
         data = Employee.parser.parse_args()
 
-        if EmployeeModel.find_by_name(data['first_name'],
-                                      data['second_name'],
-                                      data['first_surname'],
-                                      data['second_surname'],
-                                      current_identity.organization_id):
-            return {'message': 'An employee with that name already '
-                               'exists in the organization.'}, 400
+        if DepartmentModel.find_by_id(data['department_id'], current_identity):
+            empl = EmployeeModel(data['first_name'],
+                                 data['second_name'],
+                                 data['first_surname'],
+                                 data['second_surname'],
+                                 data['national_id_number'],
+                                 data['is_panamanian'],
+                                 data['date_of_birth'],
+                                 data['gender'],
+                                 data['address'],
+                                 data['home_phone'],
+                                 data['mobile_phone'],
+                                 data['email'],
+                                 data['type_of_contract'],
+                                 data['employment_date'],
+                                 data['contract_expiration_date'],
+                                 data['termination_date'],
+                                 data['termination_reason'],
+                                 data['salary_per_payment_period'],
+                                 data['representation_expenses_per_payment_period'],
+                                 data['payment_method'],
+                                 data['is_active'],
+                                 data['marital_status_id'],
+                                 data['department_id'],
+                                 data['position_id'],
+                                 data['shift_id'])
 
-        if not DepartmentModel.find_by_id(data['department_id'],
-                                          current_identity.organization_id):
-            return {'message': 'You are not allowed to add an employee to a '
-                               'department that does not belong to your '
-                               'organization.'}, 403
+            try:
+                empl.save_to_db()
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while creating '
+                                   'the employee.'}, 500
 
-        empl = EmployeeModel(data['first_name'],
-                             data['second_name'],
-                             data['first_surname'],
-                             data['second_surname'],
-                             data['national_id_number'],
-                             data['is_panamanian'],
-                             data['date_of_birth'],
-                             data['gender'],
-                             data['address'],
-                             data['home_phone'],
-                             data['mobile_phone'],
-                             data['email'],
-                             data['type_of_contract'],
-                             data['employment_date'],
-                             data['contract_expiration_date'],
-                             data['termination_date'],
-                             data['termination_reason'],
-                             data['salary_per_payment_period'],
-                             data['representation_expenses_per_payment_period'],
-                             data['payment_method'],
-                             data['is_active'],
-                             data['marital_status_id'],
-                             data['department_id'],
-                             data['position_id'],
-                             data['shift_id'])
+            return {
+                       'message': 'Employee created successfully.',
+                       'employee': EmployeeModel.find_by_id(
+                           empl.id, current_identity
+                       ).to_dict()
+                   }, 201
 
-        try:
-            empl.save_to_db()
-        except exc.SQLAlchemyError:
-            return {'message': 'An error occurred while creating '
-                               'the employee.'}, 500
-
-        return {
-                   'message': 'Employee created successfully.',
-                   'employee': EmployeeModel.find_by_id(
-                       empl.id, current_identity.organization_id
-                   ).to_dict()
-               }, 201
+        return {'message': 'You are not allowed to add an employee to a '
+                           'department that does not belong to your '
+                           'organization.'}, 403
 
     @jwt_required()
     def put(self,  employee_id):
         data = Employee.parser.parse_args()
 
-        if not DepartmentModel.find_by_id(data['department_id'],
-                                          current_identity.organization_id):
-            return {'message': 'You are not allowed to move an employee to a '
-                               'department that does not belong to your'
-                               'organization.'}, 403
+        if DepartmentModel.find_by_id(data['department_id'], current_identity):
+            empl = EmployeeModel.find_by_id(employee_id, current_identity)
 
-        empl = EmployeeModel.find_by_id(employee_id,
-                                        current_identity.organization_id)
+            if empl:
+                empl.first_name = data['first_name']
+                empl.second_name = data['second_name']
+                empl.first_surname = data['first_surname']
+                empl.second_surname = data['second_surname']
+                empl.national_id_number = data['national_id_number']
+                empl.is_panamanian = data['is_panamanian']
+                empl.date_of_birth = data['date_of_birth']
+                empl.gender = data['gender']
+                empl.address = data['address']
+                empl.home_phone = data['home_phone']
+                empl.mobile_phone = data['mobile_phone']
+                empl.email = data['email']
+                empl.type_of_contract = data['type_of_contract']
+                empl.employment_date = data['employment_date']
+                empl.contract_expiration_date = data['contract_expiration_date']
+                empl.termination_date = data['termination_date']
+                empl.termination_reason = data['termination_reason']
+                empl.salary_per_payment_period = data['salary_per_payment_period']
+                empl.representation_expenses_per_payment_period = data[
+                    'representation_expenses_per_payment_period']
+                empl.payment_method = data['payment_method']
+                empl.marital_status_id = data['marital_status_id']
+                empl.department_id = data['department_id']
+                empl.position_id = data['position_id']
+                empl.shift_id = data['shift_id']
 
-        if empl:
-            empl.first_name = data['first_name']
-            empl.second_name = data['second_name']
-            empl.first_surname = data['first_surname']
-            empl.second_surname = data['second_surname']
-            empl.national_id_number = data['national_id_number']
-            empl.is_panamanian = data['is_panamanian']
-            empl.date_of_birth = data['date_of_birth']
-            empl.gender = data['gender']
-            empl.address = data['address']
-            empl.home_phone = data['home_phone']
-            empl.mobile_phone = data['mobile_phone']
-            empl.email = data['email']
-            empl.type_of_contract = data['type_of_contract']
-            empl.employment_date = data['employment_date']
-            empl.contract_expiration_date = data['contract_expiration_date']
-            empl.termination_date = data['termination_date']
-            empl.termination_reason = data['termination_reason']
-            empl.salary_per_payment_period = data['salary_per_payment_period']
-            empl.representation_expenses_per_payment_period = data[
-                'representation_expenses_per_payment_period']
-            empl.payment_method = data['payment_method']
-            empl.marital_status_id = data['marital_status_id']
-            empl.department_id = data['department_id']
-            empl.position_id = data['position_id']
-            empl.shift_id = data['shift_id']
+                try:
+                    empl.save_to_db()
+                    return {
+                               'message': 'Employee updated successfully.',
+                               'employee': EmployeeModel.find_by_id(
+                                   empl.id, current_identity
+                               ).to_dict()
+                           }, 200
+                except exc.SQLAlchemyError:
+                    return {'message': 'An error occurred while updating '
+                                       'the employee.'}, 500
 
-            try:
-                empl.save_to_db()
-                return {
-                           'message': 'Employee updated successfully.',
-                           'employee': EmployeeModel.find_by_id(
-                               empl.id, current_identity.organization_id
-                           ).to_dict()
-                       }, 200
-            except exc.SQLAlchemyError:
-                return {'message': 'An error occurred while updating '
-                                   'the employee.'}, 500
+            return {'message': 'Employee not found.'}, 404
 
-        return {'message': 'Employee not found.'}, 404
+        return {'message': 'You are not allowed to move an employee to a '
+                           'department that does not belong to your'
+                           'organization.'}, 403
 
     @jwt_required()
     def delete(self, employee_id):
-        empl = EmployeeModel.find_by_id(employee_id,
-                                        current_identity.organization_id)
+        empl = EmployeeModel.find_by_id(employee_id, current_identity)
 
         if empl:
             if empl.is_active:
@@ -234,8 +221,7 @@ class Employee(Resource):
 class ActivateEmployee(Resource):
     @jwt_required()
     def put(self, employee_id):
-        empl = EmployeeModel.find_by_id(employee_id,
-                                        current_identity.organization_id)
+        empl = EmployeeModel.find_by_id(employee_id, current_identity)
 
         if empl:
             if not empl.is_active:

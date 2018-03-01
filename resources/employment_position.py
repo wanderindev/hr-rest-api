@@ -70,7 +70,7 @@ class EmploymentPosition(Resource):
 
         return {'message': 'You are not allowed to create an employment '
                            'position that does not belong to your '
-                           'organization.'}, 401
+                           'organization.'}, 403
 
     @jwt_required()
     def put(self,  position_id):

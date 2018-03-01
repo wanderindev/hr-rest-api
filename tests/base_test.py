@@ -115,7 +115,7 @@ class BaseTest(TestCase):
                 r = c.post('/organization',
                            data=json.dumps(o),
                            headers=self.get_headers())
-
+                print(r.data)
                 return json.loads(r.data)['organization']['id']
 
     def get_user(self, organization_id, is_super=True):
@@ -148,10 +148,12 @@ class BaseTest(TestCase):
 
                 return json.loads(r.data)['department']['id']
 
-    def get_shift(self, user):
+    def get_shift(self, user, organization_id=None):
         with self.app_context():
+            organization_id = organization_id or user.organization_id
+
             s = ShiftModel('test_s_r', 48, True, 'Quincenal',
-                           time(0, 30), False, True, user.organization_id,
+                           time(0, 30), False, True, organization_id,
                            rotation_start_hour=time(6),
                            rotation_end_hour=time(21))
             s.save_to_db()
@@ -180,8 +182,10 @@ class BaseTest(TestCase):
 
                 return json.loads(r.data)['shift']['id']
 
-    def get_employment_position(self, organization_id, user):
+    def get_employment_position(self, user, organization_id=None):
         with self.app_context():
+            organization_id = organization_id or user.organization_id
+
             e_p = EmploymentPositionModel('test_e_p_f', 'test_e_p_m',
                                           1.00, True, organization_id)
             e_p.save_to_db()
@@ -206,7 +210,7 @@ class BaseTest(TestCase):
                 return json.loads(r.data)['employment_position']['id']
 
     def get_employee(self, department_id, position_id,
-                     shift_id, organization_id):
+                     shift_id, user):
         with self.app_context():
             e = EmployeeModel('f_n', 's_n', 'f_sn', 's_sn', '1-11-111',
                               True, date(2000, 1, 31), 'Hombre', 'Panamá',
@@ -217,7 +221,44 @@ class BaseTest(TestCase):
                               1, department_id, position_id, shift_id)
             e.save_to_db()
 
-            return EmployeeModel.find_by_id(e.id, organization_id)
+            return EmployeeModel.find_by_id(e.id, user)
+
+    def get_employee_id(self, e_dict=None):
+        with self.app() as c:
+            with self.app_context():
+                empl = e_dict or {
+                    'first_name': 'f_n',
+                    'second_name': 's_n',
+                    'first_surname': 'f_sn',
+                    'second_surname': 's_sn',
+                    'national_id_number': '1-11-111',
+                    'is_panamanian': True,
+                    'date_of_birth': '2000-01-31',
+                    'gender': 'Hombre',
+                    'address': 'Panamá',
+                    'home_phone': '222-2222',
+                    'mobile_phone': '6666-6666',
+                    'email': 'f_n@f_sn.com',
+                    'type_of_contract': 'Definido',
+                    'employment_date': '2018-01-01',
+                    'contract_expiration_date': '2018-01-31',
+                    'termination_date': '2018-01-15',
+                    'termination_reason': 'Período de Prueba',
+                    'salary_per_payment_period': 104,
+                    'representation_expenses_per_payment_period': 0,
+                    'payment_method': 'ACH',
+                    'is_active': True,
+                    'marital_status_id': 1,
+                    'department_id': self.get_department_id(),
+                    'position_id': self.get_employment_position_id(),
+                    'shift_id': self.get_shift_id()
+                }
+
+                r = c.post('/employee',
+                           data=json.dumps(empl),
+                           headers=self.get_headers())
+
+                return json.loads(r.data)['employee']['id']
 
     def get_emergency_contact(self, employee_id, organization_id):
         with self.app_context():

@@ -98,7 +98,7 @@ class TestEmploymentPosition(BaseTest):
                 
     def test_emp_pos_wrong_organization(self):
         """
-        Test that status code 401 is returned when trying to POST an employment
+        Test that status code 403 is returned when trying to POST an employment
         position that does not belong to the user's organization.
         """
         with self.app() as c:
@@ -110,7 +110,7 @@ class TestEmploymentPosition(BaseTest):
                                'password': 'test_p'
                            }))
 
-                self.assertEqual(r.status_code, 401)
+                self.assertEqual(r.status_code, 403)
 
     def test_emp_pos_get_with_authentication(self):
         """

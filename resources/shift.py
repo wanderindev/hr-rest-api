@@ -232,7 +232,7 @@ class Shift(Resource):
                    }, 201
 
         return {'message': 'You are not allowed to create a shift '
-                           'that does not belong to your organization.'}, 401
+                           'that does not belong to your organization.'}, 403
 
     @jwt_required()
     def put(self,  shift_id):

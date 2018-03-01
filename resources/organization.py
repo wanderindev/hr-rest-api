@@ -31,7 +31,7 @@ class Organization(Resource):
 
         if not current_identity.is_super:
             return {'message': 'You are not allowed to create '
-                               'new organizations.'}, 401
+                               'new organizations.'}, 403
 
         if OrganizationModel.query.filter_by(
                 organization_name=data['organization_name']).first():
@@ -85,7 +85,7 @@ class Organization(Resource):
     def delete(self, organization_id):
         if not current_identity.is_super:
             return {'message': 'You are not allowed to inactivate '
-                               'an organization.'}, 401
+                               'an organization.'}, 403
 
         organization = OrganizationModel.find_by_id(organization_id,
                                                     current_identity)
@@ -109,7 +109,7 @@ class ActivateOrganization(Resource):
     def put(self, organization_id):
         if not current_identity.is_super:
             return {'message': 'You are not allowed to activate '
-                               'an organization.'}, 401
+                               'an organization.'}, 403
 
         organization = OrganizationModel.find_by_id(organization_id,
                                                     current_identity)
@@ -136,4 +136,4 @@ class Organizations(Resource):
                                               OrganizationModel.query.all()))}
 
         return {'message': 'You are not allowed to view the list of'
-                           'organizations.'}, 401
+                           'organizations.'}, 403

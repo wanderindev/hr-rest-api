@@ -93,7 +93,7 @@ class TestOrganization(BaseTest):
 
     def test_organization_post_not_super(self):
         """
-        Test that status code 401 is returned when trying to
+        Test that status code 403 is returned when trying to
         POST data to the /organization endpoint with a user which
         is not a super-user.
         """
@@ -105,7 +105,7 @@ class TestOrganization(BaseTest):
                            data=json.dumps(self.o_dict),
                            headers=self.get_headers())
 
-                self.assertEqual(r.status_code, 401)
+                self.assertEqual(r.status_code, 403)
 
                 self.toggle_is_super()
 
@@ -317,7 +317,7 @@ class TestOrganization(BaseTest):
     def test_organization_delete_not_super(self):
         """
         Test that a DELETE request to the /organization/<int:organization_id>
-        endpoint returns status code 401 if the user is not a super-user.
+        endpoint returns status code 403 if the user is not a super-user.
         """
         with self.app() as c:
             with self.app_context():
@@ -326,7 +326,7 @@ class TestOrganization(BaseTest):
                 r = c.delete(f'/organization/1',
                              headers=self.get_headers())
 
-                self.assertEqual(r.status_code, 401)
+                self.assertEqual(r.status_code, 403)
 
                 self.toggle_is_super()
 
@@ -396,7 +396,7 @@ class TestOrganization(BaseTest):
         """
         Test that a PUT request to the /activate_organization
         /<int:organization_id> endpoint returns status code
-        401 if the user is not a super-user.
+        403 if the user is not a super-user.
         """
         with self.app() as c:
             with self.app_context():
@@ -407,7 +407,7 @@ class TestOrganization(BaseTest):
                 r = c.put(f'/activate_organization/{organization_id}',
                           headers=self.get_headers())
 
-                self.assertEqual(r.status_code, 401)
+                self.assertEqual(r.status_code, 403)
 
                 self.toggle_is_super()
 
@@ -448,7 +448,7 @@ class TestOrganization(BaseTest):
     def test_organization_list_not_super(self):
         """
         Test that GET requests to the /organizations endpoint
-        returns status code 401 if the user is not a super-user.
+        returns status code 403 if the user is not a super-user.
         """
         with self.app() as c:
             with self.app_context():
@@ -457,6 +457,6 @@ class TestOrganization(BaseTest):
                 r = c.get('/organizations',
                           headers=self.get_headers())
 
-                self.assertEqual(r.status_code, 401)
+                self.assertEqual(r.status_code, 403)
 
                 self.toggle_is_super()

@@ -214,7 +214,7 @@ class TestShift(BaseTest):
                 
     def test_shift_wrong_organization(self):
         """
-        Test that status code 401 is returned when trying to POST an shift 
+        Test that status code 403 is returned when trying to POST an shift
         that does not belong to the user's organization.
         """
         with self.app() as c:
@@ -226,7 +226,7 @@ class TestShift(BaseTest):
                                'password': 'test_p'
                            }))
 
-                self.assertEqual(r.status_code, 401)
+                self.assertEqual(r.status_code, 403)
 
     def test_shift_get_with_authentication(self):
         """

@@ -14,7 +14,7 @@ class TestEmploymentPosition(BaseTest):
 
         self.o = self.get_organization()
         self.u = self.get_user(self.o.id)
-        self.e_p = self.get_employment_position(self.o.id, self.u)
+        self.e_p = self.get_employment_position(self.u)
 
     def test_find_employment_position(self):
         """Test the find_by_idmethod of EmploymentPositionModel."""
