@@ -112,10 +112,17 @@ class BaseTest(TestCase):
         with self.app() as c:
             with self.app_context():
                 o = o_dict or {'organization_name': 'test_o', 'is_active': True}
+
+                r = OrganizationModel.query.filter_by(
+                    organization_name=o['organization_name']).first()
+
+                if r:
+                    return r.id
+
                 r = c.post('/organization',
                            data=json.dumps(o),
                            headers=self.get_headers())
-                print(r.data)
+
                 return json.loads(r.data)['organization']['id']
 
     def get_user(self, organization_id, is_super=True):
@@ -141,6 +148,12 @@ class BaseTest(TestCase):
                     'organization_id': 1,
                     'is_active': True
                 }
+
+                r = DepartmentModel.query.filter_by(
+                    department_name=d['department_name']).first()
+
+                if r:
+                    return r.id
 
                 r = c.post('/department',
                            data=json.dumps(d),
@@ -176,6 +189,12 @@ class BaseTest(TestCase):
                     'rotation_end_hour': '21:00:00'
                 }
 
+                r = ShiftModel.query.filter_by(
+                    shift_name=s['shift_name']).first()
+
+                if r:
+                    return r.id
+
                 r = c.post('/shift',
                            data=json.dumps(s),
                            headers=self.get_headers())
@@ -202,6 +221,13 @@ class BaseTest(TestCase):
                     'is_active': True,
                     'organization_id': 1
                 }
+
+                r = EmploymentPositionModel.query.filter_by(
+                    position_name_feminine=e_p[
+                        'position_name_feminine']).first()
+
+                if r:
+                    return r.id
 
                 r = c.post('/employment_position',
                            data=json.dumps(e_p),
@@ -254,19 +280,49 @@ class BaseTest(TestCase):
                     'shift_id': self.get_shift_id()
                 }
 
+                r = EmployeeModel.query.filter_by(
+                    first_name=empl['first_name']).first()
+
+                if r:
+                    return r.id
+
                 r = c.post('/employee',
                            data=json.dumps(empl),
                            headers=self.get_headers())
 
                 return json.loads(r.data)['employee']['id']
 
-    def get_emergency_contact(self, employee_id, organization_id):
+    def get_emergency_contact(self, employee_id, user):
         with self.app_context():
             e_c = EmergencyContactModel('f_n', 'l_n', '111-1111', '222-2222',
                                         '6666-6666', employee_id)
             e_c.save_to_db()
 
-            return EmergencyContactModel.find_by_id(e_c.id, organization_id)
+            return EmergencyContactModel.find_by_id(e_c.id, user)
+
+    def get_emergency_contact_id(self, e_c_dict=None):
+        with self.app() as c:
+            with self.app_context():
+                e_c = e_c_dict or {
+                    'first_name': 'f_n',
+                    'last_name': 'l_n',
+                    'home_phone': '111-1111',
+                    'work_phone': '222-2222',
+                    'mobile_phone': '6666-6666',
+                    'employee_id': self.get_employee_id()
+                }
+
+                r = EmergencyContactModel.query.filter_by(
+                    first_name=e_c['first_name']).first()
+
+                if r:
+                    return r.id
+
+                r = c.post('/emergency_contact',
+                           data=json.dumps(e_c),
+                           headers=self.get_headers())
+
+                return json.loads(r.data)['emergency_contact']['id']
 
     def get_health_permit(self, employee_id, organization_id):
         with self.app_context():
