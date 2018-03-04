@@ -7,14 +7,13 @@ class TestShift(BaseTest):
     """Integration tests for the ShiftModel."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by setting up an
-        organization and a shift.
+        Extend the BaseTest setUp method by setting up an organization
+        and a shift.
         """
         super(TestShift, self).setUp()
 
         self.o = self.get_organization()
-        self.u = self.get_user(self.o.id)
-        self.s = self.get_shift(self.u)
+        self.s = self.get_shift()
 
     def test_find_shift(self):
         """Test the find_by_id method of ShiftModel."""

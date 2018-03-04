@@ -2,6 +2,7 @@ from flask_jwt import current_identity, jwt_required
 from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
+from models.employee import EmployeeModel
 from models.passport import PassportModel
 
 
@@ -25,9 +26,8 @@ class Passport(Resource):
 
     @jwt_required()
     def get(self, passport_id):
+        passp = PassportModel.find_by_id(passport_id, current_identity)
 
-        passp = PassportModel.find_by_id(
-            passport_id, current_identity.organization_id)
         if passp:
             return passp.to_dict()
 
@@ -38,57 +38,65 @@ class Passport(Resource):
     def post():
         data = Passport.parser.parse_args()
 
-        passp = PassportModel(data['passport_number'],
-                              data['issue_date'],
-                              data['expiration_date'],
-                              data['employee_id'],
-                              data['country_id'])
+        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
+            passp = PassportModel(data['passport_number'],
+                                  data['issue_date'],
+                                  data['expiration_date'],
+                                  data['employee_id'],
+                                  data['country_id'])
 
-        try:
-            passp.save_to_db()
-        except exc.SQLAlchemyError:
-            return {'message': 'An error occurred while creating '
-                               'the passport.'}, 500
+            try:
+                passp.save_to_db()
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while creating '
+                                   'the passport.'}, 500
 
-        return {
-                   'message': 'Passport created successfully.',
-                   'passport': PassportModel.find_by_id(
-                       passp.id, current_identity.organization_id
-                   ).to_dict()
-               }, 201
+            return {
+                       'message': 'Passport created successfully.',
+                       'passport': PassportModel.find_by_id(
+                           passp.id, current_identity
+                       ).to_dict()
+                   }, 201
+
+        return {'message': 'You are not allowed to create a passport '
+                           'for an employee that does not belong to your '
+                           'organization.'}, 403
 
     @jwt_required()
     def put(self,  passport_id):
         data = Passport.parser.parse_args()
 
-        passp = PassportModel.find_by_id(
-            passport_id, current_identity.organization_id)
+        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
+            passp = PassportModel.find_by_id(passport_id, current_identity)
 
-        if passp:
-            passp.passport_number = data['passport_number']
-            passp.issue_date = data['issue_date']
-            passp.expiration_date = data['expiration_date']
-            passp.employee_id = data['employee_id']
-            passp.country_id = data['country_id']
+            if passp:
+                passp.passport_number = data['passport_number']
+                passp.issue_date = data['issue_date']
+                passp.expiration_date = data['expiration_date']
+                passp.employee_id = data['employee_id']
+                passp.country_id = data['country_id']
 
-            try:
-                passp.save_to_db()
-                return {
-                   'message': 'Passport updated successfully.',
-                   'passport': PassportModel.find_by_id(
-                       passp.id, current_identity.organization_id
-                   ).to_dict()
-                }, 200
-            except exc.SQLAlchemyError:
-                return {'message': 'An error occurred while updating '
-                                   'the passport.'}, 500
+                try:
+                    passp.save_to_db()
+                    return {
+                       'message': 'Passport updated successfully.',
+                       'passport': PassportModel.find_by_id(
+                           passp.id, current_identity
+                       ).to_dict()
+                    }, 200
+                except exc.SQLAlchemyError:
+                    return {'message': 'An error occurred while updating '
+                                       'the passport.'}, 500
 
-        return {'message': 'Passport not found.'}, 404
+            return {'message': 'Passport not found.'}, 404
+
+        return {'message': 'You are not allowed to assign an passport '
+                           'to an employee that does not belong to your '
+                           'organization.'}, 403
 
     @jwt_required()
     def delete(self, passport_id):
-        passp = PassportModel.find_by_id(
-            passport_id, current_identity.organization_id)
+        passp = PassportModel.find_by_id(passport_id, current_identity)
 
         if passp:
             try:

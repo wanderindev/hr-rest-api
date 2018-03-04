@@ -22,11 +22,11 @@ class HealthPermitModel(ModelMixin, db.Model):
         self.employee_id = employee_id
 
     @classmethod
-    def find_by_id(cls, _id, organization_id):
+    def find_by_id(cls, _id, user):
         from models.employee import EmployeeModel
 
         h_permit = cls.query.filter_by(id=_id).first()
 
         if h_permit:
-            if EmployeeModel.find_by_id(h_permit.employee_id, organization_id):
+            if EmployeeModel.find_by_id(h_permit.employee_id, user):
                 return h_permit

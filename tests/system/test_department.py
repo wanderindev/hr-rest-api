@@ -8,19 +8,15 @@ class TestDepartment(BaseTest):
     """System tests for the department resource."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by creating an organization,
-        a user, and dict representing a department so it is available
-        for the different tests.
+        Extend the BaseTest setUp method by creating a dict
+        representing a department.
         """
         super(TestDepartment, self).setUp()
 
         with self.app_context():
-            self.o = self.get_organization()
-            self.u = self.get_user(self.o.id, False)
-
             self.d_dict = {
                 'department_name': 'test_d',
-                'organization_id': 1,
+                'organization_id': self.get_organization().id,
                 'is_active': True
             }
 
@@ -89,17 +85,17 @@ class TestDepartment(BaseTest):
 
                 self.assertEqual(r.status_code, 400)
 
-    def test_dept_post_wrong_organization(self):
+    def test_dept_post_wrong_user(self):
         """
         Test that status code 403 is returned when trying to POST a
-        department that does not belong to the user's organization.
+        department with a user without permission.
         """
         with self.app() as c:
             with self.app_context():
                 r = c.post('/department',
                            data=json.dumps(self.d_dict),
                            headers=self.get_headers({
-                               'username': 'test_u',
+                               'username': 'test_other_u',
                                'password': 'test_p'
                            }))
 
@@ -113,7 +109,7 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.get(f'/department/{self.get_department_id()}',
+                r = c.get(f'/department/{self.get_department().id}',
                           headers=self.get_headers())
 
                 d = json.loads(r.data)
@@ -148,7 +144,7 @@ class TestDepartment(BaseTest):
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/department/{self.get_department_id()}',
+                r = c.get(f'/department/{self.get_department().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -163,7 +159,7 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/department/{self.get_department_id()}',
+                r = c.put(f'/department/{self.get_department().id}',
                           data=json.dumps({
                               'department_name': 'new_test_d',
                               'organization_id': self.d_dict['organization_id']
@@ -188,7 +184,7 @@ class TestDepartment(BaseTest):
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/department/{self.get_department_id()}',
+                r = c.put(f'/department/{self.get_department().id}',
                           data=json.dumps({
                               'department_name': 'new_test_d',
                               'organization_id': self.d_dict['organization_id']
@@ -224,7 +220,7 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete(f'/department/{self.get_department_id()}',
+                r = c.delete(f'/department/{self.get_department().id}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -238,7 +234,7 @@ class TestDepartment(BaseTest):
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/department/{self.get_department_id()}',
+                r = c.delete(f'/department/{self.get_department().id}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -253,7 +249,7 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                department_id = self.get_department_id()
+                department_id = self.get_department().id
 
                 # Make department inactive.
                 c.delete(f'/department/{department_id}',
@@ -284,7 +280,7 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                department_id = self.get_department_id()
+                department_id = self.get_department().id
 
                 c.delete(f'/department/{department_id}',
                          headers=self.get_headers())
@@ -303,7 +299,7 @@ class TestDepartment(BaseTest):
             with self.app_context():
                 # Send PUT request to /activate_department with
                 # wrong authorization header.
-                r = c.put(f'/activate_department/{self.get_department_id()}',
+                r = c.put(f'/activate_department/{self.get_department().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -318,7 +314,7 @@ class TestDepartment(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/activate_department/{self.get_department_id()}',
+                r = c.put(f'/activate_department/{self.get_department().id}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)

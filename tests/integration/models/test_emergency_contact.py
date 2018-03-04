@@ -7,19 +7,13 @@ class TestEmergencyContact(BaseTest):
     """Integration tests for the EmergencyContactModel."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by setting up an organization, a
-        user, a department, an employment position, a shift, an employee,
+        Extend the BaseTest setUp method by setting up an employee
         and an emergency_contact.
         """
         super(TestEmergencyContact, self).setUp()
 
-        self.o = self.get_organization()
-        self.u = self.get_user(self.o.id)
-        self.d = self.get_department(self.u)
-        self.e_p = self.get_employment_position(self.u)
-        self.s = self.get_shift(self.u)
-        self.e = self.get_employee(self.d.id, self.e_p.id, self.s.id, self.u)
-        self.e_c = self.get_emergency_contact(self.e.id,  self.u)
+        self.e = self.get_employee()
+        self.e_c = self.get_emergency_contact()
 
     def test_find_id(self):
         """Test the find_by_id method of EmergencyContactModel."""

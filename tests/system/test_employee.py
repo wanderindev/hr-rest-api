@@ -1,7 +1,6 @@
 import json
 
 from models.employee import EmployeeModel
-from models.user import AppUserModel
 from tests.base_test import BaseTest
 
 
@@ -9,17 +8,12 @@ class TestEmployee(BaseTest):
     """System tests for the employee resource."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by setting up a user, a department,
-        an employment position, a shift, and a dict representing an employee.
+        Extend the BaseTest setUp method by setting up a dict
+        representing an employee.
         """
         super(TestEmployee, self).setUp()
 
         with self.app_context():
-            self.u = AppUserModel.find_by_id(1)
-            self.d = self.get_department(self.u)
-            self.e_p = self.get_employment_position(self.u)
-            self.s = self.get_shift(self.u)
-
             self.e_dict = {
                 'first_name': 'f_n',
                 'second_name': 's_n',
@@ -43,9 +37,9 @@ class TestEmployee(BaseTest):
                 'payment_method': 'ACH',
                 'is_active': True,
                 'marital_status_id': 1,
-                'department_id': self.d.id,
-                'position_id': self.e_p.id,
-                'shift_id': self.s.id
+                'department_id': self.get_department().id,
+                'position_id': self.get_employment_position().id,
+                'shift_id': self.get_shift().id
             }
 
     def test_empl_post_with_authentication(self):
@@ -128,6 +122,22 @@ class TestEmployee(BaseTest):
 
                 self.assertEqual(r.status_code, 401)
 
+    def test_dept_post_wrong_user(self):
+        """
+        Test that status code 403 is returned when trying to POST an
+        employee with a user without permission.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.post('/employee',
+                           data=json.dumps(self.e_dict),
+                           headers=self.get_headers({
+                               'username': 'test_other_u',
+                               'password': 'test_p'
+                           }))
+
+                self.assertEqual(r.status_code, 403)
+
     def test_empl_get_with_authentication(self):
         """
         Test that a GET request to the /employee/<int:employee_id>
@@ -136,7 +146,7 @@ class TestEmployee(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                employee_id = self.get_employee_id(self.e_dict)
+                employee_id = self.get_employee().id
 
                 r = c.get(f'/employee/{employee_id}',
                           headers=self.get_headers())
@@ -168,7 +178,7 @@ class TestEmployee(BaseTest):
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/employee/{self.get_employee_id(self.e_dict)}',
+                r = c.get(f'/employee/{self.get_employee().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -183,7 +193,7 @@ class TestEmployee(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/employee/{self.get_employee_id(self.e_dict)}',
+                r = c.put(f'/employee/{self.get_employee().id}',
                           data=json.dumps({
                               'first_name': 'new_f_n',
                               'second_name': 'new_s_n',
@@ -208,9 +218,9 @@ class TestEmployee(BaseTest):
                               'payment_method': 'Cheque',
                               'is_active': True,
                               'marital_status_id': 2,
-                              'department_id': self.d.id,
-                              'position_id': self.e_p.id,
-                              'shift_id': self.s.id
+                              'department_id': self.get_department().id,
+                              'position_id': self.get_employment_position().id,
+                              'shift_id': self.get_shift().id
                           }),
                           headers=self.get_headers())
 
@@ -238,10 +248,12 @@ class TestEmployee(BaseTest):
                 self.assertEqual(empl['contract_expiration_date'], '2019-01-31')
                 self.assertEqual(empl['termination_date'], '2019-01-15')
                 self.assertEqual(empl['termination_reason'], 'Renuncia')
-                self.assertEqual(empl['position_id'], self.e_p.id)
-                self.assertEqual(empl['department_id'], self.d.id)
+                self.assertEqual(empl['position_id'],
+                                 self.get_employment_position().id)
+                self.assertEqual(empl['department_id'],
+                                 self.get_department().id)
                 self.assertEqual(empl['marital_status_id'],  2)
-                self.assertEqual(empl['shift_id'], self.s.id)
+                self.assertEqual(empl['shift_id'], self.get_shift().id)
                 self.assertEqual(r.status_code, 200)
 
     def test_empl_put_without_authentication(self):
@@ -278,9 +290,9 @@ class TestEmployee(BaseTest):
                               'payment_method': 'Cheque',
                               'is_active': True,
                               'marital_status_id': 2,
-                              'department_id': self.d.id,
-                              'position_id': self.e_p.id,
-                              'shift_id': self.s.id
+                              'department_id': self.get_department().id,
+                              'position_id': self.get_employment_position().id,
+                              'shift_id': self.get_shift().id
                           }),
                           headers={
                               'Content-Type': 'application/json',
@@ -322,13 +334,57 @@ class TestEmployee(BaseTest):
                               'payment_method': 'Cheque',
                               'is_active': True,
                               'marital_status_id': 2,
-                              'department_id': self.d.id,
-                              'position_id': self.e_p.id,
-                              'shift_id': self.s.id
+                              'department_id': self.get_department().id,
+                              'position_id': self.get_employment_position().id,
+                              'shift_id': self.get_shift().id
                           }),
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
+
+    def test_emp_put_wrong_user(self):
+        """
+        Test that a PUT request to the /employee/<int:employee_id>
+        endpoint returns status code 403 if the user making the request
+        does not have permission to modify the data.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.put(f'/employee/{self.get_employee().id}',
+                          data=json.dumps({
+                              'first_name': 'new_f_n',
+                              'second_name': 'new_s_n',
+                              'first_surname': 'new_f_sn',
+                              'second_surname': 'new_s_sn',
+                              'national_id_number': 'N-1-11-111',
+                              'is_panamanian': False,
+                              'date_of_birth': '01-31-2001',
+                              'gender': 'Mujer',
+                              'address': 'Chiriquí',
+                              'home_phone': '333-3333',
+                              'mobile_phone': '6666-7777',
+                              'email': 'new_f_n@new_f_sn.com',
+                              'type_of_contract': 'Indefinido',
+                              'employment_date': '01-01-2019',
+                              'contract_expiration_date': '01-31-2019',
+                              'termination_date': '01-15-2019',
+                              'termination_reason': 'Renuncia',
+                              'salary_per_payment_period': '208.00',
+                              'representation_expenses_per_payment_period':
+                                  '100',
+                              'payment_method': 'Cheque',
+                              'is_active': True,
+                              'marital_status_id': 2,
+                              'department_id': self.get_department().id,
+                              'position_id': self.get_employment_position().id,
+                              'shift_id': self.get_shift().id
+                          }),
+                          headers=self.get_headers({
+                               'username': 'test_other_u',
+                               'password': 'test_p'
+                           }))
+
+                self.assertEqual(r.status_code, 403)
 
     def test_empl_delete_with_authentication(self):
         """
@@ -337,7 +393,7 @@ class TestEmployee(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete(f'/employee/{self.get_employee_id(self.e_dict)}',
+                r = c.delete(f'/employee/{self.get_employee().id}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -351,7 +407,7 @@ class TestEmployee(BaseTest):
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/employee/{self.get_employee_id(self.e_dict)}',
+                r = c.delete(f'/employee/{self.get_employee().id}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -366,7 +422,7 @@ class TestEmployee(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                employee_id = self.get_employee_id(self.e_dict)
+                employee_id = self.get_employee().id
 
                 # Make employee inactive.
                 c.delete(f'/employee/{employee_id}',
@@ -397,7 +453,7 @@ class TestEmployee(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                employee_id = self.get_employee_id(self.e_dict)
+                employee_id = self.get_employee().id
 
                 c.delete(f'/employee/{employee_id}',
                          headers=self.get_headers())
@@ -418,7 +474,7 @@ class TestEmployee(BaseTest):
                 # Send PUT request to /activate_employee with
                 # wrong authorization header.
                 r = c.put(f'/activate_employee/'
-                          f'{self.get_employee_id(self.e_dict)}',
+                          f'{self.get_employee().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -435,7 +491,7 @@ class TestEmployee(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.put(f'/activate_employee/'
-                          f'{self.get_employee_id(self.e_dict)}',
+                          f'{self.get_employee().id}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)

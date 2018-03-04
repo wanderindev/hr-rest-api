@@ -8,23 +8,17 @@ class TestHealthPermit(BaseTest):
     """System tests for the health permit resource."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by setting up a department, an
-        employment position, a shift, an employee and a dict representing
-        an health permit.
+        Extend the BaseTest setUp method by setting up a dict
+        representing a health permit.
         """
         super(TestHealthPermit, self).setUp()
 
         with self.app_context():
-            self.d = self.get_department(1)
-            self.e_p = self.get_employment_position(1)
-            self.s = self.get_shift(1)
-            self.e = self.get_employee(self.d.id, self.e_p.id, self.s.id, 1)
-
             self.h_p_dict = {
                 'health_permit_type': 'Verde',
                 'issue_date': '2018-01-01',
                 'expiration_date': '2019-01-01',
-                'employee_id': self.e.id
+                'employee_id': self.get_employee().id
             }
 
     def test_h_perm_post_with_authentication(self):
@@ -39,19 +33,19 @@ class TestHealthPermit(BaseTest):
                            data=json.dumps(self.h_p_dict),
                            headers=self.get_headers())
 
-                r_h_perm = json.loads(r.data)['health_permit']
+                h_perm = json.loads(r.data)['health_permit']
 
                 self.assertEqual(r.status_code, 201)
-                self.assertEqual(r_h_perm['health_permit_type'],
+                self.assertEqual(h_perm['health_permit_type'],
                                  self.h_p_dict['health_permit_type'])
-                self.assertEqual(r_h_perm['issue_date'],
+                self.assertEqual(h_perm['issue_date'],
                                  self.h_p_dict['issue_date'])
-                self.assertEqual(r_h_perm['expiration_date'],
+                self.assertEqual(h_perm['expiration_date'],
                                  self.h_p_dict['expiration_date'])
-                self.assertEqual(r_h_perm['employee_id'],
+                self.assertEqual(h_perm['employee_id'],
                                  self.h_p_dict['employee_id'])
                 self.assertIsNotNone(HealthPermitModel.find_by_id(
-                    r_h_perm['id'], 1))
+                    h_perm['id'], self.u))
 
     def test_h_perm_post_without_authentication(self):
         """
@@ -71,6 +65,22 @@ class TestHealthPermit(BaseTest):
 
                 self.assertEqual(r.status_code, 401)
 
+    def test_h_perm_post_wrong_user(self):
+        """
+        Test that status code 403 is returned when trying to POST a health
+        permit with a user without permission.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.post('/health_permit',
+                           data=json.dumps(self.h_p_dict),
+                           headers=self.get_headers({
+                               'username': 'test_other_u',
+                               'password': 'test_p'
+                           }))
+
+                self.assertEqual(r.status_code, 403)
+
     def test_h_perm_get_with_authentication(self):
         """
         Test that a GET request to the /health_permit/<id:permit_id>
@@ -79,25 +89,19 @@ class TestHealthPermit(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/health_permit',
-                           data=json.dumps(self.h_p_dict),
-                           headers=self.get_headers())
-
-                permit_id = json.loads(r.data)['health_permit']['id']
-
-                r = c.get(f'/health_permit/{permit_id}',
+                r = c.get(f'/health_permit/{self.get_health_permit().id}',
                           headers=self.get_headers())
 
-                r_dict = json.loads(r.data)
+                h_perm = json.loads(r.data)
 
                 self.assertEqual(r.status_code, 200)
-                self.assertEqual(r_dict['health_permit_type'],
+                self.assertEqual(h_perm['health_permit_type'],
                                  self.h_p_dict['health_permit_type'])
-                self.assertEqual(r_dict['issue_date'],
+                self.assertEqual(h_perm['issue_date'],
                                  self.h_p_dict['issue_date'])
-                self.assertEqual(r_dict['expiration_date'],
+                self.assertEqual(h_perm['expiration_date'],
                                  self.h_p_dict['expiration_date'])
-                self.assertEqual(r_dict['employee_id'],
+                self.assertEqual(h_perm['employee_id'],
                                  self.h_p_dict['employee_id'])
 
     def test_h_perm_get_not_found(self):
@@ -122,7 +126,7 @@ class TestHealthPermit(BaseTest):
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/health_permit/1',
+                r = c.get(f'/health_permit/{self.get_health_permit().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -137,56 +141,48 @@ class TestHealthPermit(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/health_permit',
-                           data=json.dumps(self.h_p_dict),
-                           headers=self.get_headers())
-
-                permit_id = json.loads(r.data)['health_permit']['id']
-
-                r = c.put(f'/health_permit/{permit_id}',
+                r = c.put(f'/health_permit/{self.get_health_permit().id}',
                           data=json.dumps({
                               'health_permit_type': 'Blanco',
                               'issue_date': '2018-01-31',
                               'expiration_date': '2019-01-31',
-                              'employee_id': self.e.id
+                              'employee_id': self.get_employee().id
                           }),
                           headers=self.get_headers())
 
-                r_h_perm = json.loads(r.data)['health_permit']
+                h_perm = json.loads(r.data)['health_permit']
 
-                self.assertEqual(r_h_perm['health_permit_type'],
+                self.assertEqual(h_perm['health_permit_type'],
                                  'Blanco')
-                self.assertEqual(r_h_perm['issue_date'],
+                self.assertEqual(h_perm['issue_date'],
                                  '2018-01-31')
-                self.assertEqual(r_h_perm['expiration_date'],
+                self.assertEqual(h_perm['expiration_date'],
                                  '2019-01-31')
-                self.assertEqual(r_h_perm['employee_id'],
-                                 self.e.id)
+                self.assertEqual(h_perm['employee_id'],
+                                 self.get_employee().id)
                 self.assertEqual(r.status_code, 200)
 
-    def test_h_perm_put_wrong_employee(self):
+    def test_h_perm_put_wrong_user(self):
         """
         Test that a PUT request to the /health_permit/<id:permit_id>
-        endpoint returns status code 500 if the employee_id does not exist.
+        endpoint returns status code 403 when trying to reassign a
+        health permit with a user without permission.
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/health_permit',
-                           data=json.dumps(self.h_p_dict),
-                           headers=self.get_headers())
-
-                permit_id = json.loads(r.data)['health_permit']['id']
-
-                r = c.put(f'/health_permit/{permit_id}',
+                r = c.put(f'/health_permit/{self.get_health_permit().id}',
                           data=json.dumps({
                               'health_permit_type': 'Verde',
                               'issue_date': '2018-1-31',
                               'expiration_date': '2019-1-31',
-                              'employee_id': self.e.id + 1
+                              'employee_id': self.get_employee().id
                           }),
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'test_other_u',
+                              'password': 'test_p'
+                          }))
 
-                self.assertEqual(r.status_code, 500)
+                self.assertEqual(r.status_code, 403)
 
     def test_h_perm_put_without_authentication(self):
         """
@@ -197,12 +193,12 @@ class TestHealthPermit(BaseTest):
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/health_permit/1',
+                r = c.put(f'/health_permit/{self.get_health_permit().id}',
                           data=json.dumps({
                               'health_permit_type': 'Verde',
                               'issue_date': '2018-1-31',
                               'expiration_date': '2019-1-31',
-                              'employee_id': self.e.id
+                              'employee_id': self.get_employee().id
                           }),
                           headers={
                               'Content-Type': 'application/json',
@@ -224,7 +220,7 @@ class TestHealthPermit(BaseTest):
                               'health_permit_type': 'Verde',
                               'issue_date': '2018-1-31',
                               'expiration_date': '2019-1-31',
-                              'employee_id': self.e.id
+                              'employee_id': self.get_employee().id
                           }),
                           headers=self.get_headers())
 
@@ -237,13 +233,7 @@ class TestHealthPermit(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/health_permit',
-                           data=json.dumps(self.h_p_dict),
-                           headers=self.get_headers())
-
-                permit_id = json.loads(r.data)['health_permit']['id']
-
-                r = c.delete(f'/health_permit/{permit_id}',
+                r = c.delete(f'/health_permit/{self.get_health_permit().id}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -257,7 +247,7 @@ class TestHealthPermit(BaseTest):
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/health_permit/1',
+                r = c.delete(f'/health_permit/{self.get_health_permit().id}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'

@@ -1,6 +1,8 @@
 import json
 
+from db import db
 from models.organization import OrganizationModel
+from models.user import AppUserModel
 from tests.base_test import BaseTest
 
 
@@ -9,15 +11,19 @@ class TestOrganization(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by creating a dict
-        representing an organization so it is available for
-        the different tests.
+        representing an organization and deleting users and
+        organizations created in BaseTest.
         """
         super(TestOrganization, self).setUp()
+        with self.app_context():
+            AppUserModel.query.filter(AppUserModel.id != 1).delete()
+            OrganizationModel.query.filter(OrganizationModel.id != 1).delete()
+            db.session.commit()
 
-        self.o_dict = {
-            'organization_name': 'test_o',
-            'is_active': True
-        }
+            self.o_dict = {
+                'organization_name': 'test_o',
+                'is_active': True
+            }
 
     def test_organization_post_with_authentication(self):
         """
@@ -32,7 +38,10 @@ class TestOrganization(BaseTest):
 
                 r = c.post('/organization',
                            data=json.dumps(self.o_dict),
-                           headers=self.get_headers())
+                           headers=self.get_headers({
+                               'username': 'jfeliu',
+                               'password': '1234'
+                           }))
 
                 o = json.loads(r.data)['organization']
 
@@ -82,12 +91,18 @@ class TestOrganization(BaseTest):
             with self.app_context():
                 c.post('/organization',
                        data=json.dumps(self.o_dict),
-                       headers=self.get_headers())
+                       headers=self.get_headers({
+                           'username': 'jfeliu',
+                           'password': '1234'
+                       }))
 
                 # Send duplicated POST request.
                 r = c.post('/organization',
                            data=json.dumps(self.o_dict),
-                           headers=self.get_headers())
+                           headers=self.get_headers({
+                               'username': 'jfeliu',
+                               'password': '1234'
+                           }))
 
                 self.assertEqual(r.status_code, 400)
 
@@ -103,7 +118,10 @@ class TestOrganization(BaseTest):
 
                 r = c.post('/organization',
                            data=json.dumps(self.o_dict),
-                           headers=self.get_headers())
+                           headers=self.get_headers({
+                               'username': 'jfeliu',
+                               'password': '1234'
+                           }))
 
                 self.assertEqual(r.status_code, 403)
 
@@ -116,8 +134,11 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.get(f'/organization/{self.get_organization_id()}',
-                          headers=self.get_headers())
+                r = c.get(f'/organization/{self.get_organization().id}',
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 o = json.loads(r.data)
 
@@ -135,17 +156,23 @@ class TestOrganization(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.get(f'/organization/2',
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 # Organization is not in the database.
                 self.assertEqual(r.status_code, 404)
 
-                organization_id = self.get_organization_id()
+                organization_id = self.get_organization().id
 
                 self.toggle_is_super()
 
                 r = c.get(f'/organization/{organization_id}',
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 # Organization is in the database but the user belongs to
                 # another organization and it is not a super-user.
@@ -177,11 +204,14 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/organization/{self.get_organization_id()}',
+                r = c.put(f'/organization/{self.get_organization().id}',
                           data=json.dumps({
                               'organization_name': 'new_test_o'
                           }),
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 o = json.loads(r.data)['organization']
 
@@ -234,12 +264,15 @@ class TestOrganization(BaseTest):
                           data=json.dumps({
                               'organization_name': 'new_test_o'
                           }),
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 # Organization is not in the database.
                 self.assertEqual(r.status_code, 404)
 
-                organization_id = self.get_organization_id()
+                organization_id = self.get_organization().id
 
                 self.toggle_is_super()
 
@@ -247,7 +280,10 @@ class TestOrganization(BaseTest):
                           data=json.dumps({
                               'organization_name': 'new_test_o'
                           }),
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 # Organization is in the database but the user belongs to
                 # another organization and it is not a super-user.
@@ -262,8 +298,11 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete(f'/organization/{self.get_organization_id()}',
-                             headers=self.get_headers())
+                r = c.delete(f'/organization/{self.get_organization().id}',
+                             headers=self.get_headers({
+                                 'username': 'jfeliu',
+                                 'password': '1234'
+                             }))
 
                 self.assertEqual(r.status_code, 200)
 
@@ -291,14 +330,20 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                organization_id = self.get_organization_id()
+                organization_id = self.get_organization().id
 
                 c.delete(f'/organization/{organization_id}',
-                         headers=self.get_headers())
+                         headers=self.get_headers({
+                             'username': 'jfeliu',
+                             'password': '1234'
+                         }))
 
                 # Repeat DELETE request.
                 r = c.delete(f'/organization/{organization_id}',
-                             headers=self.get_headers())
+                             headers=self.get_headers({
+                                 'username': 'jfeliu',
+                                 'password': '1234'
+                             }))
 
                 self.assertEqual(r.status_code, 400)
 
@@ -310,7 +355,10 @@ class TestOrganization(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.delete(f'/organization/2',
-                             headers=self.get_headers())
+                             headers=self.get_headers({
+                                 'username': 'jfeliu',
+                                 'password': '1234'
+                             }))
 
                 self.assertEqual(r.status_code, 404)
 
@@ -324,7 +372,10 @@ class TestOrganization(BaseTest):
                 self.toggle_is_super()
 
                 r = c.delete(f'/organization/1',
-                             headers=self.get_headers())
+                             headers=self.get_headers({
+                                 'username': 'jfeliu',
+                                 'password': '1234'
+                             }))
 
                 self.assertEqual(r.status_code, 403)
 
@@ -337,13 +388,19 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                organization_id = self.get_organization_id()
+                organization_id = self.get_organization().id
 
                 c.delete(f'/organization/{organization_id}',
-                         headers=self.get_headers())
+                         headers=self.get_headers({
+                             'username': 'jfeliu',
+                             'password': '1234'
+                         }))
 
                 r = c.put(f'/activate_organization/{organization_id}',
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 self.assertEqual(r.status_code, 200)
 
@@ -374,8 +431,11 @@ class TestOrganization(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.put(f'/activate_organization/'
-                          f'{self.get_organization_id()}',
-                          headers=self.get_headers())
+                          f'{self.get_organization().id}',
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 self.assertEqual(r.status_code, 400)
 
@@ -388,7 +448,10 @@ class TestOrganization(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.put(f'/activate_organization/2',
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 self.assertEqual(r.status_code, 404)
 
@@ -400,12 +463,15 @@ class TestOrganization(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                organization_id = self.get_organization_id()
+                organization_id = self.get_organization().id
 
                 self.toggle_is_super()
 
                 r = c.put(f'/activate_organization/{organization_id}',
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 self.assertEqual(r.status_code, 403)
 
@@ -420,7 +486,10 @@ class TestOrganization(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.get('/organizations',
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 organizations = json.loads(r.data)['organizations']
 
@@ -455,7 +524,10 @@ class TestOrganization(BaseTest):
                 self.toggle_is_super()
 
                 r = c.get('/organizations',
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'jfeliu',
+                              'password': '1234'
+                          }))
 
                 self.assertEqual(r.status_code, 403)
 

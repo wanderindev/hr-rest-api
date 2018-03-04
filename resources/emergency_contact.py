@@ -29,8 +29,8 @@ class EmergencyContact(Resource):
 
     @jwt_required()
     def get(self, contact_id):
-
         e_cont = EmergencyContactModel.find_by_id(contact_id, current_identity)
+
         if e_cont:
             return e_cont.to_dict()
 
@@ -70,29 +70,35 @@ class EmergencyContact(Resource):
     def put(self,  contact_id):
         data = EmergencyContact.parser.parse_args()
 
-        e_cont = EmergencyContactModel.find_by_id(contact_id, current_identity)
+        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
+            e_cont = EmergencyContactModel.find_by_id(contact_id,
+                                                      current_identity)
 
-        if e_cont:
-            e_cont.first_name = data['first_name']
-            e_cont.last_name = data['last_name']
-            e_cont.home_phone = data['home_phone']
-            e_cont.work_phone = data['work_phone']
-            e_cont.mobile_phone = data['mobile_phone']
-            e_cont.employee_id = data['employee_id']
+            if e_cont:
+                e_cont.first_name = data['first_name']
+                e_cont.last_name = data['last_name']
+                e_cont.home_phone = data['home_phone']
+                e_cont.work_phone = data['work_phone']
+                e_cont.mobile_phone = data['mobile_phone']
+                e_cont.employee_id = data['employee_id']
 
-            try:
-                e_cont.save_to_db()
-                return {
-                   'message': 'Emergency contact updated successfully.',
-                   'emergency_contact': EmergencyContactModel.find_by_id(
-                       e_cont.id, current_identity
-                   ).to_dict()
-                }, 200
-            except exc.SQLAlchemyError:
-                return {'message': 'An error occurred while updating '
-                                   'the emergency contact.'}, 500
+                try:
+                    e_cont.save_to_db()
+                    return {
+                       'message': 'Emergency contact updated successfully.',
+                       'emergency_contact': EmergencyContactModel.find_by_id(
+                           e_cont.id, current_identity
+                       ).to_dict()
+                    }, 200
+                except exc.SQLAlchemyError:
+                    return {'message': 'An error occurred while updating '
+                                       'the emergency contact.'}, 500
 
-        return {'message': 'Emergency contact not found.'}, 404
+            return {'message': 'Emergency contact not found.'}, 404
+
+        return {'message': 'You are not allowed to assign an emergency contact '
+                           'to an employee that does not belong to your '
+                           'organization.'}, 403
 
     @jwt_required()
     def delete(self, contact_id):

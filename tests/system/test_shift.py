@@ -8,15 +8,11 @@ class TestShift(BaseTest):
     """System tests for the shift resource."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by creating an organization, a user, 
-        and two dicts representing a rotating shift and a fixed shift so they 
-        are available for the different tests.
+        Extend the BaseTest setUp method by creating  two dicts representing
+        a rotating shift and a fixed shift.
         """
         super(TestShift, self).setUp()
         with self.app_context():
-            self.o = self.get_organization()
-            self.u = self.get_user(self.o.id, False)
-            
             self.s_r_dict = {
                 'shift_name': 'test_s_r',
                 'weekly_hours': 48,
@@ -25,7 +21,7 @@ class TestShift(BaseTest):
                 'break_length': '00:30:00',
                 'is_break_included_in_shift': False,
                 'is_active': True,
-                'organization_id': 1,
+                'organization_id': self.get_organization().id,
                 'rotation_start_hour': '06:00:00',
                 'rotation_end_hour': '21:00:00'
             }
@@ -38,7 +34,7 @@ class TestShift(BaseTest):
                 'break_length': '00:30:00',
                 'is_break_included_in_shift': False,
                 'is_active': True,
-                'organization_id': 1,
+                'organization_id': self.get_organization().id,
                 'fixed_start_hour_monday': '08:00:00',
                 'fixed_start_break_hour_monday': '12:00:00',
                 'fixed_end_break_hour_monday': '12:30:00',
@@ -212,17 +208,17 @@ class TestShift(BaseTest):
 
                 self.assertEqual(r.status_code, 400)
                 
-    def test_shift_wrong_organization(self):
+    def test_shift_post_wrong_user(self):
         """
-        Test that status code 403 is returned when trying to POST an shift
-        that does not belong to the user's organization.
+        Test that status code 403 is returned when trying to POST a
+        shift with a user without permission.
         """
         with self.app() as c:
             with self.app_context():
                 r = c.post('/shift',
                            data=json.dumps(self.s_r_dict),
                            headers=self.get_headers({
-                               'username': 'test_u',
+                               'username': 'test_other_u',
                                'password': 'test_p'
                            }))
 
@@ -235,7 +231,7 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.get(f'/shift/{self.get_shift_id()}',
+                r = c.get(f'/shift/{self.get_shift().id}',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
@@ -266,7 +262,7 @@ class TestShift(BaseTest):
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/shift/{self.get_shift_id()}',
+                r = c.get(f'/shift/{self.get_shift().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -282,7 +278,7 @@ class TestShift(BaseTest):
         with self.app() as c:
             with self.app_context():
                 # Send PUT request modifying the rotating shift.
-                r = c.put(f'/shift/{self.get_shift_id()}',
+                r = c.put(f'/shift/{self.get_shift().id}',
                           data=json.dumps({
                               'shift_name': 'new_test_s_r',
                               'weekly_hours': 44,
@@ -320,7 +316,7 @@ class TestShift(BaseTest):
                 self.assertEqual(r.status_code, 200)
 
                 # Send PUT request modifying the fixed shift.
-                r = c.put(f'/shift/{self.get_shift_id(self.s_f_dict)}',
+                r = c.put(f'/shift/{self.get_shift(self.s_f_dict).id}',
                           data=json.dumps({
                               'shift_name': 'test_s_f',
                               'weekly_hours': 48,
@@ -429,7 +425,7 @@ class TestShift(BaseTest):
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/shift/{self.get_shift_id()}',
+                r = c.put(f'/shift/{self.get_shift().id}',
                           data=json.dumps({
                               'shift_name': 'new_test_s_r',
                               'weekly_hours': 44,
@@ -482,7 +478,7 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.delete(f'/shift/{self.get_shift_id()}',
+                r = c.delete(f'/shift/{self.get_shift().id}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -496,7 +492,7 @@ class TestShift(BaseTest):
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/shift/{self.get_shift_id()}',
+                r = c.delete(f'/shift/{self.get_shift().id}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -511,7 +507,7 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                shift_id = self.get_shift_id()
+                shift_id = self.get_shift().id
 
                 # Make shift inactive.
                 c.delete(f'/shift/{shift_id}',
@@ -542,7 +538,7 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                shift_id = self.get_shift_id()
+                shift_id = self.get_shift().id
 
                 c.delete(f'/shift/{shift_id}',
                          headers=self.get_headers())
@@ -561,7 +557,7 @@ class TestShift(BaseTest):
             with self.app_context():
                 # Send PUT request to /activate_shift with
                 # wrong authorization header.
-                r = c.put(f'/activate_shift/{self.get_shift_id()}',
+                r = c.put(f'/activate_shift/{self.get_shift().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -576,7 +572,7 @@ class TestShift(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.put(f'/activate_shift/{self.get_shift_id()}',
+                r = c.put(f'/activate_shift/{self.get_shift().id}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)

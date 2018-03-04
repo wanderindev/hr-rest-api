@@ -1,7 +1,8 @@
-from datetime import date, time
+from datetime import date
 import json
 
 from unittest import TestCase
+from werkzeug.security import generate_password_hash
 
 from app import create_app
 from db import db
@@ -24,6 +25,7 @@ from models.user import AppUserModel
 app = create_app('testing')
 
 
+# noinspection PyTypeChecker
 class BaseTest(TestCase):
     """
     Base class which is inherited by all
@@ -39,12 +41,24 @@ class BaseTest(TestCase):
             db.init_app(app)
 
     def setUp(self):
-        """Create all db tables before each test."""
-        with app.app_context():
-            db.create_all()
-
+        """Create all db tables and two users before each test."""
         self.app = app.test_client
         self.app_context = app.app_context
+
+        with self.app_context():
+            db.create_all()
+
+            self.u = self.get_user()
+
+            self.other_u = self.get_user({
+                'username': 'test_other_u',
+                'password_hash': generate_password_hash('test_p'),
+                'email': 'test_other_u@test_o.com',
+                'organization_id': 1,
+                'is_super': False,
+                'is_owner': True,
+                'is_active': True
+            })
 
     def tearDown(self):
         """
@@ -84,7 +98,7 @@ class BaseTest(TestCase):
         """
         with self.app() as c:
             with self.app_context():
-                u = user or {'username': 'jfeliu', 'password': '1234'}
+                u = user or {'username': 'test_u', 'password': 'test_p'}
 
                 # Send request to auth endpoint.
                 r = c.post('/auth', data=json.dumps(u),
@@ -95,250 +109,155 @@ class BaseTest(TestCase):
                     'Authorization': 'JWT ' + json.loads(r.data)['access_token']
                 }
 
+    # TODO: check if it is still used.
     @staticmethod
     def toggle_is_super(user=None):
         u = user or AppUserModel.find_by_id(1)
         u.is_super = not u.is_super
         u.save_to_db()
 
-    def get_organization(self):
+    @staticmethod
+    def get_object(model, _dict):
+        o = model.query.filter_by(**_dict).first()
+
+        if o:
+            return o
+
+        if model is AppUserModel:
+            o = model(password='test_p', **_dict)
+        else:
+            o = model(**_dict)
+
+        o.save_to_db()
+
+        return model.query.filter_by(**_dict).first()
+
+    def get_organization(self, _dict=None):
         with self.app_context():
-            o = OrganizationModel('test_o', True)
-            o.save_to_db()
+            _dict = _dict or {'organization_name': 'test_o', 'is_active': True}
 
-            return OrganizationModel.query.filter_by(id=o.id).first()
+            return self.get_object(OrganizationModel, _dict)
 
-    def get_organization_id(self, o_dict=None):
-        with self.app() as c:
-            with self.app_context():
-                o = o_dict or {'organization_name': 'test_o', 'is_active': True}
-
-                r = OrganizationModel.query.filter_by(
-                    organization_name=o['organization_name']).first()
-
-                if r:
-                    return r.id
-
-                r = c.post('/organization',
-                           data=json.dumps(o),
-                           headers=self.get_headers())
-
-                return json.loads(r.data)['organization']['id']
-
-    def get_user(self, organization_id, is_super=True):
+    def get_user(self, _dict=None):
         with self.app_context():
-            u = AppUserModel('test_u', 'test_p', 'test_u@test_o.com',
-                             organization_id, is_super, True, True)
-            u.save_to_db()
+            _dict = _dict or {
+                'username': 'test_u',
+                'email': 'test_u@test_o.com',
+                'organization_id': self.get_organization().id,
+                'is_super': True,
+                'is_owner': True,
+                'is_active': True
+            }
+            _dict['password_hash'] = generate_password_hash(
+                _dict.pop('password', 'test_p'))
+            return self.get_object(AppUserModel, _dict)
 
-            return AppUserModel.find_by_id(u.id)
-
-    def get_department(self, user):
+    def get_department(self, _dict=None):
         with self.app_context():
-            d = DepartmentModel('test_d', user.organization_id, True)
-            d.save_to_db()
+            _dict = _dict or {
+                'department_name': 'test_d',
+                'organization_id': self.get_organization().id,
+                'is_active': True
+            }
 
-            return DepartmentModel.find_by_id(d.id, user)
+            return self.get_object(DepartmentModel, _dict)
 
-    def get_department_id(self, d_dict=None):
-        with self.app() as c:
-            with self.app_context():
-                d = d_dict or {
-                    'department_name': 'test_d',
-                    'organization_id': 1,
-                    'is_active': True
-                }
-
-                r = DepartmentModel.query.filter_by(
-                    department_name=d['department_name']).first()
-
-                if r:
-                    return r.id
-
-                r = c.post('/department',
-                           data=json.dumps(d),
-                           headers=self.get_headers())
-
-                return json.loads(r.data)['department']['id']
-
-    def get_shift(self, user, organization_id=None):
+    def get_shift(self, _dict=None):
         with self.app_context():
-            organization_id = organization_id or user.organization_id
+            _dict = _dict or {
+                'shift_name': 'test_s_r',
+                'weekly_hours': 48,
+                'is_rotating': True,
+                'payment_period': 'Quincenal',
+                'break_length': '00:30:00',
+                'is_break_included_in_shift': False,
+                'is_active': True,
+                'organization_id': self.get_organization().id,
+                'rotation_start_hour': '06:00:00',
+                'rotation_end_hour': '21:00:00'
+            }
 
-            s = ShiftModel('test_s_r', 48, True, 'Quincenal',
-                           time(0, 30), False, True, organization_id,
-                           rotation_start_hour=time(6),
-                           rotation_end_hour=time(21))
-            s.save_to_db()
+            return self.get_object(ShiftModel, _dict)
 
-            return ShiftModel.find_by_id(s.id, user)
-
-    def get_shift_id(self, s_dict=None):
-        with self.app() as c:
-            with self.app_context():
-                s = s_dict or {
-                    'shift_name': 'test_s_r',
-                    'weekly_hours': 48,
-                    'is_rotating': True,
-                    'payment_period': 'Quincenal',
-                    'break_length': '00:30:00',
-                    'is_break_included_in_shift': False,
-                    'is_active': True,
-                    'organization_id': 1,
-                    'rotation_start_hour': '06:00:00',
-                    'rotation_end_hour': '21:00:00'
-                }
-
-                r = ShiftModel.query.filter_by(
-                    shift_name=s['shift_name']).first()
-
-                if r:
-                    return r.id
-
-                r = c.post('/shift',
-                           data=json.dumps(s),
-                           headers=self.get_headers())
-
-                return json.loads(r.data)['shift']['id']
-
-    def get_employment_position(self, user, organization_id=None):
+    def get_employment_position(self, _dict=None):
         with self.app_context():
-            organization_id = organization_id or user.organization_id
+            _dict = _dict or {
+                'position_name_feminine': 'test_e_p_f',
+                'position_name_masculine': 'test_e_p_m',
+                'minimum_hourly_wage': 1.00,
+                'is_active': True,
+                'organization_id': self.get_organization().id
+            }
 
-            e_p = EmploymentPositionModel('test_e_p_f', 'test_e_p_m',
-                                          1.00, True, organization_id)
-            e_p.save_to_db()
+            return self.get_object(EmploymentPositionModel, _dict)
 
-            return EmploymentPositionModel.find_by_id(e_p.id, user)
-
-    def get_employment_position_id(self, e_p_dict=None):
-        with self.app() as c:
-            with self.app_context():
-                e_p = e_p_dict or {
-                    'position_name_feminine': 'test_e_p_f',
-                    'position_name_masculine': 'test_e_p_m',
-                    'minimum_hourly_wage': 1.00,
-                    'is_active': True,
-                    'organization_id': 1
-                }
-
-                r = EmploymentPositionModel.query.filter_by(
-                    position_name_feminine=e_p[
-                        'position_name_feminine']).first()
-
-                if r:
-                    return r.id
-
-                r = c.post('/employment_position',
-                           data=json.dumps(e_p),
-                           headers=self.get_headers())
-
-                return json.loads(r.data)['employment_position']['id']
-
-    def get_employee(self, department_id, position_id,
-                     shift_id, user):
+    def get_employee(self, _dict=None):
         with self.app_context():
-            e = EmployeeModel('f_n', 's_n', 'f_sn', 's_sn', '1-11-111',
-                              True, date(2000, 1, 31), 'Hombre', 'Panamá',
-                              '222-2222', '6666-6666', 'f_n@f_sn.com',
-                              'Definido', date(2018, 1, 1),
-                              date(2018, 1, 31), date(2018, 1, 15),
-                              'Período de Prueba', 104.00, 0, 'ACH', True,
-                              1, department_id, position_id, shift_id)
-            e.save_to_db()
+            _dict = _dict or {
+                'first_name': 'f_n',
+                'second_name': 's_n',
+                'first_surname': 'f_sn',
+                'second_surname': 's_sn',
+                'national_id_number': '1-11-111',
+                'is_panamanian': True,
+                'date_of_birth': '2000-01-31',
+                'gender': 'Hombre',
+                'address': 'Panamá',
+                'home_phone': '222-2222',
+                'mobile_phone': '6666-6666',
+                'email': 'f_n@f_sn.com',
+                'type_of_contract': 'Definido',
+                'employment_date': '2018-01-01',
+                'contract_expiration_date': '2018-01-31',
+                'termination_date': '2018-01-15',
+                'termination_reason': 'Período de Prueba',
+                'salary_per_payment_period': 104,
+                'representation_expenses_per_payment_period': 0,
+                'payment_method': 'ACH',
+                'is_active': True,
+                'marital_status_id': 1,
+                'department_id': self.get_department().id,
+                'position_id': self.get_employment_position().id,
+                'shift_id': self.get_shift().id
+            }
 
-            return EmployeeModel.find_by_id(e.id, user)
+            return self.get_object(EmployeeModel, _dict)
 
-    def get_employee_id(self, e_dict=None):
-        with self.app() as c:
-            with self.app_context():
-                empl = e_dict or {
-                    'first_name': 'f_n',
-                    'second_name': 's_n',
-                    'first_surname': 'f_sn',
-                    'second_surname': 's_sn',
-                    'national_id_number': '1-11-111',
-                    'is_panamanian': True,
-                    'date_of_birth': '2000-01-31',
-                    'gender': 'Hombre',
-                    'address': 'Panamá',
-                    'home_phone': '222-2222',
-                    'mobile_phone': '6666-6666',
-                    'email': 'f_n@f_sn.com',
-                    'type_of_contract': 'Definido',
-                    'employment_date': '2018-01-01',
-                    'contract_expiration_date': '2018-01-31',
-                    'termination_date': '2018-01-15',
-                    'termination_reason': 'Período de Prueba',
-                    'salary_per_payment_period': 104,
-                    'representation_expenses_per_payment_period': 0,
-                    'payment_method': 'ACH',
-                    'is_active': True,
-                    'marital_status_id': 1,
-                    'department_id': self.get_department_id(),
-                    'position_id': self.get_employment_position_id(),
-                    'shift_id': self.get_shift_id()
-                }
-
-                r = EmployeeModel.query.filter_by(
-                    first_name=empl['first_name']).first()
-
-                if r:
-                    return r.id
-
-                r = c.post('/employee',
-                           data=json.dumps(empl),
-                           headers=self.get_headers())
-
-                return json.loads(r.data)['employee']['id']
-
-    def get_emergency_contact(self, employee_id, user):
+    def get_emergency_contact(self, _dict=None):
         with self.app_context():
-            e_c = EmergencyContactModel('f_n', 'l_n', '111-1111', '222-2222',
-                                        '6666-6666', employee_id)
-            e_c.save_to_db()
+            _dict = _dict or {
+                'first_name': 'f_n',
+                'last_name': 'l_n',
+                'home_phone': '111-1111',
+                'work_phone': '222-2222',
+                'mobile_phone': '6666-6666',
+                'employee_id': self.get_employee().id
+            }
 
-            return EmergencyContactModel.find_by_id(e_c.id, user)
+            return self.get_object(EmergencyContactModel, _dict)
 
-    def get_emergency_contact_id(self, e_c_dict=None):
-        with self.app() as c:
-            with self.app_context():
-                e_c = e_c_dict or {
-                    'first_name': 'f_n',
-                    'last_name': 'l_n',
-                    'home_phone': '111-1111',
-                    'work_phone': '222-2222',
-                    'mobile_phone': '6666-6666',
-                    'employee_id': self.get_employee_id()
-                }
-
-                r = EmergencyContactModel.query.filter_by(
-                    first_name=e_c['first_name']).first()
-
-                if r:
-                    return r.id
-
-                r = c.post('/emergency_contact',
-                           data=json.dumps(e_c),
-                           headers=self.get_headers())
-
-                return json.loads(r.data)['emergency_contact']['id']
-
-    def get_health_permit(self, employee_id, organization_id):
+    def get_health_permit(self, _dict=None):
         with self.app_context():
-            h_p = HealthPermitModel('Verde', date(2018, 1, 1),
-                                    date(2019, 1, 1), employee_id)
-            h_p.save_to_db()
+            _dict = _dict or {
+                'health_permit_type': 'Verde',
+                'issue_date': '2018-01-01',
+                'expiration_date': '2019-01-01',
+                'employee_id': self.get_employee().id
+            }
 
-            return HealthPermitModel.find_by_id(h_p.id, organization_id)
+            return self.get_object(HealthPermitModel, _dict)
 
-    def get_passport(self, employee_id, organization_id):
+    def get_passport(self, _dict=None):
         with self.app_context():
-            p = PassportModel('123456', date(2018, 1, 1), date(2019, 1, 1),
-                              employee_id, 1)
-            p.save_to_db()
+            _dict = _dict or {
+                'passport_number': '123456',
+                'issue_date': '2018-01-01',
+                'expiration_date': '2019-01-01',
+                'employee_id': self.get_employee().id,
+                'country_id': 1
+            }
 
-            return PassportModel.find_by_id(p.id, organization_id)
+            return self.get_object(PassportModel, _dict)
 
     def get_uniform_item(self, organization_id):
         with self.app_context():

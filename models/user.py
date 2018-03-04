@@ -25,9 +25,10 @@ class AppUserModel(ModelMixin, db.Model):
                                 nullable=False, index=True)
 
     def __init__(self, username, password, email, organization_id,
-                 is_super=False, is_owner=False, is_active=True):
+                 is_super=False, is_owner=False, is_active=True,
+                 password_hash=None):
         self.username = username
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = password_hash or self.get_password_hash(password)
         self.email = email
         self.organization_id = organization_id
         self.is_super = is_super
@@ -45,5 +46,5 @@ class AppUserModel(ModelMixin, db.Model):
     def find_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
 
-    def set_password_hash(self, password):
-        self.password_hash = generate_password_hash(password)
+    def get_password_hash(self, password):
+        return generate_password_hash(password)

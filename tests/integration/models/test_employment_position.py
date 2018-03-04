@@ -8,13 +8,12 @@ class TestEmploymentPosition(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by instantiating an
-        organization, a user, and an employment position.
+        organization and an employment position.
         """
         super(TestEmploymentPosition, self).setUp()
 
         self.o = self.get_organization()
-        self.u = self.get_user(self.o.id)
-        self.e_p = self.get_employment_position(self.u)
+        self.e_p = self.get_employment_position()
 
     def test_find_employment_position(self):
         """Test the find_by_idmethod of EmploymentPositionModel."""

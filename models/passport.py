@@ -25,11 +25,11 @@ class PassportModel(ModelMixin, db.Model):
         self.country_id = country_id
 
     @classmethod
-    def find_by_id(cls, _id, organization_id):
+    def find_by_id(cls, _id, user):
         from models.employee import EmployeeModel
 
         passport = cls.query.filter_by(id=_id).first()
 
         if passport:
-            if EmployeeModel.find_by_id(passport.employee_id, organization_id):
+            if EmployeeModel.find_by_id(passport.employee_id, user):
                 return passport

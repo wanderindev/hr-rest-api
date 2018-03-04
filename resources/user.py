@@ -1,4 +1,4 @@
-from flask_jwt import jwt_required
+from flask_jwt import current_identity, jwt_required
 from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
@@ -48,26 +48,31 @@ class User(Resource):
         if AppUserModel.find_by_username(data['username']):
             return {'message': 'A user with that username already exists.'}, 400
 
-        user = AppUserModel(data['username'],
-                            data['password'],
-                            data['email'],
-                            data['organization_id'],
-                            data['is_super'],
-                            data['is_owner'],
-                            data['is_active'])
+        if (current_identity.organization_id == data['organization_id'] and
+                current_identity.is_owner) or current_identity.is_super:
+            user = AppUserModel(data['username'],
+                                data['password'],
+                                data['email'],
+                                data['organization_id'],
+                                data['is_super'],
+                                data['is_owner'],
+                                data['is_active'])
 
-        try:
-            user.save_to_db()
-        except exc.SQLAlchemyError:
-            return {'message': 'An error occurred while creating '
-                               'the user.'}, 500
+            try:
+                user.save_to_db()
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while creating '
+                                   'the user.'}, 500
 
-        return {
-                   'message': 'User created successfully.',
-                   'user': AppUserModel.find_by_id(
-                       user.id
-                   ).to_dict()
-               }, 201
+            return {
+                       'message': 'User created successfully.',
+                       'user': AppUserModel.find_by_id(
+                           user.id
+                       ).to_dict()
+                   }, 201
+
+        return {'message': 'You are not allowed to create users in your '
+                           'organization.'}, 403
 
     @jwt_required()
     def put(self, username):
@@ -77,7 +82,7 @@ class User(Resource):
 
         if user:
             user.username = data['username']
-            user.set_password_hash(data['password'])
+            user.password_hash = user.get_password_hash(data['password'])
             user.email = data['email']
             user.is_super = data['is_super']
             user.is_owner = data['is_owner']

@@ -10,17 +10,15 @@ class TestEmployee(BaseTest):
     """Integration tests for the EmployeeModel."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by setting up an organization, a user
-        a department, an employment position, a shift, and an employee.
+        Extend the BaseTest setUp method by setting up a department,
+        an employment position, a shift, and an employee.
         """
         super(TestEmployee, self).setUp()
 
-        self.o = self.get_organization()
-        self.u = self.get_user(self.o.id)
-        self.d = self.get_department(self.u)
-        self.e_p = self.get_employment_position(self.u)
-        self.s = self.get_shift(self.u)
-        self.e = self.get_employee(self.d.id, self.e_p.id, self.s.id, self.u)
+        self.d = self.get_department()
+        self.e_p = self.get_employment_position()
+        self.s = self.get_shift()
+        self.e = self.get_employee()
 
     def test_find_employee(self):
         """Test the find_by_id method of EmployeeModel."""

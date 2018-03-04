@@ -1,7 +1,6 @@
 import json
 
 from models.emergency_contact import EmergencyContactModel
-from models.user import AppUserModel
 from tests.base_test import BaseTest
 
 
@@ -9,27 +8,19 @@ class TestEmergencyContact(BaseTest):
     """System tests for the emergency contact resource."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by setting up a user, a
-        department, an employment  position, a shift, an employee
-        and a dict representing an emergency contact.
+        Extend the BaseTest setUp method by setting up a dict representing
+        an emergency contact.
         """
         super(TestEmergencyContact, self).setUp()
 
         with self.app_context():
-            self.u = AppUserModel.find_by_id(1)
-            self.d = self.get_department(self.u)
-            self.e_p = self.get_employment_position(self.u)
-            self.s = self.get_shift(self.u)
-            self.e = self.get_employee(self.d.id, self.e_p.id,
-                                       self.s.id, self.u)
-
             self.e_c_dict = {
                 'first_name': 'f_n',
                 'last_name': 'l_n',
                 'home_phone': '111-1111',
                 'work_phone': '222-2222',
                 'mobile_phone': '6666-6666',
-                'employee_id': self.e.id
+                'employee_id': self.get_employee().id
             }
 
     def test_e_cont_post_with_authentication(self):
@@ -80,21 +71,17 @@ class TestEmergencyContact(BaseTest):
 
                 self.assertEqual(r.status_code, 401)
 
-    def test_e_cont_post_wrong_organization(self):
+    def test_e_cont_post_wrong_user(self):
         """
         Test that status code 403 is returned when trying to POST an
-        emergency_contact for an employee that does not belong to the
-        user's organization.
+        emergency_contact with a user without permission.
         """
         with self.app() as c:
             with self.app_context():
-                # Create test_u in new organization who is not a super-user.
-                self.get_user(self.get_organization_id(), False)
-
                 r = c.post('/emergency_contact',
                            data=json.dumps(self.e_c_dict),
                            headers=self.get_headers({
-                               'username': 'test_u',
+                               'username': 'test_other_u',
                                'password': 'test_p'
                            }))
 
@@ -109,7 +96,7 @@ class TestEmergencyContact(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.get(f'/emergency_contact/'
-                          f'{self.get_emergency_contact_id()}',
+                          f'{self.get_emergency_contact().id}',
                           headers=self.get_headers())
 
                 e_cont = json.loads(r.data)
@@ -151,7 +138,7 @@ class TestEmergencyContact(BaseTest):
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
                 r = c.get(f'/emergency_contact/'
-                          f'{self.get_emergency_contact_id()}',
+                          f'{self.get_emergency_contact().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -167,14 +154,14 @@ class TestEmergencyContact(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.put(f'/emergency_contact/'
-                          f'{self.get_emergency_contact_id()}',
+                          f'{self.get_emergency_contact().id}',
                           data=json.dumps({
                               'first_name': 'new_f_n',
                               'last_name': 'new_l_n',
                               'home_phone': '333-3333',
                               'work_phone': '444-4444',
                               'mobile_phone': '6666-7777',
-                              'employee_id': self.e.id
+                              'employee_id': self.get_employee().id
                           }),
                           headers=self.get_headers())
 
@@ -191,29 +178,33 @@ class TestEmergencyContact(BaseTest):
                 self.assertEqual(e_cont['mobile_phone'],
                                  '6666-7777')
                 self.assertEqual(e_cont['employee_id'],
-                                 self.e.id)
+                                 self.get_employee().id)
                 self.assertEqual(r.status_code, 200)
 
-    def test_e_cont_put_wrong_employee(self):
+    def test_e_cont_put_wrong_user(self):
         """
         Test that a PUT request to the /emergency_contact/<id:contact_id>
-        endpoint returns status code 500 if the employee_id does not exist.
+        endpoint returns status code 403 when trying to reassign an emergency
+        contact with a user without permission.
         """
         with self.app() as c:
             with self.app_context():
                 r = c.put(f'/emergency_contact/'
-                          f'{self.get_emergency_contact_id()}',
+                          f'{self.get_emergency_contact().id}',
                           data=json.dumps({
                               'first_name': 'new_f_n',
                               'last_name': 'new_l_n',
                               'home_phone': '333-3333',
                               'work_phone': '444-4444',
                               'mobile_phone': '6666-7777',
-                              'employee_id': self.e.id + 1
+                              'employee_id': self.get_employee().id + 1
                           }),
-                          headers=self.get_headers())
+                          headers=self.get_headers({
+                              'username': 'test_other_u',
+                              'password': 'test_p'
+                          }))
 
-                self.assertEqual(r.status_code, 500)
+                self.assertEqual(r.status_code, 403)
 
     def test_e_cont_put_without_authentication(self):
         """
@@ -225,14 +216,14 @@ class TestEmergencyContact(BaseTest):
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
                 r = c.put(f'/emergency_contact/'
-                          f'{self.get_emergency_contact_id()}',
+                          f'{self.get_emergency_contact().id}',
                           data=json.dumps({
                               'first_name': 'new_f_n',
                               'last_name': 'new_l_n',
                               'home_phone': '333-3333',
                               'work_phone': '444-4444',
                               'mobile_phone': '6666-7777',
-                              'employee_id': self.e.id
+                              'employee_id': self.get_employee().id
                           }),
                           headers={
                               'Content-Type': 'application/json',
@@ -256,7 +247,7 @@ class TestEmergencyContact(BaseTest):
                               'home_phone': '333-3333',
                               'work_phone': '444-4444',
                               'mobile_phone': '6666-7777',
-                              'employee_id': self.e.id
+                              'employee_id': self.get_employee().id
                           }),
                           headers=self.get_headers())
 
@@ -270,7 +261,7 @@ class TestEmergencyContact(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.delete(f'/emergency_contact/'
-                             f'{self.get_emergency_contact_id()}',
+                             f'{self.get_emergency_contact().id}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -285,7 +276,7 @@ class TestEmergencyContact(BaseTest):
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
                 r = c.delete(f'/emergency_contact/'
-                             f'{self.get_emergency_contact_id()}',
+                             f'{self.get_emergency_contact().id}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'

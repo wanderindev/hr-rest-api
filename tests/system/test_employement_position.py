@@ -8,21 +8,17 @@ class TestEmploymentPosition(BaseTest):
     """System tests for the employment_position resource."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by creating an organization, a user,
-        and a dict representing an employment_position so it is available for
-        the different tests.
+        Extend the BaseTest setUp method by creating a dict
+        representing an employment_position.
         """
         super(TestEmploymentPosition, self).setUp()
         with self.app_context():
-            self.o = self.get_organization()
-            self.u = self.get_user(self.o.id, False)
-            
             self.e_p_dict = {
                 'position_name_feminine': 'test_e_p_f',
                 'position_name_masculine': 'test_e_p_m',
                 'minimum_hourly_wage': 1.00,
                 'is_active': True,
-                'organization_id': 1
+                'organization_id': self.get_organization().id
             }
 
     def test_emp_pos_post_with_authentication(self):
@@ -96,17 +92,17 @@ class TestEmploymentPosition(BaseTest):
 
                 self.assertEqual(r.status_code, 400)
                 
-    def test_emp_pos_wrong_organization(self):
+    def test_emp_pos_wrong_user(self):
         """
         Test that status code 403 is returned when trying to POST an employment
-        position that does not belong to the user's organization.
+        position with a user without permission.
         """
         with self.app() as c:
             with self.app_context():
                 r = c.post('/employment_position',
                            data=json.dumps(self.e_p_dict),
                            headers=self.get_headers({
-                               'username': 'test_u',
+                               'username': 'test_other_u',
                                'password': 'test_p'
                            }))
 
@@ -121,7 +117,7 @@ class TestEmploymentPosition(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.get(f'employment_position/'
-                          f'{self.get_employment_position_id()}',
+                          f'{self.get_employment_position().id}',
                           headers=self.get_headers())
 
                 e_p = json.loads(r.data)
@@ -155,7 +151,7 @@ class TestEmploymentPosition(BaseTest):
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
                 r = c.get(f'employment_position/'
-                          f'{self.get_employment_position_id()}',
+                          f'{self.get_employment_position().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -171,7 +167,7 @@ class TestEmploymentPosition(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.put(f'employment_position/'
-                          f'{self.get_employment_position_id()}',
+                          f'{self.get_employment_position().id}',
                           data=json.dumps({
                               'position_name_feminine': 'new_test_e_p_f',
                               'position_name_masculine': 'new_test_e_p_m',
@@ -208,7 +204,7 @@ class TestEmploymentPosition(BaseTest):
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
                 r = c.put(f'employment_position/'
-                          f'{self.get_employment_position_id()}',
+                          f'{self.get_employment_position().id}',
                           data=json.dumps({
                               'position_name_feminine': 'new_test_e_p_f',
                               'position_name_masculine': 'new_test_e_p_m',
@@ -253,7 +249,7 @@ class TestEmploymentPosition(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.delete(f'employment_position/'
-                             f'{self.get_employment_position_id()}',
+                             f'{self.get_employment_position().id}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -269,7 +265,7 @@ class TestEmploymentPosition(BaseTest):
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
                 r = c.delete(f'employment_position/'
-                             f'{self.get_employment_position_id()}',
+                             f'{self.get_employment_position().id}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -285,7 +281,7 @@ class TestEmploymentPosition(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                position_id = self.get_employment_position_id()
+                position_id = self.get_employment_position().id
 
                 # Make employment_position inactive.
                 c.delete(f'employment_position/{position_id}',
@@ -317,7 +313,7 @@ class TestEmploymentPosition(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                position_id = self.get_employment_position_id()
+                position_id = self.get_employment_position().id
 
                 c.delete(f'employment_position/{position_id}',
                          headers=self.get_headers())
@@ -338,7 +334,7 @@ class TestEmploymentPosition(BaseTest):
                 # Send PUT request to activate_employment_position
                 # with wrong authorization header.
                 r = c.put(f'activate_employment_position/'
-                          f'{self.get_employment_position_id()}',
+                          f'{self.get_employment_position().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -355,7 +351,7 @@ class TestEmploymentPosition(BaseTest):
         with self.app() as c:
             with self.app_context():
                 r = c.put(f'activate_employment_position/'
-                          f'{self.get_employment_position_id()}',
+                          f'{self.get_employment_position().id}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)

@@ -22,7 +22,7 @@ class TestUser(TestCase):
         self.assertTrue(self.u.is_owner)
         self.assertTrue(self.u.is_active)
 
-    def test_set_password_hash(self):
-        """Test the set_password_hash method of the AppUserModel class."""
-        self.u.set_password_hash('new_password')
+    def test_get_password_hash(self):
+        """Test the get_password_hash method of the AppUserModel class."""
+        self.u.password_hash = self.u.get_password_hash('new_password')
         self.assertTrue(self.u.check_password('new_password'))

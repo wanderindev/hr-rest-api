@@ -8,14 +8,13 @@ class TestDepartment(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by setting up an
-        organization, a user, and a department.
+        organization and a department.
         """
         super(TestDepartment, self).setUp()
 
         with self.app_context():
             self.o = self.get_organization()
-            self.u = self.get_user(self.o.id)
-            self.d = self.get_department(self.u)
+            self.d = self.get_department()
 
     def test_find_department(self):
         """Test the find_by_id method of DepartmentModel."""

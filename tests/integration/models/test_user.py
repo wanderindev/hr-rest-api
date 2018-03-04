@@ -8,13 +8,11 @@ class TestUser(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by setting up
-        an organization and a user.
+        an organization.
         """
         super(TestUser, self).setUp()
 
         self.o = self.get_organization()
-        self.u = self.get_user(self.o.id)
-
 
     def test_find_user(self):
         """
