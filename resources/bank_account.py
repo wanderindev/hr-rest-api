@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
 from models.bank_account import BankAccountModel
+from models.employee import EmployeeModel
 
 
 class BankAccount(Resource):
@@ -27,8 +28,7 @@ class BankAccount(Resource):
     @jwt_required()
     def get(self, account_id):
 
-        b_acc = BankAccountModel.find_by_id(account_id,
-                                            current_identity.organization_id)
+        b_acc = BankAccountModel.find_by_id(account_id, current_identity)
         if b_acc:
             return b_acc.to_dict()
 
@@ -44,57 +44,72 @@ class BankAccount(Resource):
                 account_type=data['account_type'],
                 bank_id=data['bank_id']).first():
             return {'message': 'A bank account with same number and bank_id '
-                               'already exists in the table.'}, 400
+                               'already exists.'}, 400
 
-        b_acc = BankAccountModel(data['account_number'],
-                                 data['account_type'],
-                                 data['is_active'],
-                                 data['employee_id'],
-                                 data['bank_id'])
+        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
+            b_acc = BankAccountModel(data['account_number'],
+                                     data['account_type'],
+                                     data['is_active'],
+                                     data['employee_id'],
+                                     data['bank_id'])
 
-        try:
-            b_acc.save_to_db()
-        except exc.SQLAlchemyError:
-            return {'message': 'An error occurred while creating '
-                               'the bank_account.'}, 500
+            try:
+                b_acc.save_to_db()
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while creating '
+                                   'the bank_account.'}, 500
 
-        return {
-                   'message': 'Bank account created successfully.',
-                   'bank_account': BankAccountModel.find_by_id(
-                       b_acc.id, current_identity.organization_id
-                   ).to_dict()
-               }, 201
+            return {
+                       'message': 'Bank account created successfully.',
+                       'bank_account': BankAccountModel.find_by_id(
+                           b_acc.id, current_identity
+                       ).to_dict()
+                   }, 201
+
+        return {'message': 'You are not allowed to create a bank account '
+                           'for an employee that does not belong to your '
+                           'organization.'}, 403
 
     @jwt_required()
     def put(self,  account_id):
         data = BankAccount.parser.parse_args()
 
-        b_acc = BankAccountModel.find_by_id(account_id,
-                                            current_identity.organization_id)
+        if BankAccountModel.query.filter_by(
+                account_number=data['account_number'],
+                account_type=data['account_type'],
+                bank_id=data['bank_id']).first():
+            return {'message': 'A bank account with same number and bank_id '
+                               'already exists.'}, 400
 
-        if b_acc:
-            b_acc.account_number = data['account_number']
-            b_acc.account_type = data['account_type']
-            b_acc.bank_id = data['bank_id']
+        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
+            b_acc = BankAccountModel.find_by_id(account_id, current_identity)
 
-            try:
-                b_acc.save_to_db()
-                return {
-                   'message': 'Bank account updated successfully.',
-                   'bank_account': BankAccountModel.find_by_id(
-                       b_acc.id, current_identity.organization_id
-                   ).to_dict()
-                }, 200
-            except exc.SQLAlchemyError:
-                return {'message': 'An error occurred while updating '
-                                   'the bank_account.'}, 500
+            if b_acc:
+                b_acc.account_number = data['account_number']
+                b_acc.account_type = data['account_type']
+                b_acc.bank_id = data['bank_id']
 
-        return {'message': 'Bank account not found.'}, 404
+                try:
+                    b_acc.save_to_db()
+                    return {
+                       'message': 'Bank account updated successfully.',
+                       'bank_account': BankAccountModel.find_by_id(
+                           b_acc.id, current_identity
+                       ).to_dict()
+                    }, 200
+                except exc.SQLAlchemyError:
+                    return {'message': 'An error occurred while updating '
+                                       'the bank_account.'}, 500
+
+            return {'message': 'Bank account not found.'}, 404
+
+        return {'message': 'You are not allowed to modify a bank account '
+                           'for an employee that does not belong to your '
+                           'organization.'}, 403
 
     @jwt_required()
     def delete(self, account_id):
-        b_acc = BankAccountModel.find_by_id(account_id,
-                                            current_identity.organization_id)
+        b_acc = BankAccountModel.find_by_id(account_id, current_identity)
 
         if b_acc:
             if b_acc.is_active:
@@ -113,8 +128,7 @@ class BankAccount(Resource):
 class ActivateBankAccount(Resource):
     @jwt_required()
     def put(self, account_id):
-        b_acc = BankAccountModel.find_by_id(account_id,
-                                            current_identity.organization_id)
+        b_acc = BankAccountModel.find_by_id(account_id, current_identity)
 
         if b_acc:
             if not b_acc.is_active:

@@ -7,36 +7,27 @@ class TestDependent(BaseTest):
     """Integration tests for the DependentModel."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by setting up an organization,
-        a department, an employment position, a shift, an employee,
+        Extend the BaseTest setUp method by setting up an employee
         and a dependent.
         """
         super(TestDependent, self).setUp()
 
-        self.o = self.get_organization()
-        self.d = self.get_department(self.o.id)
-        self.e_p = self.get_employment_position(self.o.id)
-        self.s = self.get_shift(self.o.id)
-        self.e = self.get_employee(self.d.id, self.e_p.id, self.s.id, self.o.id)
-        self.depen = self.get_dependent(self.e.id, self.o.id)
+        self.e = self.get_employee()
+        self.depen = self.get_dependent()
 
     def test_find_id(self):
-        """Test the find_by_id methods of DependentModel."""
+        """Test the find_by_id method of DependentModel."""
         with self.app_context():
-            depen = DependentModel.find_by_id(self.depen.id,
-                                              self.o.id)
+            depen = DependentModel.find_by_id(self.depen.id, self.u)
 
             self.assertIsNotNone(depen)
 
     def test_dependent_list_in_employee(self):
-        """
-        Test that the employee object contains an
-        dependents list.
-        """
+        """ Test that the employee object contains an dependents list. """
         with self.app_context():
             depen_list = DependentModel.query.filter_by(
                 employee_id=self.e.id).all()
-            e_depen_list = EmployeeModel.find_by_id(
-                self.e.id, self.o.id).dependents
+            depen_list_in_employee = EmployeeModel.find_by_id(
+                self.e.id, self.u).dependents
 
-            self.assertListEqual(depen_list, e_depen_list)
+            self.assertListEqual(depen_list, depen_list_in_employee)

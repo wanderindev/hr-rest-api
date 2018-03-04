@@ -281,22 +281,33 @@ class BaseTest(TestCase):
 
             return UniformRequirementModel.find_by_id(u_r.id, organization_id)
 
-    def get_bank_account(self, account_number, account_type, is_active,
-                         employee_id, bank_id, organization_id):
+    def get_bank_account(self, _dict=None):
         with self.app_context():
-            b_a = BankAccountModel(account_number, account_type,
-                                   is_active, employee_id, bank_id)
-            b_a.save_to_db()
+            with self.app_context():
+                _dict = _dict or {
+                    'account_number': '1234',
+                    'account_type': 'Corriente',
+                    'is_active': True,
+                    'employee_id': self.get_employee().id,
+                    'bank_id': 1
+                }
 
-            return BankAccountModel.find_by_id(b_a.id, organization_id)
+            return self.get_object(BankAccountModel, _dict)
 
-    def get_dependent(self, employee_id, organization_id):
+    def get_dependent(self, _dict=None):
         with self.app_context():
-            depen = DependentModel('f_n', 's_n', 'f_sn', 's_sn', 'Mujer',
-                                   date(2018, 1, 1), employee_id, 1)
-            depen.save_to_db()
+            _dict = _dict or {
+                'first_name': 'f_n',
+                'second_name': 's_n',
+                'first_surname': 'f_sn',
+                'second_surname': 's_sn',
+                'gender': 'Mujer',
+                'date_of_birth': '2018-01-01',
+                'employee_id': self.get_employee().id,
+                'family_relation_id': 1
+            }
 
-            return DependentModel.find_by_id(depen.id, organization_id)
+            return self.get_object(DependentModel, _dict)
 
     def get_schedule(self, department_id, organization_id):
         with self.app_context():

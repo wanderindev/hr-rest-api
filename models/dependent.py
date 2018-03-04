@@ -32,11 +32,11 @@ class DependentModel(ModelMixin, db.Model):
         self.family_relation_id = family_relation_id
 
     @classmethod
-    def find_by_id(cls, _id, organization_id):
+    def find_by_id(cls, _id, user):
         from models.employee import EmployeeModel
 
         depen = cls.query.filter_by(id=_id).first()
 
         if depen:
-            if EmployeeModel.find_by_id(depen.employee_id, organization_id):
+            if EmployeeModel.find_by_id(depen.employee_id, user):
                 return depen

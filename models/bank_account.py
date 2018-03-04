@@ -26,11 +26,11 @@ class BankAccountModel(ModelMixin, db.Model):
         self.bank_id = bank_id
 
     @classmethod
-    def find_by_id(cls, _id, organization_id):
+    def find_by_id(cls, _id, user):
         from models.employee import EmployeeModel
 
         b_acc = cls.query.filter_by(id=_id).first()
 
         if b_acc:
-            if EmployeeModel.find_by_id(b_acc.employee_id, organization_id):
+            if EmployeeModel.find_by_id(b_acc.employee_id, user):
                 return b_acc

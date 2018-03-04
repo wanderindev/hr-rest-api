@@ -8,22 +8,17 @@ class TestBankAccount(BaseTest):
     """System tests for the bank_account resource."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by creating a department, an
-        employment_position, a shift, an employee, and a dict representing
-        a bank_account..
+        Extend the BaseTest setUp method by creating a dict representing
+        a bank_account.
         """
         super(TestBankAccount, self).setUp()
 
         with self.app_context():
-            self.d = self.get_department(1)
-            self.e_p = self.get_employment_position(1)
-            self.s = self.get_shift(1)
-            self.e = self.get_employee(self.d.id, self.e_p.id, self.s.id, 1)
             self.b_a_dict = {
                 'account_number': '1234',
                 'account_type': 'Corriente',
                 'is_active': True,
-                'employee_id': self.e.id,
+                'employee_id': self.get_employee().id,
                 'bank_id': 1
             }
 
@@ -42,21 +37,20 @@ class TestBankAccount(BaseTest):
                            data=json.dumps(self.b_a_dict),
                            headers=self.get_headers())
 
-                r_b_a = json.loads(r.data)['bank_account']
+                b_a = json.loads(r.data)['bank_account']
 
                 self.assertEqual(r.status_code, 201)
-                self.assertTrue(r_b_a['is_active'])
-                self.assertEqual(r_b_a['account_number'],
+                self.assertTrue(b_a['is_active'])
+                self.assertEqual(b_a['account_number'],
                                  self.b_a_dict['account_number'])
-                self.assertEqual(r_b_a['account_type'],
+                self.assertEqual(b_a['account_type'],
                                  self.b_a_dict['account_type'])
-                self.assertEqual(r_b_a['employee_id'],
+                self.assertEqual(b_a['employee_id'],
                                  self.b_a_dict['employee_id'])
-                self.assertEqual(r_b_a['bank_id'],
+                self.assertEqual(b_a['bank_id'],
                                  self.b_a_dict['bank_id'])
                 self.assertIsNotNone(BankAccountModel.find_by_id(
-                    r_b_a['id'],
-                    self.d.organization_id))
+                    b_a['id'], self.u))
 
     def test_b_acc_post_without_authentication(self):
         """
@@ -93,6 +87,22 @@ class TestBankAccount(BaseTest):
                            headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
+                
+    def test_b_acc_post_wrong_user(self):
+        """
+        Test that status code 403 is returned when trying to POST an
+        bank_account with a user without permission.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.post('/bank_account',
+                           data=json.dumps(self.b_a_dict),
+                           headers=self.get_headers({
+                               'username': 'test_other_u',
+                               'password': 'test_p'
+                           }))
+
+                self.assertEqual(r.status_code, 403)
 
     def test_b_acc_get_with_authentication(self):
         """
@@ -102,13 +112,7 @@ class TestBankAccount(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/bank_account',
-                           data=json.dumps(self.b_a_dict),
-                           headers=self.get_headers())
-
-                account_id = json.loads(r.data)['bank_account']['id']
-
-                r = c.get(f'/bank_account/{account_id}',
+                r = c.get(f'/bank_account/{self.get_bank_account().id}',
                           headers=self.get_headers())
 
                 r_dict = json.loads(r.data)
@@ -146,7 +150,7 @@ class TestBankAccount(BaseTest):
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/bank_account/1',
+                r = c.get(f'/bank_account/{self.get_bank_account().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -161,34 +165,52 @@ class TestBankAccount(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/bank_account',
-                           data=json.dumps(self.b_a_dict),
-                           headers=self.get_headers())
-
-                account_id = json.loads(r.data)['bank_account']['id']
-
-                r = c.put(f'/bank_account/{account_id}',
+                r = c.put(f'/bank_account/{self.get_bank_account().id}',
                           data=json.dumps({
                               'account_number': '4321',
                               'account_type': 'Ahorro',
                               'is_active': True,
-                              'employee_id': self.e.id,
+                              'employee_id': self.get_employee().id,
                               'bank_id': 2,
                           }),
                           headers=self.get_headers())
 
-                r_b_a = json.loads(r.data)['bank_account']
+                b_a = json.loads(r.data)['bank_account']
 
-                self.assertTrue(r_b_a['is_active'])
-                self.assertEqual(r_b_a['account_number'],
+                self.assertTrue(b_a['is_active'])
+                self.assertEqual(b_a['account_number'],
                                  '4321')
-                self.assertEqual(r_b_a['account_type'],
+                self.assertEqual(b_a['account_type'],
                                  'Ahorro')
-                self.assertEqual(r_b_a['employee_id'],
-                                 self.e.id)
-                self.assertEqual(r_b_a['bank_id'],
+                self.assertEqual(b_a['employee_id'],
+                                 self.get_employee().id)
+                self.assertEqual(b_a['bank_id'],
                                  2)
                 self.assertEqual(r.status_code, 200)
+
+    def test_bank_account_put_wrong_user(self):
+        """
+        Test that a PUT request to the /bank_account/<id:account_id>
+        endpoint returns status code 403 when trying to reassign an bank
+        account with a user without permission.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.put(f'/bank_account/'
+                          f'{self.get_bank_account().id}',
+                          data=json.dumps({
+                              'account_number': '4321',
+                              'account_type': 'Ahorro',
+                              'is_active': True,
+                              'employee_id': self.get_employee().id,
+                              'bank_id': 2,
+                          }),
+                          headers=self.get_headers({
+                              'username': 'test_other_u',
+                              'password': 'test_p'
+                          }))
+
+                self.assertEqual(r.status_code, 403)
 
     def test_b_acc_put_without_authentication(self):
         """
@@ -199,12 +221,12 @@ class TestBankAccount(BaseTest):
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/bank_account/1',
+                r = c.put(f'/bank_account/{self.get_bank_account().id}',
                           data=json.dumps({
                               'account_number': '4321',
                               'account_type': 'Ahorro',
                               'is_active': True,
-                              'employee_id': self.e.id,
+                              'employee_id': self.get_employee().id,
                               'bank_id': 2,
                           }),
                           headers={
@@ -227,7 +249,7 @@ class TestBankAccount(BaseTest):
                               'account_number': '4321',
                               'account_type': 'Ahorro',
                               'is_active': True,
-                              'employee_id': self.e.id,
+                              'employee_id': self.get_employee().id,
                               'bank_id': 2,
                           }),
                           headers=self.get_headers())
@@ -241,13 +263,7 @@ class TestBankAccount(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/bank_account',
-                           data=json.dumps(self.b_a_dict),
-                           headers=self.get_headers())
-
-                account_id = json.loads(r.data)['bank_account']['id']
-
-                r = c.delete(f'/bank_account/{account_id}',
+                r = c.delete(f'/bank_account/{self.get_bank_account().id}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -261,7 +277,7 @@ class TestBankAccount(BaseTest):
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/bank_account/1',
+                r = c.delete(f'/bank_account/{self.get_bank_account().id}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
@@ -277,11 +293,7 @@ class TestBankAccount(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/bank_account',
-                           data=json.dumps(self.b_a_dict),
-                           headers=self.get_headers())
-
-                account_id = json.loads(r.data)['bank_account']['id']
+                account_id = self.get_bank_account().id
 
                 # Make bank_account inactive.
                 c.delete(f'/bank_account/{account_id}',
@@ -312,17 +324,12 @@ class TestBankAccount(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/bank_account',
-                           data=json.dumps(self.b_a_dict),
-                           headers=self.get_headers())
-
-                account_id = json.loads(r.data)['bank_account']['id']
+                account_id = self.get_bank_account().id
 
                 c.delete(f'/bank_account/{account_id}',
                          headers=self.get_headers())
 
-                r = c.put(f'/activate_bank_account/'
-                          f'{account_id}',
+                r = c.put(f'/activate_bank_account/{account_id}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -337,7 +344,8 @@ class TestBankAccount(BaseTest):
             with self.app_context():
                 # Send PUT request to /activate_bank_account with
                 # wrong authorization header.
-                r = c.put(f'/activate_bank_account/1',
+                r = c.put(f'/activate_bank_account/'
+                          f'{self.get_bank_account().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -353,13 +361,8 @@ class TestBankAccount(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/bank_account',
-                           data=json.dumps(self.b_a_dict),
-                           headers=self.get_headers())
-
-                account_id = json.loads(r.data)['bank_account']['id']
-
-                r = c.put(f'/activate_bank_account/{account_id}',
+                r = c.put(f'/activate_bank_account/'
+                          f'{self.get_bank_account().id}',
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)

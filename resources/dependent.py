@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
 from models.dependent import DependentModel
+from models.employee import EmployeeModel
 
 
 class Dependent(Resource):
@@ -35,8 +36,7 @@ class Dependent(Resource):
     @jwt_required()
     def get(self, dependent_id):
 
-        depen = DependentModel.find_by_id(
-            dependent_id, current_identity.organization_id)
+        depen = DependentModel.find_by_id(dependent_id, current_identity)
         if depen:
             return depen.to_dict()
 
@@ -47,62 +47,71 @@ class Dependent(Resource):
     def post():
         data = Dependent.parser.parse_args()
 
-        depen = DependentModel(data['first_name'],
-                               data['second_name'],
-                               data['first_surname'],
-                               data['second_surname'],
-                               data['gender'],
-                               data['date_of_birth'],
-                               data['employee_id'],
-                               data['family_relation_id'])
+        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
+            depen = DependentModel(data['first_name'],
+                                   data['second_name'],
+                                   data['first_surname'],
+                                   data['second_surname'],
+                                   data['gender'],
+                                   data['date_of_birth'],
+                                   data['employee_id'],
+                                   data['family_relation_id'])
 
-        try:
-            depen.save_to_db()
-        except exc.SQLAlchemyError:
-            return {'message': 'An error occurred while creating '
-                               'the dependent.'}, 500
+            try:
+                depen.save_to_db()
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while creating '
+                                   'the dependent.'}, 500
 
-        return {
-                   'message': 'Dependent created successfully.',
-                   'dependent': DependentModel.find_by_id(
-                       depen.id, current_identity.organization_id
-                   ).to_dict()
-               }, 201
+            return {
+                       'message': 'Dependent created successfully.',
+                       'dependent': DependentModel.find_by_id(
+                           depen.id, current_identity
+                       ).to_dict()
+                   }, 201
+
+        return {'message': 'You are not allowed to create an dependent '
+                           'for an employee that does not belong to your '
+                           'organization.'}, 403
 
     @jwt_required()
     def put(self,  dependent_id):
         data = Dependent.parser.parse_args()
 
-        depen = DependentModel.find_by_id(
-            dependent_id, current_identity.organization_id)
+        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
+            depen = DependentModel.find_by_id(dependent_id, current_identity)
 
-        if depen:
-            depen.first_name = data['first_name']
-            depen.second_name = data['second_name']
-            depen.first_surname = data['first_surname']
-            depen.second_surname = data['second_surname']
-            depen.gender = data['gender']
-            depen.date_of_birth = data['date_of_birth']
-            depen.family_relation_id = data['family_relation_id']
+            if depen:
+                depen.first_name = data['first_name']
+                depen.second_name = data['second_name']
+                depen.first_surname = data['first_surname']
+                depen.second_surname = data['second_surname']
+                depen.gender = data['gender']
+                depen.date_of_birth = data['date_of_birth']
+                depen.employee_id = data['employee_id']
+                depen.family_relation_id = data['family_relation_id']
 
-            try:
-                depen.save_to_db()
-                return {
-                   'message': 'Dependent updated successfully.',
-                   'dependent': DependentModel.find_by_id(
-                       depen.id, current_identity.organization_id
-                   ).to_dict()
-                }, 200
-            except exc.SQLAlchemyError:
-                return {'message': 'An error occurred while updating '
-                                   'the dependent.'}, 500
+                try:
+                    depen.save_to_db()
+                    return {
+                       'message': 'Dependent updated successfully.',
+                       'dependent': DependentModel.find_by_id(
+                           depen.id, current_identity
+                       ).to_dict()
+                    }, 200
+                except exc.SQLAlchemyError:
+                    return {'message': 'An error occurred while updating '
+                                       'the dependent.'}, 500
 
-        return {'message': 'Dependent not found.'}, 404
+            return {'message': 'Dependent not found.'}, 404
+
+        return {'message': 'You are not allowed to assign an dependent '
+                           'to an employee that does not belong to your '
+                           'organization.'}, 403
 
     @jwt_required()
     def delete(self, dependent_id):
-        depen = DependentModel.find_by_id(
-            dependent_id, current_identity.organization_id)
+        depen = DependentModel.find_by_id(dependent_id, current_identity)
 
         if depen:
             try:
