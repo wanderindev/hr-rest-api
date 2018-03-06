@@ -38,9 +38,7 @@ class Organization(Resource):
             return {'message': 'An organization with that '
                                'name already exists.'}, 400
 
-        organization = OrganizationModel(
-            data['organization_name'],
-            data['is_active'])
+        organization = OrganizationModel(**data)
 
         try:
             organization.save_to_db()

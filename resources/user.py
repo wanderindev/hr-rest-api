@@ -50,13 +50,7 @@ class User(Resource):
 
         if (current_identity.organization_id == data['organization_id'] and
                 current_identity.is_owner) or current_identity.is_super:
-            user = AppUserModel(data['username'],
-                                data['password'],
-                                data['email'],
-                                data['organization_id'],
-                                data['is_super'],
-                                data['is_owner'],
-                                data['is_active'])
+            user = AppUserModel(**data)
 
             try:
                 user.save_to_db()

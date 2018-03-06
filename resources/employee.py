@@ -105,31 +105,7 @@ class Employee(Resource):
         data = Employee.parser.parse_args()
 
         if DepartmentModel.find_by_id(data['department_id'], current_identity):
-            empl = EmployeeModel(data['first_name'],
-                                 data['second_name'],
-                                 data['first_surname'],
-                                 data['second_surname'],
-                                 data['national_id_number'],
-                                 data['is_panamanian'],
-                                 data['date_of_birth'],
-                                 data['gender'],
-                                 data['address'],
-                                 data['home_phone'],
-                                 data['mobile_phone'],
-                                 data['email'],
-                                 data['type_of_contract'],
-                                 data['employment_date'],
-                                 data['contract_expiration_date'],
-                                 data['termination_date'],
-                                 data['termination_reason'],
-                                 data['salary_per_payment_period'],
-                                 data['representation_expenses_per_payment_period'],
-                                 data['payment_method'],
-                                 data['is_active'],
-                                 data['marital_status_id'],
-                                 data['department_id'],
-                                 data['position_id'],
-                                 data['shift_id'])
+            empl = EmployeeModel(**data)
 
             try:
                 empl.save_to_db()

@@ -47,11 +47,7 @@ class BankAccount(Resource):
                                'already exists.'}, 400
 
         if EmployeeModel.find_by_id(data['employee_id'], current_identity):
-            b_acc = BankAccountModel(data['account_number'],
-                                     data['account_type'],
-                                     data['is_active'],
-                                     data['employee_id'],
-                                     data['bank_id'])
+            b_acc = BankAccountModel(**data)
 
             try:
                 b_acc.save_to_db()

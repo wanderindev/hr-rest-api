@@ -48,11 +48,7 @@ class EmploymentPosition(Resource):
 
         if current_identity.organization_id == data['organization_id'] or \
                 current_identity.is_super:
-            e_p = EmploymentPositionModel(data['position_name_feminine'],
-                                          data['position_name_masculine'],
-                                          data['minimum_hourly_wage'],
-                                          data['is_active'],
-                                          data['organization_id'])
+            e_p = EmploymentPositionModel(**data)
 
             try:
                 e_p.save_to_db()

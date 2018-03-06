@@ -40,9 +40,7 @@ class Department(Resource):
 
         if current_identity.organization_id == data['organization_id'] or \
                 current_identity.is_super:
-            dept = DepartmentModel(data['department_name'],
-                                   data['organization_id'],
-                                   data['is_active'])
+            dept = DepartmentModel(**data)
 
             try:
                 dept.save_to_db()

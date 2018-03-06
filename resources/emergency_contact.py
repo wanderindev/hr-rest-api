@@ -42,12 +42,7 @@ class EmergencyContact(Resource):
         data = EmergencyContact.parser.parse_args()
 
         if EmployeeModel.find_by_id(data['employee_id'], current_identity):
-            e_cont = EmergencyContactModel(data['first_name'],
-                                           data['last_name'],
-                                           data['home_phone'],
-                                           data['work_phone'],
-                                           data['mobile_phone'],
-                                           data['employee_id'])
+            e_cont = EmergencyContactModel(**data)
 
             try:
                 e_cont.save_to_db()

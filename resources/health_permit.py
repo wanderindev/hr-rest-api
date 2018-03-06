@@ -36,10 +36,7 @@ class HealthPermit(Resource):
         data = HealthPermit.parser.parse_args()
 
         if EmployeeModel.find_by_id(data['employee_id'], current_identity):
-            h_p = HealthPermitModel(data['health_permit_type'],
-                                    data['issue_date'],
-                                    data['expiration_date'],
-                                    data['employee_id'])
+            h_p = HealthPermitModel(**data)
 
             try:
                 h_p.save_to_db()

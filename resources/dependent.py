@@ -48,14 +48,7 @@ class Dependent(Resource):
         data = Dependent.parser.parse_args()
 
         if EmployeeModel.find_by_id(data['employee_id'], current_identity):
-            depen = DependentModel(data['first_name'],
-                                   data['second_name'],
-                                   data['first_surname'],
-                                   data['second_surname'],
-                                   data['gender'],
-                                   data['date_of_birth'],
-                                   data['employee_id'],
-                                   data['family_relation_id'])
+            depen = DependentModel(**data)
 
             try:
                 depen.save_to_db()

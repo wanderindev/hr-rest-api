@@ -39,11 +39,7 @@ class Passport(Resource):
         data = Passport.parser.parse_args()
 
         if EmployeeModel.find_by_id(data['employee_id'], current_identity):
-            passp = PassportModel(data['passport_number'],
-                                  data['issue_date'],
-                                  data['expiration_date'],
-                                  data['employee_id'],
-                                  data['country_id'])
+            passp = PassportModel(**data)
 
             try:
                 passp.save_to_db()
