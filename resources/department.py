@@ -69,13 +69,10 @@ class Department(Resource):
             dept.department_name = data['department_name']
 
             try:
-                dept.save_to_db()
+                _, dept = dept.update(data, ['is_active', 'organization_id'])
                 return {
                    'message': 'Department updated successfully.',
-                   'department': DepartmentModel.find_by_id(
-                       dept.id,
-                       current_identity
-                   ).to_dict()
+                   'department': dept.to_dict()
                 }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while updating '

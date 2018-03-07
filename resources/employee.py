@@ -35,10 +35,6 @@ class Employee(Resource):
     parser.add_argument('address',
                         type=str,
                         required=True)
-    parser.add_argument('is_active',
-                        default=True,
-                        type=bool,
-                        required=False)
     parser.add_argument('home_phone',
                         type=str,
                         required=False)
@@ -75,7 +71,7 @@ class Employee(Resource):
     parser.add_argument('is_active',
                         default=True,
                         type=bool,
-                        required=False)
+                        required=True)
     parser.add_argument('marital_status_id',
                         type=int,
                         required=True)
@@ -149,7 +145,8 @@ class Employee(Resource):
                 empl.contract_expiration_date = data['contract_expiration_date']
                 empl.termination_date = data['termination_date']
                 empl.termination_reason = data['termination_reason']
-                empl.salary_per_payment_period = data['salary_per_payment_period']
+                empl.salary_per_payment_period = data[
+                    'salary_per_payment_period']
                 empl.representation_expenses_per_payment_period = data[
                     'representation_expenses_per_payment_period']
                 empl.payment_method = data['payment_method']
@@ -159,12 +156,10 @@ class Employee(Resource):
                 empl.shift_id = data['shift_id']
 
                 try:
-                    empl.save_to_db()
+                    _, empl = empl.update(data, ['is_active'])
                     return {
                                'message': 'Employee updated successfully.',
-                               'employee': EmployeeModel.find_by_id(
-                                   empl.id, current_identity
-                               ).to_dict()
+                               'employee': empl.to_dict()
                            }, 200
                 except exc.SQLAlchemyError:
                     return {'message': 'An error occurred while updating '

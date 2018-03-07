@@ -66,19 +66,11 @@ class Passport(Resource):
             passp = PassportModel.find_by_id(passport_id, current_identity)
 
             if passp:
-                passp.passport_number = data['passport_number']
-                passp.issue_date = data['issue_date']
-                passp.expiration_date = data['expiration_date']
-                passp.employee_id = data['employee_id']
-                passp.country_id = data['country_id']
-
                 try:
-                    passp.save_to_db()
+                    _, passp = passp.update(data)
                     return {
                        'message': 'Passport updated successfully.',
-                       'passport': PassportModel.find_by_id(
-                           passp.id, current_identity
-                       ).to_dict()
+                       'passport': passp.to_dict()
                     }, 200
                 except exc.SQLAlchemyError:
                     return {'message': 'An error occurred while updating '

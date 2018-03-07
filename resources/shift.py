@@ -173,71 +173,11 @@ class Shift(Resource):
         shift = ShiftModel.find_by_id(shift_id, current_identity)
 
         if shift:
-            shift.shift_name = data['shift_name']
-            shift.weekly_hours = data['weekly_hours']
-            shift.is_rotating = data['is_rotating']
-            shift.payment_period = data['payment_period']
-            shift.break_length = data['break_length']
-            shift.is_break_included_in_shift = data[
-                'is_break_included_in_shift']
-            shift.rotation_start_hour = data.get('rotation_start_hour')
-            shift.rotation_end_hour = data.get('rotation_end_hour')
-            shift.fixed_start_hour_monday = data.get('fixed_start_hour_monday')
-            shift.fixed_start_break_hour_monday = data.get(
-                'fixed_start_break_hour_monday')
-            shift.fixed_end_break_hour_monday = data.get(
-                'fixed_end_break_hour_monday')
-            shift.fixed_end_hour_monday = data.get('fixed_end_hour_monday')
-            shift.fixed_start_hour_tuesday = data.get(
-                'fixed_start_hour_tuesday')
-            shift.fixed_start_break_hour_tuesday = data.get(
-                'fixed_start_break_hour_tuesday')
-            shift.fixed_end_break_hour_tuesday = data.get(
-                'fixed_end_break_hour_tuesday')
-            shift.fixed_end_hour_tuesday = data.get('fixed_end_hour_tuesday')
-            shift.fixed_start_hour_wednesday = data.get(
-                'fixed_start_hour_wednesday')
-            shift.fixed_start_break_hour_wednesday = data.get(
-                'fixed_start_break_hour_wednesday')
-            shift.fixed_end_break_hour_wednesday = data.get(
-                'fixed_end_break_hour_wednesday')
-            shift.fixed_end_hour_wednesday = data.get(
-                'fixed_end_hour_wednesday')
-            shift.fixed_start_hour_thursday = data.get(
-                'fixed_start_hour_thursday')
-            shift.fixed_start_break_hour_thursday = data.get(
-                'fixed_start_break_hour_thursday')
-            shift.fixed_end_break_hour_thursday = data.get(
-                'fixed_end_break_hour_thursday')
-            shift.fixed_end_hour_thursday = data.get('fixed_end_hour_thursday')
-            shift.fixed_start_hour_friday = data.get('fixed_start_hour_friday')
-            shift.fixed_start_break_hour_friday = data.get(
-                'fixed_start_break_hour_friday')
-            shift.fixed_end_break_hour_friday = data.get(
-                'fixed_end_break_hour_friday')
-            shift.fixed_end_hour_friday = data.get('fixed_end_hour_friday')
-            shift.fixed_start_hour_saturday = data.get(
-                'fixed_start_hour_saturday')
-            shift.fixed_start_break_hour_saturday = data.get(
-                'fixed_start_break_hour_saturday')
-            shift.fixed_end_break_hour_saturday = data.get(
-                'fixed_end_break_hour_saturday')
-            shift.fixed_end_hour_saturday = data.get('fixed_end_hour_saturday')
-            shift.fixed_start_hour_sunday = data.get('fixed_start_hour_sunday')
-            shift.fixed_start_break_hour_sunday = data.get(
-                'fixed_start_break_hour_sunday')
-            shift.fixed_end_break_hour_sunday = data.get(
-                'fixed_end_break_hour_sunday')
-            shift.fixed_end_hour_sunday = data.get('fixed_end_hour_sunday')
-            shift.rest_day = data.get('rest_day')
-
             try:
-                shift.save_to_db()
+                _, shift = shift.update(data, ['is_active', 'organization_id'])
                 return {
                            'message': 'Shift updated successfully.',
-                           'shift': ShiftModel.find_by_id(
-                               shift.id, current_identity
-                           ).to_dict()
+                           'shift': shift.to_dict()
                        }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while updating '

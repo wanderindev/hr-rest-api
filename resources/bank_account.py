@@ -81,17 +81,11 @@ class BankAccount(Resource):
             b_acc = BankAccountModel.find_by_id(account_id, current_identity)
 
             if b_acc:
-                b_acc.account_number = data['account_number']
-                b_acc.account_type = data['account_type']
-                b_acc.bank_id = data['bank_id']
-
                 try:
-                    b_acc.save_to_db()
+                    _, b_acc = b_acc.update(data, ['is_active', 'employee_id'])
                     return {
                        'message': 'Bank account updated successfully.',
-                       'bank_account': BankAccountModel.find_by_id(
-                           b_acc.id, current_identity
-                       ).to_dict()
+                       'bank_account': b_acc.to_dict()
                     }, 200
                 except exc.SQLAlchemyError:
                     return {'message': 'An error occurred while updating '

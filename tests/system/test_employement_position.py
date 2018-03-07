@@ -190,7 +190,6 @@ class TestEmploymentPosition(BaseTest):
                                  2.00)
                 self.assertEqual(e_p['organization_id'],
                                  self.e_p_dict['organization_id'])
-                self.assertListEqual(e_p['employees'], [])
                 self.assertEqual(r.status_code, 200)
 
     def test_emp_pos_put_without_authentication(self):

@@ -17,11 +17,9 @@ class ScheduleModel(ModelMixin, db.Model):
         self.department_id = department_id
 
     @classmethod
-    def find_by_id(cls, _id, organization_id):
+    def find_by_id(cls, _id, user):
         sch = cls.query.filter_by(id=_id).first()
 
         if sch:
-            if DepartmentModel.find_by_id(
-                    sch.department_id,
-                    organization_id).organization_id == organization_id:
-                return sch
+            if DepartmentModel.find_by_id(sch.department_id, user):
+                   return sch

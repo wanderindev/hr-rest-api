@@ -1,4 +1,3 @@
-from datetime import date
 import json
 
 from unittest import TestCase
@@ -309,10 +308,11 @@ class BaseTest(TestCase):
 
             return self.get_object(DependentModel, _dict)
 
-    def get_schedule(self, department_id, organization_id):
+    def get_schedule(self, _dict=None):
         with self.app_context():
-            sch = ScheduleModel(date(2018, 1, 1), department_id)
+            _dict = _dict or {
+                'start_date': '2018-01-01',
+                'department_id': self.get_department().id
+            }
 
-            sch.save_to_db()
-
-            return ScheduleModel.find_by_id(sch.id, organization_id)
+            return self.get_object(ScheduleModel, _dict)

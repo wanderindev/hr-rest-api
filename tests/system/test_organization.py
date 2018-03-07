@@ -220,16 +220,6 @@ class TestOrganization(BaseTest):
                                  'new_test_o')
                 self.assertTrue(o['is_active'])
                 self.assertIsNotNone(o['id'])
-                self.assertListEqual(o['employment_positions'],
-                                     [])
-                self.assertListEqual(o['departments'],
-                                     [])
-                self.assertListEqual(o['shifts'],
-                                     [])
-                self.assertListEqual(o['app_users'],
-                                     [])
-                self.assertListEqual(o['uniform_items'],
-                                     [])
 
     def test_organization_put_without_authentication(self):
         """

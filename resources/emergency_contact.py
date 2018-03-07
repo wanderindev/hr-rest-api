@@ -70,20 +70,11 @@ class EmergencyContact(Resource):
                                                       current_identity)
 
             if e_cont:
-                e_cont.first_name = data['first_name']
-                e_cont.last_name = data['last_name']
-                e_cont.home_phone = data['home_phone']
-                e_cont.work_phone = data['work_phone']
-                e_cont.mobile_phone = data['mobile_phone']
-                e_cont.employee_id = data['employee_id']
-
                 try:
-                    e_cont.save_to_db()
+                    _, e_cont = e_cont.update(data)
                     return {
                        'message': 'Emergency contact updated successfully.',
-                       'emergency_contact': EmergencyContactModel.find_by_id(
-                           e_cont.id, current_identity
-                       ).to_dict()
+                       'emergency_contact': e_cont.to_dict()
                     }, 200
                 except exc.SQLAlchemyError:
                     return {'message': 'An error occurred while updating '

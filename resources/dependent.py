@@ -75,22 +75,11 @@ class Dependent(Resource):
             depen = DependentModel.find_by_id(dependent_id, current_identity)
 
             if depen:
-                depen.first_name = data['first_name']
-                depen.second_name = data['second_name']
-                depen.first_surname = data['first_surname']
-                depen.second_surname = data['second_surname']
-                depen.gender = data['gender']
-                depen.date_of_birth = data['date_of_birth']
-                depen.employee_id = data['employee_id']
-                depen.family_relation_id = data['family_relation_id']
-
                 try:
-                    depen.save_to_db()
+                    _, depen = depen.update(data)
                     return {
                        'message': 'Dependent updated successfully.',
-                       'dependent': DependentModel.find_by_id(
-                           depen.id, current_identity
-                       ).to_dict()
+                       'dependent': depen.to_dict()
                     }, 200
                 except exc.SQLAlchemyError:
                     return {'message': 'An error occurred while updating '

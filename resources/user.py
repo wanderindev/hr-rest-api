@@ -75,19 +75,11 @@ class User(Resource):
         user = AppUserModel.find_by_username(username)
 
         if user:
-            user.username = data['username']
-            user.password_hash = user.get_password_hash(data['password'])
-            user.email = data['email']
-            user.is_super = data['is_super']
-            user.is_owner = data['is_owner']
-
             try:
-                user.save_to_db()
+                _, user = user.update(data, ['is_active', 'organization_id'])
                 return {
                            'message': 'User updated successfully.',
-                           'user': AppUserModel.find_by_id(
-                               user.id
-                           ).to_dict()
+                           'user': user.to_dict()
                        }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while updating '

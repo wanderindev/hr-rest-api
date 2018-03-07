@@ -53,3 +53,11 @@ class ModelMixin(object):
                 output[k] = v
 
         return output
+
+    def update(self, data, exclude=[]):
+        for key, value in data.items():
+            if key not in exclude:
+                setattr(self, key, value)
+        self.save_to_db()
+
+        return self.id, self

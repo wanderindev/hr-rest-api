@@ -62,16 +62,11 @@ class Organization(Resource):
                                                     current_identity)
 
         if organization:
-            organization.organization_name = data['organization_name']
-
             try:
-                organization.save_to_db()
+                _, organization = organization.update(data, ['is_active'])
                 return {
                            'message': 'Organization updated successfully.',
-                           'organization': OrganizationModel.find_by_id(
-                               organization.id,
-                               current_identity
-                           ).to_dict()
+                           'organization': organization.to_dict()
                        }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while updating '

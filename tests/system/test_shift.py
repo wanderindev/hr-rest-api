@@ -312,7 +312,6 @@ class TestShift(BaseTest):
                                  44)
                 self.assertEqual(shift['organization_id'],
                                  self.s_r_dict['organization_id'])
-                self.assertListEqual(shift['employees'], [])
                 self.assertEqual(r.status_code, 200)
 
                 # Send PUT request modifying the fixed shift.

@@ -80,12 +80,11 @@ class EmploymentPosition(Resource):
             e_p.minimum_hourly_wage = data['minimum_hourly_wage']
 
             try:
-                e_p.save_to_db()
+                _, e_p = e_p.update(data, ['is_active', 'organization_id'])
                 return {
                            'message': 'Employment position updated '
                                       'successfully.',
-                           'employment_position': EmploymentPositionModel
-                           .find_by_id(e_p.id, current_identity).to_dict()
+                           'employment_position': e_p.to_dict()
                        }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while updating '

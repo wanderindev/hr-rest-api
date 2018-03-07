@@ -69,12 +69,10 @@ class HealthPermit(Resource):
                 h_p.employee_id = data['employee_id']
 
                 try:
-                    h_p.save_to_db()
+                    _, h_p = h_p.update(data)
                     return {
                        'message': 'Health permit updated successfully.',
-                       'health_permit': HealthPermitModel.find_by_id(
-                           h_p.id, current_identity
-                       ).to_dict()
+                       'health_permit': h_p.to_dict()
                     }, 200
                 except exc.SQLAlchemyError:
                     return {'message': 'An error occurred while updating '
