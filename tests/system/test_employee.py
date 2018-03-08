@@ -50,6 +50,9 @@ class TestEmployee(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
+                self.assertIsNone(EmployeeModel.query.filter_by(
+                    first_name=self.e_dict['first_name']).first())
+
                 r = c.post('/employee',
                            data=json.dumps(self.e_dict),
                            headers=self.get_headers())
@@ -122,7 +125,7 @@ class TestEmployee(BaseTest):
 
                 self.assertEqual(r.status_code, 401)
 
-    def test_dept_post_wrong_user(self):
+    def test_empl_post_wrong_user(self):
         """
         Test that status code 403 is returned when trying to POST an
         employee with a user without permission.
@@ -265,7 +268,7 @@ class TestEmployee(BaseTest):
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/employee/1',
+                r = c.put(f'/employee/{self.get_employee().id}',
                           data=json.dumps({
                               'first_name': 'new_f_n',
                               'second_name': 'new_s_n',

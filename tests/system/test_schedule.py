@@ -8,17 +8,15 @@ class TestSchedule(BaseTest):
     """System tests for the schedule resource."""
     def setUp(self):
         """
-        Extend the BaseTest setUp method by creating a department and a dict 
-        representing a schedule so it is available for the different tests.
+        Extend the BaseTest setUp method by creating a dict representing
+        a schedule.
         """
         super(TestSchedule, self).setUp()
 
         with self.app_context():
-            self.d = self.get_department(1)
-            
             self.sch_dict = {
                 'start_date': '2018-01-01',
-                'department_id': self.d.id
+                'department_id': self.get_department().id,
             }
 
     def test_sch_post_with_authentication(self):
@@ -37,15 +35,15 @@ class TestSchedule(BaseTest):
                            data=json.dumps(self.sch_dict),
                            headers=self.get_headers())
 
-                r_sch = json.loads(r.data)['schedule']
+                sch = json.loads(r.data)['schedule']
 
                 self.assertEqual(r.status_code, 201)
-                self.assertEqual(r_sch['start_date'],
+                self.assertEqual(sch['start_date'],
                                  self.sch_dict['start_date'])
-                self.assertEqual(r_sch['department_id'],
+                self.assertEqual(sch['department_id'],
                                  self.sch_dict['department_id'])
-                self.assertIsNotNone(ScheduleModel.find_by_id(
-                    r_sch['id'], self.d.organization_id))
+                self.assertIsNotNone(ScheduleModel.find_by_id(sch['id'], 
+                                                              self.u))
 
     def test_sch_post_without_authentication(self):
         """
@@ -82,6 +80,22 @@ class TestSchedule(BaseTest):
                            headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
+                
+    def test_sch_post_wrong_user(self):
+        """
+        Test that status code 403 is returned when trying to POST a
+        schedule with a user without permission.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.post('/schedule',
+                           data=json.dumps(self.sch_dict),
+                           headers=self.get_headers({
+                               'username': 'test_other_u',
+                               'password': 'test_p'
+                           }))
+
+                self.assertEqual(r.status_code, 403)
 
     def test_sch_get_with_authentication(self):
         """
@@ -91,21 +105,15 @@ class TestSchedule(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/schedule',
-                           data=json.dumps(self.sch_dict),
-                           headers=self.get_headers())
-
-                schedule_id = json.loads(r.data)['schedule']['id']
-
-                r = c.get(f'/schedule/{schedule_id}',
+                r = c.get(f'/schedule/{self.get_schedule().id}',
                           headers=self.get_headers())
 
-                r_dict = json.loads(r.data)
+                sch = json.loads(r.data)
 
                 self.assertEqual(r.status_code, 200)
-                self.assertEqual(r_dict['start_date'],
+                self.assertEqual(sch['start_date'],
                                  self.sch_dict['start_date'])
-                self.assertEqual(r_dict['department_id'],
+                self.assertEqual(sch['department_id'],
                                  self.sch_dict['department_id'])
 
     def test_sch_get_not_found(self):
@@ -130,7 +138,7 @@ class TestSchedule(BaseTest):
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/schedule/1',
+                r = c.get(f'/schedule/{self.get_schedule().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -145,25 +153,19 @@ class TestSchedule(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/schedule',
-                           data=json.dumps(self.sch_dict),
-                           headers=self.get_headers())
-
-                schedule_id = json.loads(r.data)['schedule']['id']
-
-                r = c.put(f'/schedule/{schedule_id}',
+                r = c.put(f'/schedule/{self.get_schedule().id}',
                           data=json.dumps({
                               'start_date': '2018-01-31',
-                              'department_id': self.d.id
+                              'department_id': self.get_department().id
                           }),
                           headers=self.get_headers())
 
-                r_sch = json.loads(r.data)['schedule']
+                sch = json.loads(r.data)['schedule']
 
-                self.assertEqual(r_sch['start_date'],
+                self.assertEqual(sch['start_date'],
                                  '2018-01-31')
-                self.assertEqual(r_sch['department_id'],
-                                 self.d.id)
+                self.assertEqual(sch['department_id'],
+                                 self.get_department().id)
                 self.assertEqual(r.status_code, 200)
 
     def test_sch_put_without_authentication(self):
@@ -175,10 +177,10 @@ class TestSchedule(BaseTest):
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/schedule/1',
+                r = c.put(f'/schedule/{self.get_schedule().id}',
                           data=json.dumps({
                               'start_date': '2018-01-31',
-                              'department_id': self.d.id
+                              'department_id': self.get_department().id
                           }),
                           headers={
                               'Content-Type': 'application/json',
@@ -198,11 +200,31 @@ class TestSchedule(BaseTest):
                 r = c.put(f'/schedule/1',
                           data=json.dumps({
                               'start_date': '2018-01-31',
-                              'department_id': self.d.id
+                              'department_id': self.get_department().id
                           }),
                           headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 404)
+
+    def test_sch_put_wrong_user(self):
+        """
+        Test that a PUT request to the /schedule/<int:schedule_id>
+        endpoint returns status code 403 if the user making the request
+        does not have permission to modify the data.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.put(f'/schedule/{self.get_schedule().id}',
+                          data=json.dumps({
+                              'start_date': '2018-01-31',
+                              'department_id': self.get_department().id
+                          }),
+                          headers=self.get_headers({
+                               'username': 'test_other_u',
+                               'password': 'test_p'
+                           }))
+
+                self.assertEqual(r.status_code, 403)
 
     def test_sch_delete_with_authentication(self):
         """
@@ -211,13 +233,7 @@ class TestSchedule(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/schedule',
-                           data=json.dumps(self.sch_dict),
-                           headers=self.get_headers())
-
-                schedule_id = json.loads(r.data)['schedule']['id']
-
-                r = c.delete(f'/schedule/{schedule_id}',
+                r = c.delete(f'/schedule/{self.get_schedule().id}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -231,7 +247,7 @@ class TestSchedule(BaseTest):
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/schedule/1',
+                r = c.delete(f'/schedule/{self.get_schedule().id}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'
