@@ -75,10 +75,6 @@ class EmploymentPosition(Resource):
         e_p = EmploymentPositionModel.find_by_id(position_id, current_identity)
 
         if e_p:
-            e_p.position_name_feminine = data['position_name_feminine']
-            e_p.position_name_masculine = data['position_name_masculine']
-            e_p.minimum_hourly_wage = data['minimum_hourly_wage']
-
             try:
                 _, e_p = e_p.update(data, ['is_active', 'organization_id'])
                 return {

@@ -21,11 +21,9 @@ class UniformItemModel(ModelMixin, db.Model):
         self.organization_id = organization_id
 
     @classmethod
-    def find_by_id(cls, _id, organization_id):
-        return cls.query.filter_by(id=_id,
-                                   organization_id=organization_id).first()
+    def find_by_id(cls, _id, user):
+        u_i = cls.query.filter_by(id=_id).first()
 
-    @classmethod
-    def find_by_name(cls, item_name, organization_id):
-        return cls.query.filter_by(item_name=item_name,
-                                   organization_id=organization_id).first()
+        if u_i:
+            if user.is_super or user.organization_id == u_i.organization_id:
+                return u_i

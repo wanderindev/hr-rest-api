@@ -9,14 +9,14 @@ class TestUniformItem(BaseTest):
     def setUp(self):
         """
         Extend the BaseTest setUp method by creating a dict representing
-        a uniform item so it is available for the different tests.
+        a uniform item.
         """
         super(TestUniformItem, self).setUp()
 
         with self.app_context():
             self.u_i_dict = {
                 'item_name': 'test_u_i',
-                'organization_id': 1
+                'organization_id': self.get_organization().id
             }
 
     def test_u_item_post_with_authentication(self):
@@ -27,24 +27,24 @@ class TestUniformItem(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                self.assertIsNone(UniformItemModel.find_by_name(
-                    self.u_i_dict['item_name'],
-                    self.u_i_dict['organization_id']))
+                self.assertIsNone(UniformItemModel.query.filter_by(
+                    item_name=self.u_i_dict['item_name'],
+                    organization_id=self.u_i_dict['organization_id']).first())
 
                 r = c.post('/uniform_item',
                            data=json.dumps(self.u_i_dict),
                            headers=self.get_headers())
 
-                r_u_i = json.loads(r.data)['uniform_item']
+                u_i = json.loads(r.data)['uniform_item']
 
                 self.assertEqual(r.status_code, 201)
-                self.assertEqual(r_u_i['item_name'],
+                self.assertEqual(u_i['item_name'],
                                  self.u_i_dict['item_name'])
-                self.assertEqual(r_u_i['organization_id'],
+                self.assertEqual(u_i['organization_id'],
                                  self.u_i_dict['organization_id'])
-                self.assertIsNotNone(UniformItemModel.find_by_name(
-                    self.u_i_dict['item_name'],
-                    self.u_i_dict['organization_id']))
+                self.assertIsNotNone(UniformItemModel.query.filter_by(
+                    item_name=self.u_i_dict['item_name'],
+                    organization_id=self.u_i_dict['organization_id']).first())
 
     def test_u_item_post_without_authentication(self):
         """
@@ -82,6 +82,22 @@ class TestUniformItem(BaseTest):
 
                 self.assertEqual(r.status_code, 400)
 
+    def test_u_item_pos_wrong_user(self):
+        """
+        Test that status code 403 is returned when trying to POST a uniform
+        item with a user without permission.
+        """
+        with self.app() as c:
+            with self.app_context():
+                r = c.post('/uniform_item',
+                           data=json.dumps(self.u_i_dict),
+                           headers=self.get_headers({
+                               'username': 'test_other_u',
+                               'password': 'test_p'
+                           }))
+
+                self.assertEqual(r.status_code, 403)
+                
     def test_u_item_get_with_authentication(self):
         """
         Test that a GET request to the /uniform_item/<int:item_id>
@@ -90,19 +106,13 @@ class TestUniformItem(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/uniform_item',
-                           data=json.dumps(self.u_i_dict),
-                           headers=self.get_headers())
-
-                item_id = json.loads(r.data)['uniform_item']['id']
-
-                r = c.get(f'/uniform_item/{item_id}',
+                r = c.get(f'/uniform_item/{self.get_uniform_item().id}',
                           headers=self.get_headers())
 
-                r_dict = json.loads(r.data)
+                u_i = json.loads(r.data)
 
                 self.assertEqual(r.status_code, 200)
-                self.assertEqual(r_dict['item_name'],
+                self.assertEqual(u_i['item_name'],
                                  self.u_i_dict['item_name'])
 
     def test_u_item_get_not_found(self):
@@ -127,7 +137,7 @@ class TestUniformItem(BaseTest):
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/uniform_item/1',
+                r = c.get(f'/uniform_item/{self.get_uniform_item().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -142,25 +152,18 @@ class TestUniformItem(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/uniform_item',
-                           data=json.dumps(self.u_i_dict),
-                           headers=self.get_headers())
-
-                item_id = json.loads(r.data)['uniform_item']['id']
-
-                r = c.put(f'/uniform_item/{item_id}',
+                r = c.put(f'/uniform_item/{self.get_uniform_item().id}',
                           data=json.dumps({
                               'item_name': 'new_test_u_i',
-                              'organization_id': self.u_i_dict[
-                                  'organization_id'],
+                              'organization_id': self.get_organization().id
                           }),
                           headers=self.get_headers())
 
-                r_u_i = json.loads(r.data)['uniform_item']
+                u_i = json.loads(r.data)['uniform_item']
 
-                self.assertEqual(r_u_i['item_name'],
+                self.assertEqual(u_i['item_name'],
                                  'new_test_u_i')
-                self.assertEqual(r_u_i['organization_id'],
+                self.assertEqual(u_i['organization_id'],
                                  self.u_i_dict['organization_id'])
                 self.assertEqual(r.status_code, 200)
 
@@ -173,11 +176,10 @@ class TestUniformItem(BaseTest):
             with self.app_context():
                 # Send PUT request to the endpoint with
                 # wrong authentication header.
-                r = c.put(f'/uniform_item/1',
+                r = c.put(f'/uniform_item/{self.get_uniform_item().id}',
                           data=json.dumps({
                               'item_name': 'new_test_u_i',
-                              'organization_id': self.u_i_dict[
-                                  'organization_id'],
+                              'organization_id':  self.get_organization().id
                           }),
                           headers={
                               'Content-Type': 'application/json',
@@ -197,8 +199,7 @@ class TestUniformItem(BaseTest):
                 r = c.put(f'/uniform_item/1',
                           data=json.dumps({
                               'item_name': 'new_test_u_i',
-                              'organization_id': self.u_i_dict[
-                                  'organization_id'],
+                              'organization_id':  self.get_organization().id
                           }),
                           headers=self.get_headers())
 
@@ -211,13 +212,7 @@ class TestUniformItem(BaseTest):
         """
         with self.app() as c:
             with self.app_context():
-                r = c.post('/uniform_item',
-                           data=json.dumps(self.u_i_dict),
-                           headers=self.get_headers())
-
-                item_id = json.loads(r.data)['uniform_item']['id']
-
-                r = c.delete(f'/uniform_item/{item_id}',
+                r = c.delete(f'/uniform_item/{self.get_uniform_item().id}',
                              headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 200)
@@ -231,7 +226,7 @@ class TestUniformItem(BaseTest):
             with self.app_context():
                 # Send DELETE request to the endpoint
                 # with wrong authorization header.
-                r = c.delete(f'/uniform_item/1',
+                r = c.delete(f'/uniform_item/{self.get_uniform_item().id}',
                              headers={
                                  'Content-Type': 'application/json',
                                  'Authorization': 'JWT FaKeToKeN!!'

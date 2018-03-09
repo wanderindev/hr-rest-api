@@ -14,27 +14,21 @@ class TestUniformItem(BaseTest):
 
         with self.app_context():
             self.o = self.get_organization()
-            self.u_i = self.get_uniform_item(self.o.id)
+            self.u_i = self.get_uniform_item()
 
     def test_find_uniform_item(self):
         """Test the find_by_name and find_by_id methods of UniformItemModel."""
         with self.app_context():
-            u_i_by_name = UniformItemModel.find_by_name(self.u_i.item_name,
-                                                        self.o.id)
-            u_i_by_id = UniformItemModel.find_by_id(self.u_i.id,
-                                                    self.o.id)
+            u_i = UniformItemModel.find_by_id(self.u_i.id, self.u)
 
-            self.assertIsNotNone(u_i_by_name)
-            self.assertIsNotNone(u_i_by_id)
-            self.assertEqual(u_i_by_name, u_i_by_id)
+            self.assertIsNotNone(u_i)
 
     def test_uniform_item_list_in_organization(self):
         """Test that the organization object contains a uniform item list."""
         with self.app_context():
             u_i_list = UniformItemModel.query.filter_by(
                 organization_id=self.o.id).all()
-            o_u_i_list = OrganizationModel.query.filter_by(
-                organization_name=self.o.organization_name).first()\
-                .uniform_items
+            u_i_list_in_org = OrganizationModel.find_by_id(
+                self.o.id, self.u).uniform_items
 
-            self.assertListEqual(u_i_list, o_u_i_list)
+            self.assertListEqual(u_i_list, u_i_list_in_org)

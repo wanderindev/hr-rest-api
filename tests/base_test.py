@@ -258,27 +258,34 @@ class BaseTest(TestCase):
 
             return self.get_object(PassportModel, _dict)
 
-    def get_uniform_item(self, organization_id):
+    def get_uniform_item(self, _dict=None):
         with self.app_context():
-            u_i = UniformItemModel('test_u_i', organization_id)
-            u_i.save_to_db()
+            _dict = _dict or {
+                'item_name': 'test_u_i',
+                'organization_id': self.get_organization().id
+            }
 
-            return UniformItemModel.find_by_id(u_i.id, organization_id)
+            return self.get_object(UniformItemModel, _dict)
 
-    def get_uniform_size(self, item_id, organization_id):
+    def get_uniform_size(self, _dict=None):
         with self.app_context():
-            u_s = UniformSizeModel('test_u_s', item_id)
-            u_s.save_to_db()
+            with self.app_context():
+                _dict = _dict or {
+                    'item_name': 'test_u_i',
+                    'organization_id': self.get_organization().id
+                }
 
-            return UniformSizeModel.find_by_id(u_s.id, organization_id)
+                return self.get_object(UniformSizeModel, _dict)
 
-    def get_uniform_requirement(self, employee_id, item_id,
-                                size_id, organization_id):
+    def get_uniform_requirement(self, _dict=None):
         with self.app_context():
-            u_r = UniformRequirementModel(employee_id, item_id, size_id)
-            u_r.save_to_db()
+            _dict = _dict or {
+                'employee_id': self.get_employee().id,
+                'uniform_item_id': self.get_uniform_item().id,
+                'uniform_size_id': self.get_uniform_size().id
+            }
 
-            return UniformRequirementModel.find_by_id(u_r.id, organization_id)
+            return self.get_object(UniformRequirementModel, _dict)
 
     def get_bank_account(self, _dict=None):
         with self.app_context():

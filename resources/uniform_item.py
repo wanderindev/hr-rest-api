@@ -16,9 +16,7 @@ class UniformItem(Resource):
 
     @jwt_required()
     def get(self, item_id):
-
-        u_i = UniformItemModel.find_by_id(item_id,
-                                          current_identity.organization_id)
+        u_i = UniformItemModel.find_by_id(item_id, current_identity)
         if u_i:
             return u_i.to_dict()
 
@@ -29,45 +27,44 @@ class UniformItem(Resource):
     def post():
         data = UniformItem.parser.parse_args()
 
-        if UniformItemModel.find_by_name(data['item_name'],
-                                         data['organization_id']):
+        if UniformItemModel.query.filter_by(
+                item_name=data['item_name'],
+                organization_id=data['organization_id']).first():
             return {'message': 'A uniform item with that name already '
                                'exists in the organization.'}, 400
 
-        u_i = UniformItemModel(data['item_name'],
-                               data['organization_id'])
+        if current_identity.organization_id == data['organization_id'] or \
+                current_identity.is_super:
+            u_i = UniformItemModel(**data)
 
-        try:
-            u_i.save_to_db()
-        except exc.SQLAlchemyError:
-            return {'message': 'An error occurred while creating '
-                               'the uniform item.'}, 500
+            try:
+                u_i.save_to_db()
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while creating '
+                                   'the uniform item.'}, 500
 
-        return {
-                   'message': 'Uniform item created successfully.',
-                   'uniform_item': UniformItemModel.find_by_id(
-                       u_i.id, current_identity.organization_id
-                   ).to_dict()
-               }, 201
+            return {
+                       'message': 'Uniform item created successfully.',
+                       'uniform_item': UniformItemModel.find_by_id(
+                           u_i.id, current_identity
+                       ).to_dict()
+                   }, 201
+
+        return {'message': 'You are not allowed to create a uniform item '
+                           'that does not belong to your organization.'}, 403
 
     @jwt_required()
     def put(self,  item_id):
         data = UniformItem.parser.parse_args()
 
-        u_i = UniformItemModel.find_by_id(item_id,
-                                          current_identity.organization_id)
+        u_i = UniformItemModel.find_by_id(item_id, current_identity)
 
         if u_i:
-            u_i.item_name = data['item_name']
-
             try:
-                u_i.save_to_db()
+                _, u_i = u_i.update(data, ['organization_id'])
                 return {
                    'message': 'Uniform item updated successfully.',
-                   'uniform_item': UniformItemModel.find_by_id(
-                       u_i.id,
-                       current_identity.organization_id
-                   ).to_dict()
+                   'uniform_item': u_i.to_dict()
                 }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while updating '
@@ -77,8 +74,7 @@ class UniformItem(Resource):
 
     @jwt_required()
     def delete(self, item_id):
-        u_i = UniformItemModel.find_by_id(item_id,
-                                          current_identity.organization_id)
+        u_i = UniformItemModel.find_by_id(item_id, current_identity)
 
         if u_i:
             try:

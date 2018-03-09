@@ -15,17 +15,6 @@ class TestUniformItem(BaseTest):
         super(TestUniformItem, self).setUp()
 
         with self.app_context():
-            # Employee object depends on department, employment
-            # position, and shift
-            self.d = self.get_department(1)
-            self.e_p = self.get_employment_position(1)
-            self.s = self.get_shift(1)
-
-            self.e = self.get_employee(self.d.id, self.e_p.id, self.s.id, 1)
-            self.u_i = self.get_uniform_item(1)
-            self.u_s_1 = self.get_uniform_size(self.u_i.id, 1)
-            self.u_s_2 = self.get_uniform_size(self.u_i.id, 1)
-
             self.u_r_dict = {
                 'employee_id': self.e.id,
                 'uniform_item_id': self.u_i.id,
