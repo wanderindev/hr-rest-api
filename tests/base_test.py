@@ -271,8 +271,8 @@ class BaseTest(TestCase):
         with self.app_context():
             with self.app_context():
                 _dict = _dict or {
-                    'item_name': 'test_u_i',
-                    'organization_id': self.get_organization().id
+                    'size_description': 'test_u_s',
+                    'uniform_item_id': self.get_uniform_item().id
                 }
 
                 return self.get_object(UniformSizeModel, _dict)

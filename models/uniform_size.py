@@ -16,27 +16,11 @@ class UniformSizeModel(ModelMixin, db.Model):
         self.uniform_item_id = uniform_item_id
 
     @classmethod
-    def find_by_id(cls, _id, organization_id):
+    def find_by_id(cls, _id, user):
         from models.uniform_item import UniformItemModel
 
         size = cls.query.filter_by(id=_id).first()
 
         if size:
-            if UniformItemModel.find_by_id(
-                    size.uniform_item_id,
-                    organization_id).organization_id == organization_id:
-                return size
-
-    @classmethod
-    def find_by_description(cls, size_description, uniform_item_id,
-                            organization_id):
-        from models.uniform_item import UniformItemModel
-
-        size = cls.query.filter_by(size_description=size_description,
-                                   uniform_item_id=uniform_item_id).first()
-
-        if size:
-            if UniformItemModel.find_by_id(
-                    size.uniform_item_id,
-                    organization_id).organization_id == organization_id:
+            if UniformItemModel.find_by_id(size.uniform_item_id, user):
                 return size

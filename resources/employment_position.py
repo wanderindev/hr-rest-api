@@ -78,10 +78,10 @@ class EmploymentPosition(Resource):
             try:
                 _, e_p = e_p.update(data, ['is_active', 'organization_id'])
                 return {
-                           'message': 'Employment position updated '
-                                      'successfully.',
-                           'employment_position': e_p.to_dict()
-                       }, 200
+                   'message': 'Employment position updated '
+                              'successfully.',
+                   'employment_position': e_p.to_dict()
+               }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while updating '
                                    'the employment position.'}, 500
