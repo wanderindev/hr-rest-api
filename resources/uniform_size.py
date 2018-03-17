@@ -35,10 +35,10 @@ class UniformSize(Resource):
             return {'message': 'A uniform size with that description already '
                                'exists for that uniform item.'}, 400
 
-        organization_id = UniformItemModel.find_by_id(
-            data['uniform_item_id'], current_identity).organization_id
+        item = UniformItemModel.find_by_id(data['uniform_item_id'],
+                                           current_identity)
 
-        if organization_id or current_identity.is_super:
+        if item or current_identity.is_super:
             u_s = UniformSizeModel(**data)
 
             try:
@@ -52,6 +52,10 @@ class UniformSize(Resource):
                        'uniform_size': UniformSizeModel.find_by_id(
                            u_s.id, current_identity).to_dict()
                    }, 201
+
+        return {'message': 'You are not allowed to create a uniform size for '
+                           'an item that does not belong to your '
+                           'organization.'}, 403
 
     @jwt_required()
     def put(self,  size_id):
