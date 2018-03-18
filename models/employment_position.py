@@ -29,8 +29,10 @@ class EmploymentPositionModel(ModelMixin, db.Model):
 
     @classmethod
     def find_by_id(cls, _id, user):
+        from models.organization import OrganizationModel
+
         e_p = cls.query.filter_by(id=_id).first()
 
         if e_p:
-            if user.is_super or user.organization_id == e_p.organization_id:
+            if OrganizationModel.find_by_id(e_p.organization_id, user):
                 return e_p

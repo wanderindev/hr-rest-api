@@ -81,22 +81,6 @@ class TestUniformItem(BaseTest):
                            headers=self.get_headers())
 
                 self.assertEqual(r.status_code, 400)
-
-    def test_u_item_pos_wrong_user(self):
-        """
-        Test that status code 403 is returned when trying to POST a uniform
-        item with a user without permission.
-        """
-        with self.app() as c:
-            with self.app_context():
-                r = c.post('/uniform_item',
-                           data=json.dumps(self.u_i_dict),
-                           headers=self.get_headers({
-                               'username': 'test_other_u',
-                               'password': 'test_p'
-                           }))
-
-                self.assertEqual(r.status_code, 403)
                 
     def test_u_item_get_with_authentication(self):
         """

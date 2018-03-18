@@ -131,7 +131,7 @@ class TestHealthPermit(BaseTest):
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/passport/1',
+                r = c.get(f'/passport/{self.get_passport().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'
@@ -169,29 +169,6 @@ class TestHealthPermit(BaseTest):
                 self.assertEqual(passp['country_id'],
                                  2)
                 self.assertEqual(r.status_code, 200)
-
-    def test_passp_put_wrong_user(self):
-        """
-        Test that a PUT request to the /passport/<id:passport_id>
-        endpoint returns status code 403 when trying to reassign a
-        passport with a user without permission.
-        """
-        with self.app() as c:
-            with self.app_context():
-                r = c.put(f'/passport/{self.get_passport().id}',
-                          data=json.dumps({
-                              'passport_number': '654321',
-                              'issue_date': '2018-1-31',
-                              'expiration_date': '2019-1-31',
-                              'employee_id': self.get_employee().id,
-                              'country_id': 2
-                          }),
-                          headers=self.get_headers({
-                              'username': 'test_other_u',
-                              'password': 'test_p'
-                          }))
-
-                self.assertEqual(r.status_code, 403)
 
     def test_passp_put_without_authentication(self):
         """

@@ -40,7 +40,12 @@ class AppUserModel(ModelMixin, db.Model):
 
     @classmethod
     def find_by_id(cls, _id):
-       return cls.query.filter_by(id=_id).first()
+        from models.organization import OrganizationModel
+
+        user = cls.query.filter_by(id=_id).first()
+
+        if OrganizationModel.find_by_id(user.organization_id, user):
+            return user
 
     @classmethod
     def find_by_username(cls, username):

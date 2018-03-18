@@ -345,50 +345,6 @@ class TestEmployee(BaseTest):
 
                 self.assertEqual(r.status_code, 404)
 
-    def test_emp_put_wrong_user(self):
-        """
-        Test that a PUT request to the /employee/<int:employee_id>
-        endpoint returns status code 403 if the user making the request
-        does not have permission to modify the data.
-        """
-        with self.app() as c:
-            with self.app_context():
-                r = c.put(f'/employee/{self.get_employee().id}',
-                          data=json.dumps({
-                              'first_name': 'new_f_n',
-                              'second_name': 'new_s_n',
-                              'first_surname': 'new_f_sn',
-                              'second_surname': 'new_s_sn',
-                              'national_id_number': 'N-1-11-111',
-                              'is_panamanian': False,
-                              'date_of_birth': '01-31-2001',
-                              'gender': 'Mujer',
-                              'address': 'Chiriquí',
-                              'home_phone': '333-3333',
-                              'mobile_phone': '6666-7777',
-                              'email': 'new_f_n@new_f_sn.com',
-                              'type_of_contract': 'Indefinido',
-                              'employment_date': '01-01-2019',
-                              'contract_expiration_date': '01-31-2019',
-                              'termination_date': '01-15-2019',
-                              'termination_reason': 'Renuncia',
-                              'salary_per_payment_period': '208.00',
-                              'representation_expenses_per_payment_period':
-                                  '100',
-                              'payment_method': 'Cheque',
-                              'is_active': True,
-                              'marital_status_id': 2,
-                              'department_id': self.get_department().id,
-                              'position_id': self.get_employment_position().id,
-                              'shift_id': self.get_shift().id
-                          }),
-                          headers=self.get_headers({
-                               'username': 'test_other_u',
-                               'password': 'test_p'
-                           }))
-
-                self.assertEqual(r.status_code, 403)
-
     def test_empl_delete_with_authentication(self):
         """
         Test that a DELETE request to the /employee/<int:employee_id>

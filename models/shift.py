@@ -141,8 +141,10 @@ class ShiftModel(ModelMixin, db.Model):
 
     @classmethod
     def find_by_id(cls, _id, user):
+        from models.organization import OrganizationModel
+
         shift = cls.query.filter_by(id=_id).first()
 
         if shift:
-            if user.is_super or user.organization_id == shift.organization_id:
+            if OrganizationModel.find_by_id(shift.organization_id, user):
                 return shift

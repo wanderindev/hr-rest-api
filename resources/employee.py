@@ -87,7 +87,6 @@ class Employee(Resource):
 
     @jwt_required()
     def get(self, employee_id):
-
         empl = EmployeeModel.find_by_id(employee_id, current_identity)
 
         if empl:
@@ -124,52 +123,47 @@ class Employee(Resource):
     def put(self,  employee_id):
         data = Employee.parser.parse_args()
 
-        if DepartmentModel.find_by_id(data['department_id'], current_identity):
-            empl = EmployeeModel.find_by_id(employee_id, current_identity)
+        empl = EmployeeModel.find_by_id(employee_id, current_identity)
 
-            if empl:
-                empl.first_name = data['first_name']
-                empl.second_name = data['second_name']
-                empl.first_surname = data['first_surname']
-                empl.second_surname = data['second_surname']
-                empl.national_id_number = data['national_id_number']
-                empl.is_panamanian = data['is_panamanian']
-                empl.date_of_birth = data['date_of_birth']
-                empl.gender = data['gender']
-                empl.address = data['address']
-                empl.home_phone = data['home_phone']
-                empl.mobile_phone = data['mobile_phone']
-                empl.email = data['email']
-                empl.type_of_contract = data['type_of_contract']
-                empl.employment_date = data['employment_date']
-                empl.contract_expiration_date = data['contract_expiration_date']
-                empl.termination_date = data['termination_date']
-                empl.termination_reason = data['termination_reason']
-                empl.salary_per_payment_period = data[
-                    'salary_per_payment_period']
-                empl.representation_expenses_per_payment_period = data[
-                    'representation_expenses_per_payment_period']
-                empl.payment_method = data['payment_method']
-                empl.marital_status_id = data['marital_status_id']
-                empl.department_id = data['department_id']
-                empl.position_id = data['position_id']
-                empl.shift_id = data['shift_id']
+        if empl:
+            empl.first_name = data['first_name']
+            empl.second_name = data['second_name']
+            empl.first_surname = data['first_surname']
+            empl.second_surname = data['second_surname']
+            empl.national_id_number = data['national_id_number']
+            empl.is_panamanian = data['is_panamanian']
+            empl.date_of_birth = data['date_of_birth']
+            empl.gender = data['gender']
+            empl.address = data['address']
+            empl.home_phone = data['home_phone']
+            empl.mobile_phone = data['mobile_phone']
+            empl.email = data['email']
+            empl.type_of_contract = data['type_of_contract']
+            empl.employment_date = data['employment_date']
+            empl.contract_expiration_date = data['contract_expiration_date']
+            empl.termination_date = data['termination_date']
+            empl.termination_reason = data['termination_reason']
+            empl.salary_per_payment_period = data[
+                'salary_per_payment_period']
+            empl.representation_expenses_per_payment_period = data[
+                'representation_expenses_per_payment_period']
+            empl.payment_method = data['payment_method']
+            empl.marital_status_id = data['marital_status_id']
+            empl.department_id = data['department_id']
+            empl.position_id = data['position_id']
+            empl.shift_id = data['shift_id']
 
-                try:
-                    _, empl = empl.update(data, ['is_active'])
-                    return {
-                               'message': 'Employee updated successfully.',
-                               'employee': empl.to_dict()
-                           }, 200
-                except exc.SQLAlchemyError:
-                    return {'message': 'An error occurred while updating '
-                                       'the employee.'}, 500
+            try:
+                _, empl = empl.update(data, ['is_active'])
+                return {
+                           'message': 'Employee updated successfully.',
+                           'employee': empl.to_dict()
+                       }, 200
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while updating '
+                                   'the employee.'}, 500
 
-            return {'message': 'Employee not found.'}, 404
-
-        return {'message': 'You are not allowed to move an employee to a '
-                           'department that does not belong to your'
-                           'organization.'}, 403
+        return {'message': 'Employee not found.'}, 404
 
     @jwt_required()
     def delete(self, employee_id):

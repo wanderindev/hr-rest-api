@@ -188,30 +188,6 @@ class TestBankAccount(BaseTest):
                                  2)
                 self.assertEqual(r.status_code, 200)
 
-    def test_bank_account_put_wrong_user(self):
-        """
-        Test that a PUT request to the /bank_account/<id:account_id>
-        endpoint returns status code 403 when trying to reassign an bank
-        account with a user without permission.
-        """
-        with self.app() as c:
-            with self.app_context():
-                r = c.put(f'/bank_account/'
-                          f'{self.get_bank_account().id}',
-                          data=json.dumps({
-                              'account_number': '4321',
-                              'account_type': 'Ahorro',
-                              'is_active': True,
-                              'employee_id': self.get_employee().id,
-                              'bank_id': 2,
-                          }),
-                          headers=self.get_headers({
-                              'username': 'test_other_u',
-                              'password': 'test_p'
-                          }))
-
-                self.assertEqual(r.status_code, 403)
-
     def test_b_acc_put_without_authentication(self):
         """
         Test that a PUT request to the /bank_account/<int:account_id>

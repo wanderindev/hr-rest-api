@@ -10,7 +10,7 @@ class TestOrganization(BaseTest):
         an OrganizationModel object.
         """
         super(TestOrganization, self).setUp()
-        self.o = OrganizationModel('test_o', True)
+        self.o = OrganizationModel('new_test_o', True)
 
     def test_save_to_db(self):
         """Test the save_to_db method of the ModelsMixin class."""

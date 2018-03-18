@@ -2,6 +2,7 @@ from flask_jwt import current_identity, jwt_required
 from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
+from models.organization import OrganizationModel
 from models.uniform_item import UniformItemModel
 
 
@@ -17,6 +18,7 @@ class UniformItem(Resource):
     @jwt_required()
     def get(self, item_id):
         u_i = UniformItemModel.find_by_id(item_id, current_identity)
+
         if u_i:
             return u_i.to_dict()
 
@@ -33,8 +35,8 @@ class UniformItem(Resource):
             return {'message': 'A uniform item with that name already '
                                'exists in the organization.'}, 400
 
-        if current_identity.organization_id == data['organization_id'] or \
-                current_identity.is_super:
+        if OrganizationModel.find_by_id(data['organization_id'],
+                                        current_identity):
             u_i = UniformItemModel(**data)
 
             try:
@@ -49,9 +51,6 @@ class UniformItem(Resource):
                            u_i.id, current_identity
                        ).to_dict()
                    }, 201
-
-        return {'message': 'You are not allowed to create a uniform item '
-                           'that does not belong to your organization.'}, 403
 
     @jwt_required()
     def put(self,  item_id):

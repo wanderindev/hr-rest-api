@@ -206,26 +206,6 @@ class TestSchedule(BaseTest):
 
                 self.assertEqual(r.status_code, 404)
 
-    def test_sch_put_wrong_user(self):
-        """
-        Test that a PUT request to the /schedule/<int:schedule_id>
-        endpoint returns status code 403 if the user making the request
-        does not have permission to modify the data.
-        """
-        with self.app() as c:
-            with self.app_context():
-                r = c.put(f'/schedule/{self.get_schedule().id}',
-                          data=json.dumps({
-                              'start_date': '2018-01-31',
-                              'department_id': self.get_department().id
-                          }),
-                          headers=self.get_headers({
-                               'username': 'test_other_u',
-                               'password': 'test_p'
-                           }))
-
-                self.assertEqual(r.status_code, 403)
-
     def test_sch_delete_with_authentication(self):
         """
         Test that a DELETE request to the /schedule/<int:schedule_id>

@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
 from models.shift import ShiftModel
-from utils import get_time
+from models.organization import OrganizationModel
 
 
 class Shift(Resource):
@@ -130,6 +130,7 @@ class Shift(Resource):
     @jwt_required()
     def get(self, shift_id):
         shift = ShiftModel.find_by_id(shift_id, current_identity)
+
         if shift:
             return shift.to_dict()
 
@@ -146,8 +147,8 @@ class Shift(Resource):
             return {'message': 'A shift with that name already '
                                'exists in the organization.'}, 400
 
-        if current_identity.organization_id == data['organization_id'] or \
-                current_identity.is_super:
+        if OrganizationModel.find_by_id(data['organization_id'],
+                                        current_identity):
             shift = ShiftModel(**data)
 
             try:

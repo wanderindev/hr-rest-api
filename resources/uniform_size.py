@@ -17,8 +17,8 @@ class UniformSize(Resource):
 
     @jwt_required()
     def get(self, size_id):
-
         u_s = UniformSizeModel.find_by_id(size_id, current_identity)
+
         if u_s:
             return u_s.to_dict()
 

@@ -1,6 +1,6 @@
 from db import db
+
 from models.mixin import ModelMixin
-from models.uniform_item import UniformItemModel
 
 
 class UniformRequirementModel(ModelMixin, db.Model):
@@ -23,11 +23,13 @@ class UniformRequirementModel(ModelMixin, db.Model):
         self.uniform_size_id = uniform_size_id
 
     @classmethod
-    def find_by_id(cls, _id, organization_id):
+    def find_by_id(cls, _id, user):
+        from models.employee import EmployeeModel
+        from models.uniform_item import UniformItemModel
+
         req = cls.query.filter_by(id=_id).first()
 
         if req:
-            if UniformItemModel.find_by_id(
-                    req.uniform_item_id,
-                    organization_id).organization_id == organization_id:
+            if UniformItemModel.find_by_id(req.uniform_item_id, user) and \
+                    EmployeeModel.find_by_id(req.employee_id, user):
                 return req

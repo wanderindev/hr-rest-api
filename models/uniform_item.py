@@ -22,8 +22,10 @@ class UniformItemModel(ModelMixin, db.Model):
 
     @classmethod
     def find_by_id(cls, _id, user):
+        from models.organization import OrganizationModel
+
         u_i = cls.query.filter_by(id=_id).first()
 
         if u_i:
-            if user.is_super or user.organization_id == u_i.organization_id:
+            if OrganizationModel.find_by_id(u_i.organization_id, user):
                 return u_i

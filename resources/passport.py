@@ -62,25 +62,20 @@ class Passport(Resource):
     def put(self,  passport_id):
         data = Passport.parser.parse_args()
 
-        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
-            passp = PassportModel.find_by_id(passport_id, current_identity)
+        passp = PassportModel.find_by_id(passport_id, current_identity)
 
-            if passp:
-                try:
-                    _, passp = passp.update(data)
-                    return {
-                       'message': 'Passport updated successfully.',
-                       'passport': passp.to_dict()
-                    }, 200
-                except exc.SQLAlchemyError:
-                    return {'message': 'An error occurred while updating '
-                                       'the passport.'}, 500
+        if passp:
+            try:
+                _, passp = passp.update(data)
+                return {
+                   'message': 'Passport updated successfully.',
+                   'passport': passp.to_dict()
+                }, 200
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while updating '
+                                   'the passport.'}, 500
 
-            return {'message': 'Passport not found.'}, 404
-
-        return {'message': 'You are not allowed to assign an passport '
-                           'to an employee that does not belong to your '
-                           'organization.'}, 403
+        return {'message': 'Passport not found.'}, 404
 
     @jwt_required()
     def delete(self, passport_id):

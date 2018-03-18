@@ -35,8 +35,8 @@ class Dependent(Resource):
 
     @jwt_required()
     def get(self, dependent_id):
-
         depen = DependentModel.find_by_id(dependent_id, current_identity)
+
         if depen:
             return depen.to_dict()
 
@@ -71,25 +71,20 @@ class Dependent(Resource):
     def put(self,  dependent_id):
         data = Dependent.parser.parse_args()
 
-        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
-            depen = DependentModel.find_by_id(dependent_id, current_identity)
+        depen = DependentModel.find_by_id(dependent_id, current_identity)
 
-            if depen:
-                try:
-                    _, depen = depen.update(data)
-                    return {
-                       'message': 'Dependent updated successfully.',
-                       'dependent': depen.to_dict()
-                    }, 200
-                except exc.SQLAlchemyError:
-                    return {'message': 'An error occurred while updating '
-                                       'the dependent.'}, 500
+        if depen:
+            try:
+                _, depen = depen.update(data)
+                return {
+                   'message': 'Dependent updated successfully.',
+                   'dependent': depen.to_dict()
+                }, 200
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while updating '
+                                   'the dependent.'}, 500
 
-            return {'message': 'Dependent not found.'}, 404
-
-        return {'message': 'You are not allowed to assign an dependent '
-                           'to an employee that does not belong to your '
-                           'organization.'}, 403
+        return {'message': 'Dependent not found.'}, 404
 
     @jwt_required()
     def delete(self, dependent_id):

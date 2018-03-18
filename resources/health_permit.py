@@ -59,30 +59,25 @@ class HealthPermit(Resource):
     def put(self,  permit_id):
         data = HealthPermit.parser.parse_args()
 
-        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
-            h_p = HealthPermitModel.find_by_id(permit_id, current_identity)
+        h_p = HealthPermitModel.find_by_id(permit_id, current_identity)
 
-            if h_p:
-                h_p.health_permit_type = data['health_permit_type']
-                h_p.issue_date = data['issue_date']
-                h_p.expiration_date = data['expiration_date']
-                h_p.employee_id = data['employee_id']
+        if h_p:
+            h_p.health_permit_type = data['health_permit_type']
+            h_p.issue_date = data['issue_date']
+            h_p.expiration_date = data['expiration_date']
+            h_p.employee_id = data['employee_id']
 
-                try:
-                    _, h_p = h_p.update(data)
-                    return {
-                       'message': 'Health permit updated successfully.',
-                       'health_permit': h_p.to_dict()
-                    }, 200
-                except exc.SQLAlchemyError:
-                    return {'message': 'An error occurred while updating '
-                                       'the health permit.'}, 500
+            try:
+                _, h_p = h_p.update(data)
+                return {
+                   'message': 'Health permit updated successfully.',
+                   'health_permit': h_p.to_dict()
+                }, 200
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while updating '
+                                   'the health permit.'}, 500
 
-            return {'message': 'Health permit not found.'}, 404
-
-        return {'message': 'You are not allowed to assign a health permit '
-                           'to an employee that does not belong to your '
-                           'organization.'}, 403
+        return {'message': 'Health permit not found.'}, 404
 
     @jwt_required()
     def delete(self, permit_id):

@@ -181,31 +181,6 @@ class TestEmergencyContact(BaseTest):
                                  self.get_employee().id)
                 self.assertEqual(r.status_code, 200)
 
-    def test_e_cont_put_wrong_user(self):
-        """
-        Test that a PUT request to the /emergency_contact/<id:contact_id>
-        endpoint returns status code 403 when trying to reassign an emergency
-        contact with a user without permission.
-        """
-        with self.app() as c:
-            with self.app_context():
-                r = c.put(f'/emergency_contact/'
-                          f'{self.get_emergency_contact().id}',
-                          data=json.dumps({
-                              'first_name': 'new_f_n',
-                              'last_name': 'new_l_n',
-                              'home_phone': '333-3333',
-                              'work_phone': '444-4444',
-                              'mobile_phone': '6666-7777',
-                              'employee_id': self.get_employee().id + 1
-                          }),
-                          headers=self.get_headers({
-                              'username': 'test_other_u',
-                              'password': 'test_p'
-                          }))
-
-                self.assertEqual(r.status_code, 403)
-
     def test_e_cont_put_without_authentication(self):
         """
         Test that a PUT request to the /emergency_contact/<id:contact_id>

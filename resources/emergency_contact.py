@@ -65,26 +65,21 @@ class EmergencyContact(Resource):
     def put(self,  contact_id):
         data = EmergencyContact.parser.parse_args()
 
-        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
-            e_cont = EmergencyContactModel.find_by_id(contact_id,
-                                                      current_identity)
+        e_cont = EmergencyContactModel.find_by_id(contact_id,
+                                                  current_identity)
 
-            if e_cont:
-                try:
-                    _, e_cont = e_cont.update(data)
-                    return {
-                       'message': 'Emergency contact updated successfully.',
-                       'emergency_contact': e_cont.to_dict()
-                    }, 200
-                except exc.SQLAlchemyError:
-                    return {'message': 'An error occurred while updating '
-                                       'the emergency contact.'}, 500
+        if e_cont:
+            try:
+                _, e_cont = e_cont.update(data)
+                return {
+                   'message': 'Emergency contact updated successfully.',
+                   'emergency_contact': e_cont.to_dict()
+                }, 200
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while updating '
+                                   'the emergency contact.'}, 500
 
-            return {'message': 'Emergency contact not found.'}, 404
-
-        return {'message': 'You are not allowed to assign an emergency contact '
-                           'to an employee that does not belong to your '
-                           'organization.'}, 403
+        return {'message': 'Emergency contact not found.'}, 404
 
     @jwt_required()
     def delete(self, contact_id):

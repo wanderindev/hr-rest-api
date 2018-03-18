@@ -187,32 +187,6 @@ class TestDependent(BaseTest):
                 self.assertEqual(depen['family_relation_id'], 2)
                 self.assertEqual(r.status_code, 200)
 
-    def test_depen_put_wrong_user(self):
-        """
-        Test that a PUT request to the /dependent/<id:dependent_id>
-        endpoint returns status code 403 when trying to reassign an emergency
-        contact with a user without permission.
-        """
-        with self.app() as c:
-            with self.app_context():
-                r = c.put(f'/dependent/{self.get_dependent().id}',
-                          data=json.dumps({
-                              'first_name': 'new_f_n',
-                              'second_name': 'new_s_n',
-                              'first_surname': 'new_f_sn',
-                              'second_surname': 'new_s_sn',
-                              'gender': 'Hombre',
-                              'date_of_birth': '2018-01-31',
-                              'employee_id': self.get_employee().id,
-                              'family_relation_id': 2
-                          }),
-                          headers=self.get_headers({
-                              'username': 'test_other_u',
-                              'password': 'test_p'
-                          }))
-
-                self.assertEqual(r.status_code, 403)
-
     def test_depen_put_without_authentication(self):
         """
         Test that a PUT request to the /dependent/<id:dependent_id>

@@ -162,28 +162,6 @@ class TestHealthPermit(BaseTest):
                                  self.get_employee().id)
                 self.assertEqual(r.status_code, 200)
 
-    def test_h_perm_put_wrong_user(self):
-        """
-        Test that a PUT request to the /health_permit/<id:permit_id>
-        endpoint returns status code 403 when trying to reassign a
-        health permit with a user without permission.
-        """
-        with self.app() as c:
-            with self.app_context():
-                r = c.put(f'/health_permit/{self.get_health_permit().id}',
-                          data=json.dumps({
-                              'health_permit_type': 'Verde',
-                              'issue_date': '2018-1-31',
-                              'expiration_date': '2019-1-31',
-                              'employee_id': self.get_employee().id
-                          }),
-                          headers=self.get_headers({
-                              'username': 'test_other_u',
-                              'password': 'test_p'
-                          }))
-
-                self.assertEqual(r.status_code, 403)
-
     def test_h_perm_put_without_authentication(self):
         """
         Test that a PUT request to the /health_permit/<id:permit_id>

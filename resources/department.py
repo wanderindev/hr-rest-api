@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
 from models.department import DepartmentModel
+from models.organization import OrganizationModel
 
 
 class Department(Resource):
@@ -38,8 +39,8 @@ class Department(Resource):
             return {'message': 'A department with that name already '
                                'exists in the organization.'}, 400
 
-        if current_identity.organization_id == data['organization_id'] or \
-                current_identity.is_super:
+        if OrganizationModel.find_by_id(data['organization_id'],
+                                        current_identity):
             dept = DepartmentModel(**data)
 
             try:

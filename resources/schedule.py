@@ -62,25 +62,20 @@ class Schedule(Resource):
             return {'message': 'A schedule for that department and date '
                                'already exists in the table.'}, 400
 
-        if DepartmentModel.find_by_id(data['department_id'], current_identity):
-            sch = ScheduleModel.find_by_id(schedule_id, current_identity)
+        sch = ScheduleModel.find_by_id(schedule_id, current_identity)
 
-            if sch:
-                try:
-                    _, sch = sch.update(data)
-                    return {
-                       'message': 'Schedule updated successfully.',
-                       'schedule': sch.to_dict()
-                    }, 200
-                except exc.SQLAlchemyError:
-                    return {'message': 'An error occurred while updating '
-                                       'the schedule.'}, 500
+        if sch:
+            try:
+                _, sch = sch.update(data)
+                return {
+                   'message': 'Schedule updated successfully.',
+                   'schedule': sch.to_dict()
+                }, 200
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while updating '
+                                   'the schedule.'}, 500
 
-            return {'message': 'Schedule not found.'}, 404
-
-        return {'message': 'You are not allowed to move a schedule to a '
-                           'department that does not belong to your'
-                           'organization.'}, 403
+        return {'message': 'Schedule not found.'}, 404
 
     @jwt_required()
     def delete(self, schedule_id):

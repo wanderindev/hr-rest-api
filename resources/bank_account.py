@@ -27,8 +27,8 @@ class BankAccount(Resource):
 
     @jwt_required()
     def get(self, account_id):
-
         b_acc = BankAccountModel.find_by_id(account_id, current_identity)
+
         if b_acc:
             return b_acc.to_dict()
 
@@ -77,25 +77,20 @@ class BankAccount(Resource):
             return {'message': 'A bank account with same number and bank_id '
                                'already exists.'}, 400
 
-        if EmployeeModel.find_by_id(data['employee_id'], current_identity):
-            b_acc = BankAccountModel.find_by_id(account_id, current_identity)
+        b_acc = BankAccountModel.find_by_id(account_id, current_identity)
 
-            if b_acc:
-                try:
-                    _, b_acc = b_acc.update(data, ['is_active', 'employee_id'])
-                    return {
-                       'message': 'Bank account updated successfully.',
-                       'bank_account': b_acc.to_dict()
-                    }, 200
-                except exc.SQLAlchemyError:
-                    return {'message': 'An error occurred while updating '
-                                       'the bank_account.'}, 500
+        if b_acc:
+            try:
+                _, b_acc = b_acc.update(data, ['is_active', 'employee_id'])
+                return {
+                   'message': 'Bank account updated successfully.',
+                   'bank_account': b_acc.to_dict()
+                }, 200
+            except exc.SQLAlchemyError:
+                return {'message': 'An error occurred while updating '
+                                   'the bank_account.'}, 500
 
-            return {'message': 'Bank account not found.'}, 404
-
-        return {'message': 'You are not allowed to modify a bank account '
-                           'for an employee that does not belong to your '
-                           'organization.'}, 403
+        return {'message': 'Bank account not found.'}, 404
 
     @jwt_required()
     def delete(self, account_id):

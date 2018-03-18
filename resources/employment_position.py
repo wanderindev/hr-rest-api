@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import exc
 
 from models.employment_position import EmploymentPositionModel
+from models.organization import OrganizationModel
 
 
 class EmploymentPosition(Resource):
@@ -27,6 +28,7 @@ class EmploymentPosition(Resource):
     @jwt_required()
     def get(self, position_id):
         e_p = EmploymentPositionModel.find_by_id(position_id, current_identity)
+
         if e_p:
             return e_p.to_dict()
 
@@ -46,8 +48,8 @@ class EmploymentPosition(Resource):
             return {'message': 'An employment position with that name already '
                                'exists in the organization.'}, 400
 
-        if current_identity.organization_id == data['organization_id'] or \
-                current_identity.is_super:
+        if OrganizationModel.find_by_id(data['organization_id'],
+                                        current_identity):
             e_p = EmploymentPositionModel(**data)
 
             try:

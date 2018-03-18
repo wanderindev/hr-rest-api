@@ -109,7 +109,5 @@ class EmployeeModel(ModelMixin, db.Model):
         empl = cls.query.filter_by(id=_id).first()
 
         if empl:
-            dept = DepartmentModel.find_by_id(empl.department_id, user)
-
-            if dept:
+            if DepartmentModel.find_by_id(empl.department_id, user):
                 return empl

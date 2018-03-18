@@ -24,8 +24,10 @@ class DepartmentModel(ModelMixin, db.Model):
 
     @classmethod
     def find_by_id(cls, _id, user):
+        from models.organization import OrganizationModel
+
         dept = cls.query.filter_by(id=_id).first()
 
         if dept:
-            if user.is_super or user.organization_id == dept.organization_id:
+            if OrganizationModel.find_by_id(dept.organization_id, user):
                 return dept
