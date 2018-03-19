@@ -60,7 +60,7 @@ class UniformItem(Resource):
 
         if u_i:
             try:
-                _, u_i = u_i.update(data, ['organization_id'])
+                _, u_i = u_i.update(data, ('organization_id'))
                 return {
                    'message': 'Uniform item updated successfully.',
                    'uniform_item': u_i.to_dict()

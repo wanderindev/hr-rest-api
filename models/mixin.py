@@ -54,9 +54,11 @@ class ModelMixin(object):
 
         return output
 
-    def update(self, data, exclude=[]):
+    def update(self, data, exclude=()):
         for key, value in data.items():
-            if key not in exclude:
+            if key is 'password':
+                setattr(self, 'password_hash', self.get_password_hash(value))
+            elif key not in exclude:
                 setattr(self, key, value)
         self.save_to_db()
 

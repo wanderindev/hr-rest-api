@@ -81,7 +81,7 @@ class BankAccount(Resource):
 
         if b_acc:
             try:
-                _, b_acc = b_acc.update(data, ['is_active', 'employee_id'])
+                _, b_acc = b_acc.update(data, ('is_active', 'employee_id'))
                 return {
                    'message': 'Bank account updated successfully.',
                    'bank_account': b_acc.to_dict()

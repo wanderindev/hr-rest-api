@@ -76,7 +76,7 @@ class User(Resource):
 
         if user:
             try:
-                _, user = user.update(data, ['is_active', 'organization_id'])
+                _, user = user.update(data, ('is_active', 'organization_id'))
                 return {
                            'message': 'User updated successfully.',
                            'user': user.to_dict()

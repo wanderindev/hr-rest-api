@@ -175,7 +175,7 @@ class Shift(Resource):
 
         if shift:
             try:
-                _, shift = shift.update(data, ['is_active', 'organization_id'])
+                _, shift = shift.update(data, ('is_active', 'organization_id'))
                 return {
                            'message': 'Shift updated successfully.',
                            'shift': shift.to_dict()

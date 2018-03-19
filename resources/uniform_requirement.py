@@ -84,7 +84,7 @@ class UniformRequirement(Resource):
 
             if u_r:
                 try:
-                    _, u_r = u_r.update(data, ['employee_id, uniform_item_id'])
+                    _, u_r = u_r.update(data, ('employee_id, uniform_item_id'))
                     return {
                        'message': 'Uniform requirement updated successfully.',
                        'uniform_requirement': u_r.to_dict()

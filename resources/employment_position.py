@@ -78,7 +78,7 @@ class EmploymentPosition(Resource):
 
         if e_p:
             try:
-                _, e_p = e_p.update(data, ['is_active', 'organization_id'])
+                _, e_p = e_p.update(data, ('is_active', 'organization_id'))
                 return {
                    'message': 'Employment position updated '
                               'successfully.',

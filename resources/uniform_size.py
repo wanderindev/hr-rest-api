@@ -65,7 +65,7 @@ class UniformSize(Resource):
 
         if u_s:
             try:
-                _, u_s = u_s.update(data, ['uniform_item_id'])
+                _, u_s = u_s.update(data, ('uniform_item_id'))
                 return {
                    'message': 'Uniform size updated successfully.',
                    'uniform_size': u_s.to_dict()

@@ -70,7 +70,7 @@ class Department(Resource):
             dept.department_name = data['department_name']
 
             try:
-                _, dept = dept.update(data, ['is_active', 'organization_id'])
+                _, dept = dept.update(data, ('is_active', 'organization_id'))
                 return {
                    'message': 'Department updated successfully.',
                    'department': dept.to_dict()
