@@ -1,5 +1,6 @@
 from db import db
 from models.department import DepartmentModel
+from models.schedule_detail import ScheduleDetailModel
 from models.mixin import ModelMixin
 
 
@@ -12,6 +13,10 @@ class ScheduleModel(ModelMixin, db.Model):
                               db.ForeignKey('department.id'),
                               nullable=False, index=True)
 
+    schedule_details = db.relationship(ScheduleDetailModel,
+                                       backref='schedule',
+                                       lazy='joined')
+
     def __init__(self, start_date, department_id):
         self.start_date = start_date
         self.department_id = department_id
@@ -22,4 +27,4 @@ class ScheduleModel(ModelMixin, db.Model):
 
         if sch:
             if DepartmentModel.find_by_id(sch.department_id, user):
-                   return sch
+                return sch

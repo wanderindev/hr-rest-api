@@ -15,6 +15,7 @@ from models.health_permit import HealthPermitModel
 from models.organization import OrganizationModel
 from models.passport import PassportModel
 from models.schedule import ScheduleModel
+from models.schedule_detail import ScheduleDetailModel
 from models.shift import ShiftModel
 from models.uniform_item import UniformItemModel
 from models.uniform_requirement import UniformRequirementModel
@@ -73,6 +74,7 @@ class BaseTest(TestCase):
             HealthPermitModel.query.delete()
             PassportModel.query.delete()
             UniformRequirementModel.query.delete()
+            ScheduleDetailModel.query.delete()
             ScheduleModel.query.delete()
             EmployeeModel.query.delete()
             EmploymentPositionModel.query.delete()
@@ -323,3 +325,32 @@ class BaseTest(TestCase):
             }
 
             return self.get_object(ScheduleModel, _dict)
+
+    def get_schedule_detail(self, _dict=None):
+        with self.app_context():
+            _dict = _dict or {
+                'day_1_start': '2018-01-01 06:00:00',
+                'day_1_end': '2018-01-01 14:00:00',
+                'day_1_comment': 'comment 1',
+                'day_2_start': '2018-01-02 06:00:00',
+                'day_2_end': '2018-01-02 14:00:00',
+                'day_2_comment': 'comment 2',
+                'day_3_start': '2018-01-03 06:00:00',
+                'day_3_end': '2018-01-03 14:00:00',
+                'day_3_comment': 'comment 3',
+                'day_4_start': '2018-01-04 06:00:00',
+                'day_4_end': '2018-01-04 14:00:00',
+                'day_4_comment': 'comment 4',
+                'day_5_start': None,
+                'day_5_end': None,
+                'day_5_comment': None,
+                'day_6_start': '2018-01-06 22:00:00',
+                'day_6_end': '2018-01-07 06:00:00',
+                'day_6_comment': 'comment 6',
+                'day_7_start': '2018-01-07 22:00:00',
+                'day_7_end': '2018-01-08 06:00:00',
+                'day_7_comment': 'comment 7',
+                'employee_id': self.get_employee().id,
+                'schedule_id': self.get_schedule().id
+            }
+            return self.get_object(ScheduleDetailModel, _dict)
