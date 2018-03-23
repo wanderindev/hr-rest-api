@@ -95,7 +95,7 @@ class TestDependent(BaseTest):
 
     def test_depen_get_with_authentication(self):
         """
-        Test that a GET request to the /dependent/<id:dependent_id>
+        Test that a GET request to the /dependent/<int:dependent_id>
         endpoint returns the correct dependent and status code 200 if
         the user is authenticated.
         """
@@ -126,7 +126,7 @@ class TestDependent(BaseTest):
 
     def test_depen_get_not_found(self):
         """
-        Test that a GET request to the /dependent/<id:dependent_id>
+        Test that a GET request to the /dependent/<int:dependent_id>
         endpoint returns status code 404 if the dependent is not
         found in the database table.
         """
@@ -139,7 +139,7 @@ class TestDependent(BaseTest):
 
     def test_depen_get_without_authentication(self):
         """
-        Test that a GET request to the /dependent/<id:dependent_id>
+        Test that a GET request to the /dependent/<int:dependent_id>
         returns status code 401 if the user is not authenticated.
         """
         with self.app() as c:
@@ -156,7 +156,7 @@ class TestDependent(BaseTest):
 
     def test_depen_put_with_authentication(self):
         """
-        Test that a PUT request to the /dependent/<id:dependent_id>
+        Test that a PUT request to the /dependent/<int:dependent_id>
         endpoint returns status code 200.
         """
         with self.app() as c:
@@ -189,7 +189,7 @@ class TestDependent(BaseTest):
 
     def test_depen_put_without_authentication(self):
         """
-        Test that a PUT request to the /dependent/<id:dependent_id>
+        Test that a PUT request to the /dependent/<int:dependent_id>
         endpoint returns status code 401 if the user is not authenticated.
         """
         with self.app() as c:
@@ -216,7 +216,7 @@ class TestDependent(BaseTest):
 
     def test_depen_put_not_found(self):
         """
-        Test that a PUT request to the /dependent/<id:dependent_id>
+        Test that a PUT request to the /dependent/<int:dependent_id>
         endpoint returns status code 404 if the dependent is not
         in the database.
         """
@@ -239,7 +239,7 @@ class TestDependent(BaseTest):
 
     def test_depen_delete_with_authentication(self):
         """
-        Test that a DELETE request to the /dependent/<id:dependent_id>
+        Test that a DELETE request to the /dependent/<int:dependent_id>
         endpoint returns status code 200.
         """
         with self.app() as c:
@@ -251,7 +251,7 @@ class TestDependent(BaseTest):
 
     def test_depen_delete_without_authentication(self):
         """
-        Test that a DELETE request to the /dependent/<id:dependent_id>
+        Test that a DELETE request to the /dependent/<int:dependent_id>
         endpoint returns status code 401 if user is not authenticated.
         """
         with self.app() as c:
@@ -268,7 +268,7 @@ class TestDependent(BaseTest):
 
     def test_depen_delete_not_found(self):
         """
-        Test that a DELETE request to the /dependent/<id:dependent_id>
+        Test that a DELETE request to the /dependent/<int:dependent_id>
         endpoint returns status code 404 if the dependent is not found.
         """
         with self.app() as c:
