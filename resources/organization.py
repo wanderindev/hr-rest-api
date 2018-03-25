@@ -63,7 +63,7 @@ class Organization(Resource):
 
         if organization:
             try:
-                _, organization = organization.update(data, ('is_active'))
+                _, organization = organization.update(data, ('is_active',))
                 return {
                            'message': 'Organization updated successfully.',
                            'organization': organization.to_dict()

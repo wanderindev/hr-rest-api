@@ -154,7 +154,7 @@ class Employee(Resource):
             empl.shift_id = data['shift_id']
 
             try:
-                _, empl = empl.update(data, ('is_active'))
+                _, empl = empl.update(data, ('is_active',))
                 return {
                            'message': 'Employee updated successfully.',
                            'employee': empl.to_dict()

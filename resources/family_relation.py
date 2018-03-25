@@ -9,4 +9,4 @@ class FamilyRelationList(Resource):
     @jwt_required()
     def get(self):
         return {'family_relations': list(map(lambda x: x.to_dict(),
-                                            FamilyRelationModel.find_all()))}
+                                         FamilyRelationModel.find_all()))}

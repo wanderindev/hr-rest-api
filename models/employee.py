@@ -7,6 +7,7 @@ from models.emergency_contact import EmergencyContactModel
 from models.health_permit import HealthPermitModel
 from models.mixin import ModelMixin
 from models.passport import PassportModel
+from models.payment import PaymentModel
 from models.uniform_requirement import UniformRequirementModel
 
 
@@ -66,6 +67,9 @@ class EmployeeModel(ModelMixin, db.Model):
     dependents = db.relationship(DependentModel,
                                  backref='employee',
                                  lazy='joined')
+    payments = db.relationship(PaymentModel,
+                               backref='employee',
+                               lazy='joined')
 
     def __init__(self, first_name, second_name, first_surname, second_surname,
                  national_id_number, is_panamanian, date_of_birth, gender,

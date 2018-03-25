@@ -146,7 +146,7 @@ class TestDependent(BaseTest):
             with self.app_context():
                 # Send the GET request to the endpoint with
                 # wrong authentication header.
-                r = c.get(f'/dependent/1',
+                r = c.get(f'/dependent/{self.get_dependent().id}',
                           headers={
                               'Content-Type': 'application/json',
                               'Authorization': 'JWT FaKeToKeN!!'

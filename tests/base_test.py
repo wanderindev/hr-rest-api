@@ -14,6 +14,7 @@ from models.employment_position import EmploymentPositionModel
 from models.health_permit import HealthPermitModel
 from models.organization import OrganizationModel
 from models.passport import PassportModel
+from models.payment import PaymentModel
 from models.schedule import ScheduleModel
 from models.schedule_detail import ScheduleDetailModel
 from models.shift import ShiftModel
@@ -76,6 +77,7 @@ class BaseTest(TestCase):
             UniformRequirementModel.query.delete()
             ScheduleDetailModel.query.delete()
             ScheduleModel.query.delete()
+            PaymentModel.query.delete()
             EmployeeModel.query.delete()
             EmploymentPositionModel.query.delete()
             ShiftModel.query.delete()
@@ -354,3 +356,13 @@ class BaseTest(TestCase):
                 'schedule_id': self.get_schedule().id
             }
             return self.get_object(ScheduleDetailModel, _dict)
+
+    def get_payment(self, _dict=None):
+        with self.app_context():
+            _dict = _dict or {
+                'payment_date': '2018-01-01',
+                'document_number': '1234-abc',
+                'employee_id': self.get_employee().id
+            }
+
+            return self.get_object(PaymentModel, _dict)
