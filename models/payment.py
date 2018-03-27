@@ -1,5 +1,6 @@
 from db import db
 from models.mixin import ModelMixin
+from models.payment_detail import PaymentDetailModel
 
 
 class PaymentModel(ModelMixin, db.Model):
@@ -11,6 +12,10 @@ class PaymentModel(ModelMixin, db.Model):
     employee_id = db.Column(db.Integer,
                             db.ForeignKey('employee.id'),
                             nullable=False, index=True)
+
+    payment_details = db.relationship(PaymentDetailModel,
+                                      backref='payment',
+                                      lazy='joined')
 
     def __init__(self, payment_date, document_number, employee_id):
         self.payment_date = payment_date

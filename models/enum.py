@@ -8,11 +8,18 @@ DAYS_OF_WEEK = db.Enum('Lunes', 'Martes', 'Miércoles', 'Jueves',
 
 GENDER = db.Enum('Mujer', 'Hombre', name='gender')
 
+HEALTH_PERMIT_TYPE = db.Enum('Blanco', 'Verde', name='health_permit_type')
+
 PAYMENT_METHOD = db.Enum('Efectivo', 'Cheque', 'ACH', name='payment_method')
 
 PAYMENT_PERIOD = db.Enum('Diario', 'Semanal', 'Bisemanal',
                          'Quincenal', 'Mensual',
                          name='payment_period')
+
+PAYMENT_TYPE = db.Enum('Salario Regular', 'Sobre Tiempo', 'Vacación',
+                       'XIII Mes', 'Bonificación', 'Prima de Antigüedad',
+                       'Indemnización', 'Prima de Producción',
+                       'Gasto de Representación', name='payment_type')
 
 TERMINATION_REASON = db.Enum('Renuncia', 'Período de Prueba',
                              'Expiración de Contrato',
@@ -20,5 +27,3 @@ TERMINATION_REASON = db.Enum('Renuncia', 'Período de Prueba',
                              name='termination_reason')
 
 TYPE_OF_CONTRACT = db.Enum('Definido', 'Indefinido', name='type_of_contract')
-
-HEALTH_PERMIT_TYPE = db.Enum('Blanco', 'Verde', name='health_permit_type')
