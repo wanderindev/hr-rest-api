@@ -73,13 +73,15 @@ class Creditor(Resource):
         cred = CreditorModel.find_by_id(creditor_id, current_identity)
 
         if cred:
-            cred.department_name = data['department_name']
+            cred.creditor_name = data['creditor_name']
+            cred.phone_number = data['phone_number']
+            cred.email = data['email']
 
             try:
                 _, cred = cred.update(data, ('is_active', 'organization_id'))
                 return {
                    'message': 'Creditor updated successfully.',
-                   'department': cred.to_dict()
+                   'creditor': cred.to_dict()
                 }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while updating '
