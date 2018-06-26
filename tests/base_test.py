@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash
 from app import create_app
 from db import db
 from models.bank_account import BankAccountModel
+from models.creditor import CreditorModel
 from models.department import DepartmentModel
 from models.dependent import DependentModel
 from models.emergency_contact import EmergencyContactModel
@@ -78,6 +79,7 @@ class BaseTest(TestCase):
             UniformRequirementModel.query.delete()
             ScheduleDetailModel.query.delete()
             ScheduleModel.query.delete()
+            CreditorModel.query.delete()
             PaymentDetailModel.query.delete()
             PaymentModel.query.delete()
             EmployeeModel.query.delete()
@@ -381,3 +383,15 @@ class BaseTest(TestCase):
             }
 
             return self.get_object(PaymentDetailModel, _dict)
+
+    def get_creditor(self, _dict=None):
+        with self.app_context():
+            _dict = _dict or {
+                'creditor_name': 'test_cr',
+                'phone_number': '123-4567',
+                'email': 'test@test_cr.com',
+                'organization_id': self.get_organization().id,
+                'is_active': True
+            }
+
+            return self.get_object(CreditorModel, _dict)

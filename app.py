@@ -5,6 +5,7 @@ from flask_restful import Api
 from resources.bank import BankList
 from resources.bank_account import ActivateBankAccount, BankAccount
 from resources.country import CountryList
+from resources.creditor import ActivateCreditor, Creditor
 from resources.department import ActivateDepartment, Department
 from resources.dependent import Dependent
 from resources.emergency_contact import EmergencyContact
@@ -159,5 +160,11 @@ def create_app(config_file=None):
     api.add_resource(PaymentDetail,
                      '/payment_detail',
                      '/payment_detail/<int:detail_id>')
+
+    api.add_resource(Creditor,
+                     '/creditor',
+                     '/creditor/<int:creditor_id>')
+    api.add_resource(ActivateCreditor,
+                     '/activate_creditor/<int:creditor_id>')
 
     return app

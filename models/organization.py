@@ -1,4 +1,5 @@
 from db import db
+from models.creditor import CreditorModel
 from models.department import DepartmentModel
 from models.employment_position import EmploymentPositionModel
 from models.mixin import ModelMixin
@@ -33,6 +34,10 @@ class OrganizationModel(ModelMixin, db.Model):
     uniform_items = db.relationship(UniformItemModel,
                                     backref='organization',
                                     lazy='joined')
+
+    creditors = db.relationship(CreditorModel,
+                                backref='organization',
+                                lazy='joined')
 
     def __init__(self, organization_name, is_active):
         self.organization_name = organization_name

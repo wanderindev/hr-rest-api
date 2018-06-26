@@ -12,3 +12,4 @@ class TestDepartment(TestCase):
 
         self.assertEqual(self.d.department_name, 'test_d')
         self.assertEqual(self.d.organization_id, 1)
+        self.assertTrue(self.d.is_active)
