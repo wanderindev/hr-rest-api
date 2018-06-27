@@ -1,5 +1,7 @@
 from db import db
+from models.deduction import DeductionModel
 from models.mixin import ModelMixin
+
 
 
 class CreditorModel(ModelMixin, db.Model):
@@ -13,6 +15,10 @@ class CreditorModel(ModelMixin, db.Model):
     organization_id = db.Column(db.Integer,
                                 db.ForeignKey('organization.id'),
                                 nullable=False, index=True)
+
+    deductions = db.relationship(DeductionModel,
+                                 backref='creditor',
+                                 lazy='joined')
 
     def __init__(self, creditor_name, phone_number,
                  email, organization_id, is_active):
