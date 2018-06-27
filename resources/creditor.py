@@ -13,7 +13,7 @@ class Creditor(Resource):
                         required=True)
     parser.add_argument('phone_number',
                         type=str,
-                        required=True)
+                        required=False)
     parser.add_argument('email',
                         type=str,
                         required=False)
