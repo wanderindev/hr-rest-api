@@ -178,7 +178,7 @@ class TestDeduction(BaseTest):
                 ded = json.loads(r.data)['deduction']
 
                 self.assertEqual(ded['start_date'], '2018-02-01')
-                self.assertEqual(ded['end_date'], '2018-02-31')
+                self.assertEqual(ded['end_date'], '2018-02-28')
                 self.assertEqual(float(ded['deduction_per_payment_period']),
                                  45.67)
                 self.assertEqual(ded['payment_method'], 'Efectivo')
