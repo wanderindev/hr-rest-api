@@ -1,4 +1,5 @@
 from db import db
+from models.deduction_detail import DeductionDetailModel
 from models.enum import PAYMENT_METHOD
 from models.mixin import ModelMixin
 
@@ -19,6 +20,10 @@ class DeductionModel(ModelMixin, db.Model):
     creditor_id = db.Column(db.Integer,
                             db.ForeignKey('creditor.id'),
                             nullable=False, index=True)
+
+    deduction_details = db.relationship(DeductionDetailModel,
+                                        backref='deduction',
+                                        lazy='joined')
 
     def __init__(self, start_date, end_date, deduction_per_payment_period,
                  payment_method, deduct_in_december, is_active,
