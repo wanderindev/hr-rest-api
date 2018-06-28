@@ -38,7 +38,7 @@ class TestDeduction(BaseTest):
         """ Test that the creditor object contains an deductions list. """
         with self.app_context():
             ded_list = DeductionModel.query.filter_by(
-                employee_id=self.e.id).all()
+                creditor_id=self.cr.id).all()
             ded_list_in_creditor = CreditorModel.find_by_id(
                 self.cr.id, self.u).deductions
 

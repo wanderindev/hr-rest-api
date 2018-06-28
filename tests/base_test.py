@@ -8,6 +8,7 @@ from db import db
 from models.bank_account import BankAccountModel
 from models.creditor import CreditorModel
 from models.deduction import DeductionModel
+from models.deduction_detail import DeductionDetailModel
 from models.department import DepartmentModel
 from models.dependent import DependentModel
 from models.emergency_contact import EmergencyContactModel
@@ -80,6 +81,7 @@ class BaseTest(TestCase):
             UniformRequirementModel.query.delete()
             ScheduleDetailModel.query.delete()
             ScheduleModel.query.delete()
+            DeductionDetailModel.query.delete()
             DeductionModel.query.delete()
             CreditorModel.query.delete()
             PaymentDetailModel.query.delete()
@@ -407,8 +409,18 @@ class BaseTest(TestCase):
                 'payment_method': 'Cheque',
                 'deduct_in_december': True,
                 'is_active': True,
-                'employee_id': self.get_organization().id,
+                'employee_id': self.get_employee().id,
                 'creditor_id': self.get_creditor().id
             }
 
             return self.get_object(DeductionModel, _dict)
+
+    def get_deduction_detail(self, _dict=None):
+        with self.app_context():
+            _dict = _dict or {
+                'deducted_amount': 67.89,
+                'payment_id': self.get_payment().id,
+                'deduction_id': self.get_deduction().id
+            }
+
+            return self.get_object(DeductionDetailModel, _dict)

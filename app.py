@@ -7,6 +7,7 @@ from resources.bank_account import ActivateBankAccount, BankAccount
 from resources.country import CountryList
 from resources.creditor import ActivateCreditor, Creditor
 from resources.deduction import ActivateDeduction, Deduction
+from resources.deduction_detail import DeductionDetail
 from resources.department import ActivateDepartment, Department
 from resources.dependent import Dependent
 from resources.emergency_contact import EmergencyContact
@@ -173,5 +174,9 @@ def create_app(config_file=None):
                      '/deduction/<int:deduction_id>')
     api.add_resource(ActivateDeduction,
                      '/activate_deduction/<int:deduction_id>')
+
+    api.add_resource(DeductionDetail,
+                     '/deduction_detail',
+                     '/deduction_detail/<int:detail_id>')
 
     return app
