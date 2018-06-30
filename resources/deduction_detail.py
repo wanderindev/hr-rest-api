@@ -43,7 +43,7 @@ class DeductionDetail(Resource):
 
             return {
                        'message': 'Deduction detail created successfully.',
-                       'payment': DeductionDetailModel.find_by_id(
+                       'deduction_detail': DeductionDetailModel.find_by_id(
                            d_d.id, current_identity
                        ).to_dict()
                    }, 201
@@ -63,7 +63,7 @@ class DeductionDetail(Resource):
                 _, d_d = d_d.update(data)
                 return {
                    'message': 'Deduction detail updated successfully.',
-                   'payment': d_d.to_dict()
+                   'deduction_detail': d_d.to_dict()
                 }, 200
             except exc.SQLAlchemyError:
                 return {'message': 'An error occurred while updating '
