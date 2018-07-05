@@ -53,18 +53,6 @@ class BaseTest(TestCase):
         with self.app_context():
             db.create_all()
 
-            self.u = self.get_user()
-
-            self.other_u = self.get_user({
-                'username': 'test_other_u',
-                'password_hash': generate_password_hash('test_p'),
-                'email': 'test_other_u@test_o.com',
-                'organization_id': 1,
-                'is_super': False,
-                'is_owner': True,
-                'is_active': True
-            })
-
     def tearDown(self):
         """
         Delete all rows in all tables, except for the seed organization
@@ -111,14 +99,71 @@ class BaseTest(TestCase):
             with self.app_context():
                 u = user or {'username': 'test_u', 'password': 'test_p'}
 
-                # Send request to auth endpoint.
-                r = c.post('/auth', data=json.dumps(u),
-                           headers={'Content-Type': 'application/json'})
+                try:
+                    result = c.post('/auth',
+                                    data=json.dumps(u),
+                                    headers={
+                                        'Content-Type': 'application/json'
+                                    })
+                    return {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'JWT ' +
+                                         json.loads(result.data)['access_token']
+                    }
+                except Exception:
+                    return {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'JWT FaKeToKeN!!'
+                    }
 
-                return {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'JWT ' + json.loads(r.data)['access_token']
-                }
+    def set_test_users(self):
+        with self.app_context():
+            self.test_user = {
+                'username': 'test_u',
+                'password': 'test_p'
+            }
+
+            self.other_test_user = {
+                'username': 'test_other_u',
+                'password': 'test_p'
+            }
+
+            self.fake_user = {
+                'username': 'fake_u',
+                'password': 'fake_p'
+            }
+
+            self.root_user = {
+                'username': 'jfeliu',
+                'password': '1234'
+            }
+
+    def create_users(self):
+        with self.app_context():
+            self.set_test_users()
+            self.u = self.get_user()
+            self.other_u = self.get_user({
+                'username': 'test_other_u',
+                'password_hash': generate_password_hash('test_p'),
+                'email': 'test_other_u@test_o.com',
+                'organization_id': 1,
+                'is_super': False,
+                'is_owner': True,
+                'is_active': True
+            })
+
+    def check_record(self, expected, record):
+        for key in self.parsed_model['keys']:
+            if key in self.parsed_model['int']:
+                self.assertEqual(expected[key], int(record[key]))
+            elif key in self.parsed_model['float']:
+                self.assertEqual(expected[key], float(record[key]))
+            elif key in self.parsed_model['bool'] and expected[key]:
+                self.assertTrue(record[key])
+            elif key in self.parsed_model['bool'] and not expected[key]:
+                self.assertFalse(record[key])
+            else:
+                self.assertEqual(expected[key], record[key])
 
     # TODO: check if it is still used.
     @staticmethod

@@ -2,6 +2,7 @@ from datetime import date, datetime, time
 from decimal import Decimal
 
 from sqlalchemy.orm import collections
+from sqlalchemy.sql import sqltypes
 
 from db import db
 
@@ -18,22 +19,52 @@ class ModelMixin(object):
         return f'<{class_name}({attributes})>'
 
     def activate(self):
-        if hasattr(self, 'is_active'):
-            self.is_active = True
-            self.save_to_db()
+        self.is_active = True
+        self.save_to_db()
 
     def delete_from_db(self):
         if hasattr(self, 'is_active'):
-            raise ValueError('Deleting this record is not allowed.  '
-                             'Try making it inactive')
+            if self.is_active:
+                self.inactivate()
+            else:
+                raise ValueError('Registro ya estaba inactivo.')
         else:
             db.session.delete(self)
             db.session.commit()
 
+    @classmethod
+    def parse_model(cls):
+        parsed_model = {
+            'keys': [],
+            'unique': [],
+            'nullable': [],
+            'int': [],
+            'float': [],
+            'bool': [],
+            'str': []
+        }
+
+        for col in cls.__table__.columns:
+            if col.key != 'id':
+                parsed_model['keys'].append(col.key)
+                if col.unique:
+                    parsed_model['unique'].append(col.key)
+                if col.nullable:
+                    parsed_model['nullable'].append(col.key)
+                if isinstance(col.type, sqltypes.Integer):
+                    parsed_model['int'].append(col.key)
+                elif isinstance(col.type, sqltypes.Numeric):
+                    parsed_model['float'].append(col.key)
+                elif isinstance(col.type, sqltypes.Boolean):
+                    parsed_model['bool'].append(col.key)
+                else:
+                    parsed_model['str'].append(col.key)
+
+        return parsed_model
+
     def inactivate(self):
-        if hasattr(self, 'is_active'):
-            self.is_active = False
-            self.save_to_db()
+        self.is_active = False
+        self.save_to_db()
 
     def save_to_db(self):
         db.session.add(self)

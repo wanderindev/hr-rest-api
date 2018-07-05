@@ -12,7 +12,7 @@ class OrganizationModel(ModelMixin, db.Model):
     __tablename__ = 'organization'
 
     id = db.Column(db.Integer, primary_key=True)
-    organization_name = db.Column(db.String(80), nullable=False)
+    organization_name = db.Column(db.String(80), unique=True, nullable=False)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     app_users = db.relationship(AppUserModel,
@@ -47,4 +47,9 @@ class OrganizationModel(ModelMixin, db.Model):
     def find_by_id(cls, _id, user):
         if user.is_super or user.organization_id == _id:
             return cls.query.filter_by(id=_id).first()
+
+    @classmethod
+    def find_all(cls, user):
+        if user.is_super:
+            return cls.query.all()
 
