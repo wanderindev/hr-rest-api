@@ -15,6 +15,7 @@ from models.emergency_contact import EmergencyContactModel
 from models.employee import EmployeeModel
 from models.employment_position import EmploymentPositionModel
 from models.health_permit import HealthPermitModel
+from models.marital_status import MaritalStatusModel
 from models.organization import OrganizationModel
 from models.passport import PassportModel
 from models.payment import PaymentModel
@@ -179,16 +180,17 @@ class BaseTest(TestCase):
     def check_record(self, expected, record, parsed_model):
         """Assert that all columns in a record contain the expected values"""
         for key in parsed_model['keys']:
-            if key in parsed_model['int']:
-                self.assertEqual(expected[key], int(record[key]))
-            elif key in parsed_model['float']:
-                self.assertEqual(expected[key], float(record[key]))
-            elif key in parsed_model['bool'] and expected[key]:
-                self.assertTrue(record[key])
-            elif key in parsed_model['bool'] and not expected[key]:
-                self.assertFalse(record[key])
-            else:
-                self.assertEqual(expected[key], record[key])
+            if record[key] is not None:
+                if key in parsed_model['int']:
+                    self.assertEqual(expected[key], int(record[key]))
+                elif key in parsed_model['float']:
+                    self.assertEqual(expected[key], float(record[key]))
+                elif key in parsed_model['bool'] and expected[key]:
+                    self.assertTrue(record[key])
+                elif key in parsed_model['bool'] and not expected[key]:
+                    self.assertFalse(record[key])
+                else:
+                    self.assertEqual(expected[key], record[key])
 
     def get_system_test_params(self):
         return [
@@ -225,17 +227,159 @@ class BaseTest(TestCase):
                 ),
                 'department',
                 'test'
+            ),
+            (
+                'MaritalStatus Resource',
+                MaritalStatusModel,
+                None,
+                'marital_statuses',
+                'test'
+            ),
+            (
+                'Employment Position Resource',
+                EmploymentPositionModel,
+                (
+                    {
+                        'position_name_feminine': 'test_e_p_f',
+                        'position_name_masculine': 'test_e_p_m',
+                        'minimum_hourly_wage': 1.00,
+                        'is_active': True,
+                        'organization_id': self.get_organization,
+                    },
+                    {
+                        'position_name_feminine': 'new_test_e_p_f',
+                        'position_name_masculine': 'new_test_e_p_m',
+                        'minimum_hourly_wage': 2.00,
+                        'is_active': True,
+                        'organization_id': self.get_organization,
+                    }
+                ),
+                'employment_position',
+                'test'
+            ),
+            (
+                'Shift Resource - Rotating',
+                ShiftModel,
+                (
+                    {
+                        'shift_name': 'test_s_r',
+                        'weekly_hours': 48,
+                        'is_rotating': True,
+                        'payment_period': 'Quincenal',
+                        'break_length': '00:30:00',
+                        'is_break_included_in_shift': False,
+                        'is_active': True,
+                        'organization_id': self.get_organization,
+                        'rotation_start_hour': '06:00:00',
+                        'rotation_end_hour': '21:00:00'
+                    },
+                    {
+                        'shift_name': 'new_test_s_r',
+                        'weekly_hours': 44,
+                        'is_rotating': True,
+                        'payment_period': 'Semanal',
+                        'break_length': '01:00:00',
+                        'is_break_included_in_shift': True,
+                        'is_active': True,
+                        'organization_id': self.get_organization,
+                        'rotation_start_hour': '00:00:00',
+                        'rotation_end_hour': '15:00:00'
+                    }
+                ),
+                'shift',
+                'test'
+            ),
+            (
+                'Shift Resource - Fixed',
+                ShiftModel,
+                (
+                    {
+                        'shift_name': 'test_s_f',
+                        'weekly_hours': 44,
+                        'is_rotating': False,
+                        'payment_period': 'Quincenal',
+                        'break_length': '00:30:00',
+                        'is_break_included_in_shift': False,
+                        'is_active': True,
+                        'organization_id': self.get_organization,
+                        'fixed_start_hour_monday': '08:00:00',
+                        'fixed_start_break_hour_monday': '12:00:00',
+                        'fixed_end_break_hour_monday': '12:30:00',
+                        'fixed_end_hour_monday': '16:30:00',
+                        'fixed_start_hour_tuesday': '08:00:00',
+                        'fixed_start_break_hour_tuesday': '12:00:00',
+                        'fixed_end_break_hour_tuesday': '12:30:00',
+                        'fixed_end_hour_tuesday': '16:30:00',
+                        'fixed_start_hour_wednesday': '08:00:00',
+                        'fixed_start_break_hour_wednesday': '12:00:00',
+                        'fixed_end_break_hour_wednesday': '12:30:00',
+                        'fixed_end_hour_wednesday': '16:30:00',
+                        'fixed_start_hour_thursday': '08:00:00',
+                        'fixed_start_break_hour_thursday': '12:00:00',
+                        'fixed_end_break_hour_thursday': '12:30:00',
+                        'fixed_end_hour_thursday': '16:30:00',
+                        'fixed_start_hour_friday': '08:00:00',
+                        'fixed_start_break_hour_friday': '12:00:00',
+                        'fixed_end_break_hour_friday': '12:30:00',
+                        'fixed_end_hour_friday': '16:30:00',
+                        'fixed_start_hour_saturday': '08:00:00',
+                        'fixed_end_hour_saturday': '12:00:00',
+                        'rest_day': 'Domingo'
+                    },
+                    {
+                        'shift_name': 'test_s_f',
+                        'weekly_hours': 48,
+                        'is_rotating': False,
+                        'payment_period': 'Diario',
+                        'break_length': '00:30:00',
+                        'is_break_included_in_shift': False,
+                        'is_active': True,
+                        'organization_id': self.get_organization,
+                        'fixed_start_hour_sunday': '09:00:00',
+                        'fixed_start_break_hour_sunday': '13:00:00',
+                        'fixed_end_break_hour_sunday': '13:30:00',
+                        'fixed_end_hour_sunday': '17:30:00',
+                        'fixed_start_hour_monday': '09:00:00',
+                        'fixed_start_break_hour_monday': '13:00:00',
+                        'fixed_end_break_hour_monday': '13:30:00',
+                        'fixed_end_hour_monday': '17:30:00',
+                        'fixed_start_hour_tuesday': '09:00:00',
+                        'fixed_start_break_hour_tuesday': '13:00:00',
+                        'fixed_end_break_hour_tuesday': '13:30:00',
+                        'fixed_end_hour_tuesday': '17:30:00',
+                        'fixed_start_hour_wednesday': '09:00:00',
+                        'fixed_start_break_hour_wednesday': '13:00:00',
+                        'fixed_end_break_hour_wednesday': '13:30:00',
+                        'fixed_end_hour_wednesday': '17:30:00',
+                        'fixed_start_hour_thursday': '09:00:00',
+                        'fixed_start_break_hour_thursday': '13:00:00',
+                        'fixed_end_break_hour_thursday': '13:30:00',
+                        'fixed_end_hour_thursday': '17:30:00',
+                        'fixed_start_hour_friday': '09:00:00',
+                        'fixed_start_break_hour_friday': '13:00:00',
+                        'fixed_end_break_hour_friday': '13:30:00',
+                        'fixed_end_hour_friday': '17:30:00',
+                        'fixed_start_hour_saturday': None,
+                        'fixed_end_hour_saturday': None,
+                        'rest_day': 'Sábado'
+                    }
+                ),
+                'shift',
+                'test'
             )
         ]
 
     @staticmethod
     def get_b_object(b_obj):
-        for _obj in b_obj:
-            for k, v in _obj.items():
-                if callable(v):
-                    _obj[k] = v().id
+        if b_obj is not None:
+            for _obj in b_obj:
+                for k, v in _obj.items():
+                    if callable(v):
+                        _obj[k] = v().id
 
-        return b_obj
+            return b_obj
+
+        return None, None
 
     # TODO: check if it is still used.
     @staticmethod
@@ -250,15 +394,18 @@ class BaseTest(TestCase):
         Return an object from the database if it exists.  Create
         and return the object if it does not exists
         """
-        o = model.query.filter_by(**_dict).first()
-
-        if o:
-            return o
-
         if model is AppUserModel:
-            o = model(password='test_p', **_dict)
+            o = model.query.filter_by(username=_dict['username']).first()
+            if o:
+                return o
+            else:
+                o = model(password='test_p', **_dict)
         else:
-            o = model(**_dict)
+            o = model.query.filter_by(**_dict).first()
+            if o:
+                return o
+            else:
+                o = model(**_dict)
 
         o.save_to_db()
 

@@ -1,5 +1,7 @@
 from datetime import time
 
+from sqlalchemy import UniqueConstraint
+
 from db import db
 from models.employee import EmployeeModel
 from models.enum import DAYS_OF_WEEK, PAYMENT_PERIOD
@@ -8,6 +10,9 @@ from models.mixin import ModelMixin
 
 class ShiftModel(ModelMixin, db.Model):
     __tablename__ = 'shift'
+    __table_args__ = (UniqueConstraint('shift_name', 'organization_id',
+                                       name='shift_shift_name_organization_id_'
+                                            'uindex'),)
 
     id = db.Column(db.Integer, primary_key=True)
     shift_name = db.Column(db.String(80), nullable=False)
@@ -16,7 +21,7 @@ class ShiftModel(ModelMixin, db.Model):
     payment_period = db.Column(PAYMENT_PERIOD, nullable=False)
     rotation_start_hour = db.Column(db.Time)
     rotation_end_hour = db.Column(db.Time)
-    break_length = db.Column(db.Integer, nullable=False)
+    break_length = db.Column(db.Time, nullable=False)
     is_break_included_in_shift = db.Column(db.Boolean, nullable=False)
     fixed_start_hour_monday = db.Column(db.Time)
     fixed_start_break_hour_monday = db.Column(db.Time)
@@ -148,3 +153,7 @@ class ShiftModel(ModelMixin, db.Model):
         if shift:
             if OrganizationModel.find_by_id(shift.organization_id, user):
                 return shift
+
+    @classmethod
+    def find_all(cls, user):
+        return cls.query.filter_by(organization_id=user.organization_id).all()

@@ -1,3 +1,5 @@
+from sqlalchemy import UniqueConstraint
+
 from db import db
 from models.employee import EmployeeModel
 from models.mixin import ModelMixin
@@ -5,6 +7,15 @@ from models.mixin import ModelMixin
 
 class EmploymentPositionModel(ModelMixin, db.Model):
     __tablename__ = 'employment_position'
+    __table_args__ = (UniqueConstraint('position_name_feminine',
+                                       'organization_id',
+                                       name='employment_position_position_name_'
+                                            'feminine_organization_id_uindex'),
+                      UniqueConstraint('position_name_masculine',
+                                       'organization_id',
+                                       name='employment_position_position_name_'
+                                            'masculine_organization_id_uindex')
+                      )
 
     id = db.Column(db.Integer, primary_key=True)
     position_name_feminine = db.Column(db.String(80), nullable=False)
@@ -36,3 +47,7 @@ class EmploymentPositionModel(ModelMixin, db.Model):
         if e_p:
             if OrganizationModel.find_by_id(e_p.organization_id, user):
                 return e_p
+
+    @classmethod
+    def find_all(cls, user):
+        return cls.query.filter_by(organization_id=user.organization_id).all()

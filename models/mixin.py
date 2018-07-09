@@ -39,7 +39,7 @@ class ModelMixin(object):
     @classmethod
     def get_unique_constraints(cls):
         u_contraints = []
-        if cls.__table_args__:
+        if hasattr(cls, '__table_args__'):
             for arg in cls.__table_args__:
                 if isinstance(arg, UniqueConstraint):
                     contraint = []

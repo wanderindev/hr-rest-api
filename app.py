@@ -13,10 +13,10 @@ from resources.dependent import Dependent
 from resources.emergency_contact import EmergencyContact
 from resources.employee import ActivateEmployee, Employee
 from resources.employment_position import ActivateEmploymentPosition, \
-    EmploymentPosition
+    EmploymentPosition, EmploymentPositions
 from resources.family_relation import FamilyRelationList
 from resources.health_permit import HealthPermit
-from resources.marital_status import MaritalStatusList
+from resources.marital_status import MaritalStatuses
 from resources.organization import ActivateOrganization, Organization, \
     Organizations
 from resources.passport import Passport
@@ -24,7 +24,7 @@ from resources.payment import Payment
 from resources.payment_detail import PaymentDetail
 from resources.schedule import Schedule
 from resources.schedule_detail import ScheduleDetail
-from resources.shift import ActivateShift, Shift
+from resources.shift import ActivateShift, Shift, Shifts
 from resources.uniform_item import UniformItem
 from resources.uniform_requirement import UniformRequirement
 from resources.uniform_size import UniformSize
@@ -85,20 +85,24 @@ def create_app(config_file=None):
     api.add_resource(Departments,
                      '/departments')
 
-    api.add_resource(MaritalStatusList,
+    api.add_resource(MaritalStatuses,
                      '/marital_statuses')
 
     api.add_resource(EmploymentPosition,
                      '/employment_position',
-                     '/employment_position/<int:position_id>')
+                     '/employment_position/<int:_id>')
     api.add_resource(ActivateEmploymentPosition,
-                     '/activate_employment_position/<int:position_id>')
+                     '/activate_employment_position/<int:_id>')
+    api.add_resource(EmploymentPositions,
+                     '/employment_positions')
 
     api.add_resource(Shift,
                      '/shift',
-                     '/shift/<int:shift_id>')
+                     '/shift/<int:_id>')
     api.add_resource(ActivateShift,
-                     '/activate_shift/<int:shift_id>')
+                     '/activate_shift/<int:_id>')
+    api.add_resource(Shifts,
+                     '/shifts')
 
     api.add_resource(Employee,
                      '/employee',

@@ -26,24 +26,25 @@ class TestResources(BaseTest):
                     parsed_model = model.parse_model()
                     o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, o_post=o_post, user=user):
-                        self.assertIsNone(
-                            model.query.filter_by(**o_post).first())
+                    if o_post is not None:
+                        with self.subTest(resource, o_post=o_post, user=user):
+                            self.assertIsNone(
+                                model.query.filter_by(**o_post).first())
 
-                        result = c.post(f'/{endpoint}',
-                                        data=json.dumps(o_post),
-                                        headers=self.get_headers(user))
+                            result = c.post(f'/{endpoint}',
+                                            data=json.dumps(o_post),
+                                            headers=self.get_headers(user))
 
-                        record = json.loads(result.data)['record']
+                            record = json.loads(result.data)['record']
 
-                        self.assertEqual(201, result.status_code)
+                            self.assertEqual(201, result.status_code)
 
-                        self.assertIsNotNone(model.query.filter_by(
-                            id=record['id']).first())
+                            self.assertIsNotNone(model.query.filter_by(
+                                id=record['id']).first())
 
-                        self.check_record(o_post, record, parsed_model)
+                            self.check_record(o_post, record, parsed_model)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_post_without_authentication(self):
         """
@@ -57,14 +58,15 @@ class TestResources(BaseTest):
                     user = self.get_test_user('fake')
                     o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, o_post=o_post, user=user):
-                        result = c.post(f'/{endpoint}',
-                                        data=json.dumps(o_post),
-                                        headers=self.get_headers(user))
+                    if o_post is not None:
+                        with self.subTest(resource, o_post=o_post, user=user):
+                            result = c.post(f'/{endpoint}',
+                                            data=json.dumps(o_post),
+                                            headers=self.get_headers(user))
 
-                        self.assertEqual(401, result.status_code)
+                            self.assertEqual(401, result.status_code)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_post_not_unique(self):
         """
@@ -112,24 +114,25 @@ class TestResources(BaseTest):
                     parsed_model = model.parse_model()
                     o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, o_post=o_post, user=user):
-                        # POST the object to the database and get the id.
-                        result = c.post(f'/{endpoint}',
-                                        data=json.dumps(o_post),
-                                        headers=self.get_headers(user))
-                        _id = json.loads(result.data)['record']['id']
+                    if o_post is not None:
+                        with self.subTest(resource, o_post=o_post, user=user):
+                            # POST the object to the database and get the id.
+                            result = c.post(f'/{endpoint}',
+                                            data=json.dumps(o_post),
+                                            headers=self.get_headers(user))
+                            _id = json.loads(result.data)['record']['id']
 
-                        # Make GET request.
-                        result = c.get(f'/{endpoint}/{_id}',
-                                       headers=self.get_headers(user))
+                            # Make GET request.
+                            result = c.get(f'/{endpoint}/{_id}',
+                                           headers=self.get_headers(user))
 
-                        record = json.loads(result.data)['record']
+                            record = json.loads(result.data)['record']
 
-                        self.assertEqual(200, result.status_code)
+                            self.assertEqual(200, result.status_code)
 
-                        self.check_record(o_post, record, parsed_model)
+                            self.check_record(o_post, record, parsed_model)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_get_without_authentication(self):
         """
@@ -141,14 +144,16 @@ class TestResources(BaseTest):
                 for params in self.get_system_test_params():
                     resource, model, b_obj, endpoint, user_type = params
                     user = self.get_test_user('fake')
+                    o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, user=user):
-                        result = c.get(f'/{endpoint}/999',
-                                       headers=self.get_headers(user))
+                    if o_post is not None:
+                        with self.subTest(resource, user=user):
+                            result = c.get(f'/{endpoint}/999',
+                                           headers=self.get_headers(user))
 
-                        self.assertEqual(401, result.status_code)
+                            self.assertEqual(401, result.status_code)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_get_not_found(self):
         """
@@ -160,14 +165,16 @@ class TestResources(BaseTest):
                 for params in self.get_system_test_params():
                     resource, model, b_obj, endpoint, user_type = params
                     user = self.get_test_user(user_type)
+                    o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, user=user):
-                        result = c.get(f'/{endpoint}/999',
-                                       headers=self.get_headers(user))
+                    if o_post is not None:
+                        with self.subTest(resource, user=user):
+                            result = c.get(f'/{endpoint}/999',
+                                           headers=self.get_headers(user))
 
-                        self.assertEqual(404, result.status_code)
+                            self.assertEqual(404, result.status_code)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_put_with_authentication(self):
         """
@@ -182,24 +189,25 @@ class TestResources(BaseTest):
                     parsed_model = model.parse_model()
                     o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, o_put=o_put, user=user):
-                        # POST the object to the database and get the id.
-                        result = c.post(f'/{endpoint}',
-                                        data=json.dumps(o_post),
-                                        headers=self.get_headers(user))
-                        _id = json.loads(result.data)['record']['id']
+                    if o_post is not None:
+                        with self.subTest(resource, o_put=o_put, user=user):
+                            # POST the object to the database and get the id.
+                            result = c.post(f'/{endpoint}',
+                                            data=json.dumps(o_post),
+                                            headers=self.get_headers(user))
+                            _id = json.loads(result.data)['record']['id']
 
-                        result = c.put(f'/{endpoint}/{_id}',
-                                       data=json.dumps(o_put),
-                                       headers=self.get_headers(user))
+                            result = c.put(f'/{endpoint}/{_id}',
+                                           data=json.dumps(o_put),
+                                           headers=self.get_headers(user))
 
-                        record = json.loads(result.data)['record']
+                            record = json.loads(result.data)['record']
 
-                        self.assertEqual(200, result.status_code)
+                            self.assertEqual(200, result.status_code)
 
-                        self.check_record(o_put, record, parsed_model)
+                            self.check_record(o_put, record, parsed_model)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_put_without_authentication(self):
         """
@@ -213,14 +221,15 @@ class TestResources(BaseTest):
                     user = self.get_test_user('fake')
                     o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, o_put=o_put, user=user):
-                        result = c.put(f'/{endpoint}/999',
-                                       data=json.dumps(o_put),
-                                       headers=self.get_headers(user))
+                    if o_post is not None:
+                        with self.subTest(resource, o_put=o_put, user=user):
+                            result = c.put(f'/{endpoint}/999',
+                                           data=json.dumps(o_put),
+                                           headers=self.get_headers(user))
 
-                        self.assertEqual(401, result.status_code)
+                            self.assertEqual(401, result.status_code)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_put_not_unique(self):
         """
@@ -235,27 +244,28 @@ class TestResources(BaseTest):
                     parsed_model = model.parse_model()
                     o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, o_put=o_put, user=user):
-                        # POST the object to the database and get the id.
-                        result = c.post(f'/{endpoint}',
-                                        data=json.dumps(o_post),
-                                        headers=self.get_headers(user))
-                        _id = json.loads(result.data)['record']['id']
+                    if parsed_model['unique']:
+                        with self.subTest(resource, o_put=o_put, user=user):
+                            # POST the object to the database and get the id.
+                            result = c.post(f'/{endpoint}',
+                                            data=json.dumps(o_post),
+                                            headers=self.get_headers(user))
+                            _id = json.loads(result.data)['record']['id']
 
-                        # POST a new object to the database.
-                        result = c.post(f'/{endpoint}',
-                                        data=json.dumps(o_put),
-                                        headers=self.get_headers(user))
+                            # POST a new object to the database.
+                            c.post(f'/{endpoint}',
+                                   data=json.dumps(o_put),
+                                   headers=self.get_headers(user))
 
-                        # PUT into original object data that violates
-                        # unique contraint.
-                        result = c.put(f'/{endpoint}/{_id}',
-                                       data=json.dumps(o_put),
-                                       headers=self.get_headers(user))
+                            # PUT into original object data that violates
+                            # unique contraint.
+                            result = c.put(f'/{endpoint}/{_id}',
+                                           data=json.dumps(o_put),
+                                           headers=self.get_headers(user))
 
-                        self.assertEqual(400, result.status_code)
+                            self.assertEqual(400, result.status_code)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_put_not_found(self):
         """
@@ -269,14 +279,15 @@ class TestResources(BaseTest):
                     user = self.get_test_user(user_type)
                     o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, o_put=o_put, user=user):
-                        result = c.put(f'/{endpoint}/999',
-                                       data=json.dumps(o_put),
-                                       headers=self.get_headers(user))
+                    if o_post is not None:
+                        with self.subTest(resource, o_put=o_put, user=user):
+                            result = c.put(f'/{endpoint}/999',
+                                           data=json.dumps(o_put),
+                                           headers=self.get_headers(user))
 
-                        self.assertEqual(404, result.status_code)
+                            self.assertEqual(404, result.status_code)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_delete_with_authentication(self):
         """
@@ -290,19 +301,20 @@ class TestResources(BaseTest):
                     user = self.get_test_user(user_type)
                     o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, o_post=o_post, user=user):
-                        # POST the object to the database and get the id.
-                        result = c.post(f'/{endpoint}',
-                                        data=json.dumps(o_post),
-                                        headers=self.get_headers(user))
-                        _id = json.loads(result.data)['record']['id']
+                    if o_post is not None:
+                        with self.subTest(resource, o_post=o_post, user=user):
+                            # POST the object to the database and get the id.
+                            result = c.post(f'/{endpoint}',
+                                            data=json.dumps(o_post),
+                                            headers=self.get_headers(user))
+                            _id = json.loads(result.data)['record']['id']
 
-                        result = c.delete(f'/{endpoint}/{_id}',
-                                          headers=self.get_headers(user))
+                            result = c.delete(f'/{endpoint}/{_id}',
+                                              headers=self.get_headers(user))
 
-                        self.assertEqual(200, result.status_code)
+                            self.assertEqual(200, result.status_code)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_delete_without_authentication(self):
         """
@@ -314,14 +326,16 @@ class TestResources(BaseTest):
                 for params in self.get_system_test_params():
                     resource, model, b_obj, endpoint, user_type = params
                     user = self.get_test_user('fake')
+                    o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, user=user):
-                        result = c.delete(f'/{endpoint}/999',
-                                          headers=self.get_headers(user))
+                    if o_post is not None:
+                        with self.subTest(resource, user=user):
+                            result = c.delete(f'/{endpoint}/999',
+                                              headers=self.get_headers(user))
 
-                        self.assertEqual(401, result.status_code)
+                            self.assertEqual(401, result.status_code)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_delete_not_found(self):
         """
@@ -333,14 +347,16 @@ class TestResources(BaseTest):
                 for params in self.get_system_test_params():
                     resource, model, b_obj, endpoint, user_type = params
                     user = self.get_test_user(user_type)
+                    o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, user=user):
-                        result = c.delete(f'/{endpoint}/999',
-                                          headers=self.get_headers(user))
+                    if o_post is not None:
+                        with self.subTest(resource, user=user):
+                            result = c.delete(f'/{endpoint}/999',
+                                              headers=self.get_headers(user))
 
-                        self.assertEqual(404, result.status_code)
+                            self.assertEqual(404, result.status_code)
 
-                        self.clear_db()
+                            self.clear_db()
 
     def test_activate_inactivate_with_authentication(self):
         """
@@ -505,24 +521,37 @@ class TestResources(BaseTest):
                     o_post, o_put = self.get_b_object(b_obj)
 
                     with self.subTest(resource, o_post=o_post, user=user):
-                        # POST the object to the database and get the id.
-                        result = c.post(f'/{endpoint}',
-                                        data=json.dumps(o_post),
-                                        headers=self.get_headers(user))
-                        _id = json.loads(result.data)['record']['id']
+                        if endpoint == 'marital_statuses':
+                            result = c.get(f'/{endpoint}',
+                                           headers=self.get_headers(user))
 
-                        result = c.get(f'/{endpoint}s',
-                                       headers=self.get_headers(user))
+                            self.assertEqual(200, result.status_code)
 
-                        _list = json.loads(result.data)['list']
+                            self.assertGreater(
+                                len(json.loads(result.data)['list']),
+                                0
+                            )
 
-                        self.assertEqual(200, result.status_code)
+                            self.clear_db()
+                        else:
+                            # POST the object to the database and get the id.
+                            result = c.post(f'/{endpoint}',
+                                            data=json.dumps(o_post),
+                                            headers=self.get_headers(user))
+                            _id = json.loads(result.data)['record']['id']
 
-                        self.assertIn(model.query.filter_by(id=_id)
-                                      .first()
-                                      .to_dict(), _list)
+                            result = c.get(f'/{endpoint}s',
+                                           headers=self.get_headers(user))
 
-                        self.clear_db()
+                            _list = json.loads(result.data)['list']
+
+                            self.assertEqual(200, result.status_code)
+
+                            self.assertIn(model.query.filter_by(id=_id)
+                                          .first()
+                                          .to_dict(), _list)
+
+                            self.clear_db()
 
     def test_list_without_authentication(self):
         """
@@ -536,8 +565,12 @@ class TestResources(BaseTest):
                     user = self.get_test_user('fake')
 
                     with self.subTest(resource, user=user):
-                        result = c.get(f'/{endpoint}s',
-                                       headers=self.get_headers(user))
+                        if endpoint == 'marital_statuses':
+                            result = c.get(f'/{endpoint}',
+                                           headers=self.get_headers(user))
+                        else:
+                            result = c.get(f'/{endpoint}s',
+                                           headers=self.get_headers(user))
 
                         self.assertEqual(401, result.status_code)
 

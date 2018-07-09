@@ -78,7 +78,8 @@ class ResourceMixin(Resource):
                 for key in constraint:
                     _filter[key] = data[key]
 
-                if self.model.query.filter_by(**_filter).first().id != _id:
+                if self.model.query.filter_by(**_filter).first() and \
+                        self.model.query.filter_by(**_filter).first().id != _id:
                     return {'message': f'El valor "{_filter}" viola '
                                        f'UNIQUE_CONSTRAINT de la tabla'}, 400
 
