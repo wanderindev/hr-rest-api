@@ -143,17 +143,3 @@ class ShiftModel(ModelMixin, db.Model):
                 'fixed_end_hour_sunday')
 
             self.rest_day = kwargs.get('rest_day')
-
-    @classmethod
-    def find_by_id(cls, _id, user):
-        from models.organization import OrganizationModel
-
-        shift = cls.query.filter_by(id=_id).first()
-
-        if shift:
-            if OrganizationModel.find_by_id(shift.organization_id, user):
-                return shift
-
-    @classmethod
-    def find_all(cls, user):
-        return cls.query.filter_by(organization_id=user.organization_id).all()

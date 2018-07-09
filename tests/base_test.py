@@ -327,7 +327,7 @@ class BaseTest(TestCase):
                         'rest_day': 'Domingo'
                     },
                     {
-                        'shift_name': 'test_s_f',
+                        'shift_name': 'new_test_s_f',
                         'weekly_hours': 48,
                         'is_rotating': False,
                         'payment_period': 'Diario',

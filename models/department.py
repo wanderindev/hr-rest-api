@@ -26,17 +26,3 @@ class DepartmentModel(ModelMixin, db.Model):
         self.department_name = department_name
         self.organization_id = organization_id
         self.is_active = is_active
-
-    @classmethod
-    def find_by_id(cls, _id, user):
-        from models.organization import OrganizationModel
-
-        dept = cls.query.filter_by(id=_id).first()
-
-        if dept:
-            if OrganizationModel.find_by_id(dept.organization_id, user):
-                return dept
-
-    @classmethod
-    def find_all(cls, user):
-        return cls.query.filter_by(organization_id=user.organization_id).all()
