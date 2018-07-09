@@ -1,14 +1,18 @@
 from datetime import date, datetime, time
 from decimal import Decimal
 
+from sqlalchemy import MetaData
 from sqlalchemy.orm import collections
 from sqlalchemy.sql import sqltypes
+from sqlalchemy.sql.schema import UniqueConstraint
 
 from db import db
 
 
 # noinspection PyAttributeOutsideInit
 class ModelMixin(object):
+    metadata = MetaData()
+
     def __iter__(self):
         return ((k, v) for k, v in vars(self).items() if not k.startswith('_'))
 
@@ -31,6 +35,24 @@ class ModelMixin(object):
         else:
             db.session.delete(self)
             db.session.commit()
+
+    @classmethod
+    def get_unique_constraints(cls):
+        u_contraints = []
+        if cls.__table_args__:
+            for arg in cls.__table_args__:
+                if isinstance(arg, UniqueConstraint):
+                    contraint = []
+                    for col in cls.__table__.columns:
+                        if arg.__contains__(col.key):
+                            contraint.append(col.key)
+                    u_contraints.append(tuple(contraint))
+
+        return u_contraints
+
+    def inactivate(self):
+        self.is_active = False
+        self.save_to_db()
 
     @classmethod
     def parse_model(cls):
@@ -60,11 +82,9 @@ class ModelMixin(object):
                 else:
                     parsed_model['str'].append(col.key)
 
-        return parsed_model
+        parsed_model['unique'] = cls.get_unique_constraints()
 
-    def inactivate(self):
-        self.is_active = False
-        self.save_to_db()
+        return parsed_model
 
     def save_to_db(self):
         db.session.add(self)

@@ -8,7 +8,7 @@ from resources.country import CountryList
 from resources.creditor import ActivateCreditor, Creditor
 from resources.deduction import ActivateDeduction, Deduction
 from resources.deduction_detail import DeductionDetail
-from resources.department import ActivateDepartment, Department
+from resources.department import ActivateDepartment, Department, Departments
 from resources.dependent import Dependent
 from resources.emergency_contact import EmergencyContact
 from resources.employee import ActivateEmployee, Employee
@@ -79,9 +79,11 @@ def create_app(config_file=None):
 
     api.add_resource(Department,
                      '/department',
-                     '/department/<int:department_id>')
+                     '/department/<int:_id>')
     api.add_resource(ActivateDepartment,
-                     '/activate_department/<int:department_id>')
+                     '/activate_department/<int:_id>')
+    api.add_resource(Departments,
+                     '/departments')
 
     api.add_resource(MaritalStatusList,
                      '/marital_statuses')

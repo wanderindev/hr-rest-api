@@ -4,27 +4,29 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 class ResourceMixin(Resource):
-    parser = reqparse.RequestParser()
+    def get_parser(self):
+        parser = reqparse.RequestParser()
 
-    def set_parser(self):
         for key in self.parsed_model['keys']:
             is_required = key not in self.parsed_model['nullable']
             if key in self.parsed_model['int']:
-                self.parser.add_argument(key,
-                                         type=int,
-                                         required=is_required)
+                parser.add_argument(key,
+                                    type=int,
+                                    required=is_required)
             elif key in self.parsed_model['float']:
-                self.parser.add_argument(key,
-                                         type=float,
-                                         required=is_required)
+                parser.add_argument(key,
+                                    type=float,
+                                    required=is_required)
             elif key in self.parsed_model['bool']:
-                self.parser.add_argument(key,
-                                         type=bool,
-                                         required=is_required)
+                parser.add_argument(key,
+                                    type=bool,
+                                    required=is_required)
             else:
-                self.parser.add_argument(key,
-                                         type=str,
-                                         required=is_required)
+                parser.add_argument(key,
+                                    type=str,
+                                    required=is_required)
+
+        return parser
 
     @jwt_required()
     def get(self, _id):
@@ -37,16 +39,18 @@ class ResourceMixin(Resource):
 
     @jwt_required()
     def post(self):
-        self.set_parser()
-        data = self.parser.parse_args()
+        parser = self.get_parser()
+        data = parser.parse_args()
 
-        for key in self.parsed_model['unique']:
-            _filter = {key: data[key]}
+        if self.parsed_model['unique']:
+            for constraint in self.parsed_model['unique']:
+                _filter ={}
+                for key in constraint:
+                    _filter[key] = data[key]
 
-            if self.model.query.filter_by(**_filter).first():
-                return {'message': f'El valor "{data[key]}" para la '
-                                   f'columna "{key}" ya existe en '
-                                   f'la tabla'}, 400
+                if self.model.query.filter_by(**_filter).first():
+                    return {'message': f'El valor "{_filter}" viola '
+                                       f'UNIQUE_CONSTRAINT de la tabla'}, 400
 
         record = self.model(**data)
 
@@ -65,8 +69,18 @@ class ResourceMixin(Resource):
 
     @jwt_required()
     def put(self, _id):
-        self.set_parser()
-        data = self.parser.parse_args()
+        parser = self.get_parser()
+        data = parser.parse_args()
+
+        if self.parsed_model['unique']:
+            for constraint in self.parsed_model['unique']:
+                _filter ={}
+                for key in constraint:
+                    _filter[key] = data[key]
+
+                if self.model.query.filter_by(**_filter).first().id != _id:
+                    return {'message': f'El valor "{_filter}" viola '
+                                       f'UNIQUE_CONSTRAINT de la tabla'}, 400
 
         record = self.model.find_by_id(_id, current_identity)
 

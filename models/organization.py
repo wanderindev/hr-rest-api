@@ -1,3 +1,5 @@
+from sqlalchemy import UniqueConstraint
+
 from db import db
 from models.creditor import CreditorModel
 from models.department import DepartmentModel
@@ -10,9 +12,12 @@ from models.user import AppUserModel
 
 class OrganizationModel(ModelMixin, db.Model):
     __tablename__ = 'organization'
+    __table_args__ = (UniqueConstraint('organization_name',
+                                       name='organization_'
+                                            'organization_name_uindex'),)
 
     id = db.Column(db.Integer, primary_key=True)
-    organization_name = db.Column(db.String(80), unique=True, nullable=False)
+    organization_name = db.Column(db.String(80), nullable=False)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     app_users = db.relationship(AppUserModel,

@@ -46,42 +46,47 @@ class BaseTest(TestCase):
             db.init_app(app)
 
     def setUp(self):
-        """Create all db tables and two users before each test."""
-        self.app = app.test_client
+        """Create all db tables before each test."""
+        self.client = app.test_client
         self.app_context = app.app_context
 
         with self.app_context():
             db.create_all()
 
     def tearDown(self):
+        """Clear db tables after each test"""
+        with self.app_context():
+            self.clear_db()
+
+    @staticmethod
+    def clear_db():
         """
         Delete all rows in all tables, except for the seed organization
-        and seed user, after every test.
+        and seed user.  It is called on tearDown and also after all subTest.
         """
-        with app.app_context():
-            db.session.remove()
-            AppUserModel.query.filter(AppUserModel.id != 1).delete()
-            BankAccountModel.query.delete()
-            EmergencyContactModel.query.delete()
-            DependentModel.query.delete()
-            HealthPermitModel.query.delete()
-            PassportModel.query.delete()
-            UniformRequirementModel.query.delete()
-            ScheduleDetailModel.query.delete()
-            ScheduleModel.query.delete()
-            DeductionDetailModel.query.delete()
-            DeductionModel.query.delete()
-            CreditorModel.query.delete()
-            PaymentDetailModel.query.delete()
-            PaymentModel.query.delete()
-            EmployeeModel.query.delete()
-            EmploymentPositionModel.query.delete()
-            ShiftModel.query.delete()
-            UniformSizeModel.query.delete()
-            UniformItemModel.query.delete()
-            DepartmentModel.query.delete()
-            OrganizationModel.query.filter(OrganizationModel.id != 1).delete()
-            db.session.commit()
+        db.session.remove()
+        AppUserModel.query.filter(AppUserModel.id != 1).delete()
+        BankAccountModel.query.delete()
+        EmergencyContactModel.query.delete()
+        DependentModel.query.delete()
+        HealthPermitModel.query.delete()
+        PassportModel.query.delete()
+        UniformRequirementModel.query.delete()
+        ScheduleDetailModel.query.delete()
+        ScheduleModel.query.delete()
+        DeductionDetailModel.query.delete()
+        DeductionModel.query.delete()
+        CreditorModel.query.delete()
+        PaymentDetailModel.query.delete()
+        PaymentModel.query.delete()
+        EmployeeModel.query.delete()
+        EmploymentPositionModel.query.delete()
+        ShiftModel.query.delete()
+        UniformSizeModel.query.delete()
+        UniformItemModel.query.delete()
+        DepartmentModel.query.delete()
+        OrganizationModel.query.filter(OrganizationModel.id != 1).delete()
+        db.session.commit()
 
     def get_headers(self, user=None):
         """
@@ -95,7 +100,7 @@ class BaseTest(TestCase):
         Returns:
             The request headers.
         """
-        with self.app() as c:
+        with self.client() as c:
             with self.app_context():
                 u = user or {'username': 'test_u', 'password': 'test_p'}
 
@@ -110,13 +115,17 @@ class BaseTest(TestCase):
                         'Authorization': 'JWT ' +
                                          json.loads(result.data)['access_token']
                     }
-                except Exception:
+                except Exception as e:
+                    # Returns fake token for testing purposes if user
+                    # is not in the database.
+                    print(e)
                     return {
                         'Content-Type': 'application/json',
                         'Authorization': 'JWT FaKeToKeN!!'
                     }
 
     def set_test_users(self):
+        """Set up dicts with credentials for test users"""
         with self.app_context():
             self.test_user = {
                 'username': 'test_u',
@@ -139,6 +148,7 @@ class BaseTest(TestCase):
             }
 
     def create_users(self):
+        """Add users to the database"""
         with self.app_context():
             self.set_test_users()
             self.u = self.get_user()
@@ -152,18 +162,80 @@ class BaseTest(TestCase):
                 'is_active': True
             })
 
-    def check_record(self, expected, record):
-        for key in self.parsed_model['keys']:
-            if key in self.parsed_model['int']:
+    def get_test_user(self, user_type):
+        if user_type is 'root':
+            self.set_test_users()
+            return self.root_user
+        elif user_type is 'test':
+            self.create_users()
+            return self.test_user
+        elif user_type is 'other':
+            self.create_users()
+            return self.other_test_user
+        elif user_type is 'fake':
+            self.set_test_users()
+            return self.fake_user
+
+    def check_record(self, expected, record, parsed_model):
+        """Assert that all columns in a record contain the expected values"""
+        for key in parsed_model['keys']:
+            if key in parsed_model['int']:
                 self.assertEqual(expected[key], int(record[key]))
-            elif key in self.parsed_model['float']:
+            elif key in parsed_model['float']:
                 self.assertEqual(expected[key], float(record[key]))
-            elif key in self.parsed_model['bool'] and expected[key]:
+            elif key in parsed_model['bool'] and expected[key]:
                 self.assertTrue(record[key])
-            elif key in self.parsed_model['bool'] and not expected[key]:
+            elif key in parsed_model['bool'] and not expected[key]:
                 self.assertFalse(record[key])
             else:
                 self.assertEqual(expected[key], record[key])
+
+    def get_system_test_params(self):
+        return [
+            (
+                'Organization Resource',
+                OrganizationModel,
+                (
+                    {
+                        'organization_name': 'test_o',
+                        'is_active': True
+                    },
+                    {
+                        'organization_name': 'new_test_o',
+                        'is_active': False
+                    }
+                ),
+                'organization',
+                'root'
+            ),
+            (
+                'Department Resource',
+                DepartmentModel,
+                (
+                    {
+                        'department_name': 'test_d',
+                        'organization_id': self.get_organization,
+                        'is_active': True
+                    },
+                    {
+                        'department_name': 'new_test_d',
+                        'organization_id': self.get_organization,
+                        'is_active': True
+                    }
+                ),
+                'department',
+                'test'
+            )
+        ]
+
+    @staticmethod
+    def get_b_object(b_obj):
+        for _obj in b_obj:
+            for k, v in _obj.items():
+                if callable(v):
+                    _obj[k] = v().id
+
+        return b_obj
 
     # TODO: check if it is still used.
     @staticmethod
@@ -174,6 +246,10 @@ class BaseTest(TestCase):
 
     @staticmethod
     def get_object(model, _dict):
+        """
+        Return an object from the database if it exists.  Create
+        and return the object if it does not exists
+        """
         o = model.query.filter_by(**_dict).first()
 
         if o:
@@ -189,12 +265,14 @@ class BaseTest(TestCase):
         return model.query.filter_by(**_dict).first()
 
     def get_organization(self, _dict=None):
+        """Create and return an organization object"""
         with self.app_context():
             _dict = _dict or {'organization_name': 'test_o', 'is_active': True}
 
             return self.get_object(OrganizationModel, _dict)
 
     def get_user(self, _dict=None):
+        """Create and return a user object"""
         with self.app_context():
             _dict = _dict or {
                 'username': 'test_u',
@@ -206,9 +284,11 @@ class BaseTest(TestCase):
             }
             _dict['password_hash'] = generate_password_hash(
                 _dict.pop('password', 'test_p'))
+
             return self.get_object(AppUserModel, _dict)
 
     def get_department(self, _dict=None):
+        """Create and return a department object"""
         with self.app_context():
             _dict = _dict or {
                 'department_name': 'test_d',
@@ -219,6 +299,7 @@ class BaseTest(TestCase):
             return self.get_object(DepartmentModel, _dict)
 
     def get_shift(self, _dict=None):
+        """Create and return a shift object"""
         with self.app_context():
             _dict = _dict or {
                 'shift_name': 'test_s_r',
@@ -236,6 +317,7 @@ class BaseTest(TestCase):
             return self.get_object(ShiftModel, _dict)
 
     def get_employment_position(self, _dict=None):
+        """Create and return an employment_position object"""
         with self.app_context():
             _dict = _dict or {
                 'position_name_feminine': 'test_e_p_f',
@@ -248,6 +330,7 @@ class BaseTest(TestCase):
             return self.get_object(EmploymentPositionModel, _dict)
 
     def get_employee(self, _dict=None):
+        """Create and return an employee object"""
         with self.app_context():
             _dict = _dict or {
                 'first_name': 'f_n',
@@ -280,6 +363,7 @@ class BaseTest(TestCase):
             return self.get_object(EmployeeModel, _dict)
 
     def get_emergency_contact(self, _dict=None):
+        """Create and return an emergency_contact object"""
         with self.app_context():
             _dict = _dict or {
                 'first_name': 'f_n',
@@ -293,6 +377,7 @@ class BaseTest(TestCase):
             return self.get_object(EmergencyContactModel, _dict)
 
     def get_health_permit(self, _dict=None):
+        """Create and return a health_permit object"""
         with self.app_context():
             _dict = _dict or {
                 'health_permit_type': 'Verde',
@@ -304,6 +389,7 @@ class BaseTest(TestCase):
             return self.get_object(HealthPermitModel, _dict)
 
     def get_passport(self, _dict=None):
+        """Create and return a passport object"""
         with self.app_context():
             _dict = _dict or {
                 'passport_number': '123456',
@@ -316,6 +402,7 @@ class BaseTest(TestCase):
             return self.get_object(PassportModel, _dict)
 
     def get_uniform_item(self, _dict=None):
+        """Create and return a uniform_item object"""
         with self.app_context():
             _dict = _dict or {
                 'item_name': 'test_u_i',
@@ -325,6 +412,7 @@ class BaseTest(TestCase):
             return self.get_object(UniformItemModel, _dict)
 
     def get_uniform_size(self, _dict=None):
+        """Create and return a uniform_size object"""
         with self.app_context():
             with self.app_context():
                 _dict = _dict or {
@@ -335,6 +423,7 @@ class BaseTest(TestCase):
                 return self.get_object(UniformSizeModel, _dict)
 
     def get_uniform_requirement(self, _dict=None):
+        """Create and return a uniform_requirement object"""
         with self.app_context():
             _dict = _dict or {
                 'employee_id': self.get_employee().id,
@@ -345,6 +434,7 @@ class BaseTest(TestCase):
             return self.get_object(UniformRequirementModel, _dict)
 
     def get_bank_account(self, _dict=None):
+        """Create and return a bank_account object"""
         with self.app_context():
             with self.app_context():
                 _dict = _dict or {
@@ -358,6 +448,7 @@ class BaseTest(TestCase):
             return self.get_object(BankAccountModel, _dict)
 
     def get_dependent(self, _dict=None):
+        """Create and return a dependent object"""
         with self.app_context():
             _dict = _dict or {
                 'first_name': 'f_n',
@@ -373,6 +464,7 @@ class BaseTest(TestCase):
             return self.get_object(DependentModel, _dict)
 
     def get_schedule(self, _dict=None):
+        """Create and return a schedule object"""
         with self.app_context():
             _dict = _dict or {
                 'start_date': '2018-01-01',
@@ -382,6 +474,7 @@ class BaseTest(TestCase):
             return self.get_object(ScheduleModel, _dict)
 
     def get_schedule_detail(self, _dict=None):
+        """Create and return a schedule_detail object"""
         with self.app_context():
             _dict = _dict or {
                 'day_1_start': '2018-01-01T06:00:00',
@@ -411,6 +504,7 @@ class BaseTest(TestCase):
             return self.get_object(ScheduleDetailModel, _dict)
 
     def get_payment(self, _dict=None):
+        """Create and return a payment object"""
         with self.app_context():
             _dict = _dict or {
                 'payment_date': '2018-01-01',
@@ -421,6 +515,7 @@ class BaseTest(TestCase):
             return self.get_object(PaymentModel, _dict)
 
     def get_payment_detail(self, _dict=None):
+        """Create and return a payment_detail object"""
         with self.app_context():
             _dict = _dict or {
                 'payment_type': 'Salario Regular',
@@ -434,6 +529,7 @@ class BaseTest(TestCase):
             return self.get_object(PaymentDetailModel, _dict)
 
     def get_creditor(self, _dict=None):
+        """Create and return a creditor object"""
         with self.app_context():
             _dict = _dict or {
                 'creditor_name': 'test_cr',
@@ -446,6 +542,7 @@ class BaseTest(TestCase):
             return self.get_object(CreditorModel, _dict)
 
     def get_deduction(self, _dict=None):
+        """Create and return a deduction object"""
         with self.app_context():
             _dict = _dict or {
                 'start_date': '2018-01-01',
@@ -461,6 +558,7 @@ class BaseTest(TestCase):
             return self.get_object(DeductionModel, _dict)
 
     def get_deduction_detail(self, _dict=None):
+        """Create and return a dedcution_detail object"""
         with self.app_context():
             _dict = _dict or {
                 'deducted_amount': 67.89,

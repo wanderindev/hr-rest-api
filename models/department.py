@@ -1,3 +1,5 @@
+from sqlalchemy import UniqueConstraint
+
 from db import db
 from models.employee import EmployeeModel
 from models.mixin import ModelMixin
@@ -5,6 +7,9 @@ from models.mixin import ModelMixin
 
 class DepartmentModel(ModelMixin, db.Model):
     __tablename__ = 'department'
+    __table_args__ = (UniqueConstraint('department_name', 'organization_id',
+                                       name='department_department_name_'
+                                            'organization_id_uindex'),)
 
     id = db.Column(db.Integer, primary_key=True)
     department_name = db.Column(db.String(80), nullable=False)
@@ -31,3 +36,7 @@ class DepartmentModel(ModelMixin, db.Model):
         if dept:
             if OrganizationModel.find_by_id(dept.organization_id, user):
                 return dept
+
+    @classmethod
+    def find_all(cls, user):
+        return cls.query.filter_by(organization_id=user.organization_id).all()

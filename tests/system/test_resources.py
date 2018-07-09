@@ -1,8 +1,6 @@
 import json
-import unittest
 
 from tests.base_test import BaseTest
-from tests.business_objects import Organization
 
 
 class TestResources(BaseTest):
@@ -15,137 +13,532 @@ class TestResources(BaseTest):
         """
         super(TestResources, self).setUp()
 
-    def test_post_requests(self):
-        """Test all post request to the application resources"""
-        pass
-
-    def test_put_requests(self):
-        """Test all put request to the application resources"""
-        pass
-
-    def test_get_requests(self):
-        """Test all get request to the application resources"""
-        pass
-
-    def test_delete_requests(self):
-        """Test all delete request to the application resources"""
-        pass
-
-    @staticmethod
-    def print_test_marker(mark, test_name, res_name):
-        print(f'\n'
-              f'{mark} "{test_name}" for {res_name} resource.')
-
-    def run_test(self, test_name, res_name, _kwargs):
-        test = getattr(self, test_name, 'test_not_found')
-
-        self.print_test_marker('STARTS', test_name, res_name)
-        test(**_kwargs)
-        self.print_test_marker('ENDS', test_name, res_name)
-
-    def run_tests_for_records(self, res, user):
-        res_name = res['name']
-        tests = res['tests']['system']['record']
-        model = res['model']
-        endpoint = res['endpoints']['record']
-        b_objs = res['objects']
-        verbs = ['post', 'get', 'put', 'delete']
-
-        self.parsed_model = model.parse_model()
-
-        for verb in verbs:
-            for test_name in tests[verb]:
-                _kwargs = {
-                    'model': model,
-                    'endpoint': endpoint,
-                    'b_obj': b_objs[verb],
-                    'user': user
-                }
-                self.run_test(test_name, res_name, _kwargs)
-
-    def run_tests_for_activate(self):
-        pass
-
-    def run_tests_for_list(self):
-        pass
-
-    def test_all_resources(self):
-        """Test all system tests for the application resources"""
-        resources_to_test = [
-            Organization
-        ]
-
-        for res in resources_to_test:
-            if res['name'] is not 'Organization':
-                self.create_users()
-                user = self.test_user
-            else:
-                self.set_test_users()
-                user = self.root_user
-
-            if res['endpoints']['record'] is not None:
-                self.run_tests_for_records(res, user)
-
-            if res['endpoints']['activate'] is not None:
-                self.run_tests_for_activate()
-
-            if res['endpoints']['list'] is not None:
-                self.run_tests_for_list()
-
-    def test_not_found(self):
-        print('Did not find test: ')
-
-    def test_post_with_authentication(self, model, b_obj, endpoint, user):
+    def test_post_with_authentication(self):
         """
         Test that POST requests to a resource's endpoint return
-        status code 201 and the correct business object.
+        status code 201 and the correct record.
         """
-        with self.app() as c:
+        with self.client() as c:
             with self.app_context():
-                self.assertIsNone(
-                    model.query.filter_by(**b_obj).first())
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+                    parsed_model = model.parse_model()
+                    o_post, o_put = self.get_b_object(b_obj)
 
-                result = c.post(endpoint,
-                                data=json.dumps(b_obj),
-                                headers=self.get_headers(user))
+                    with self.subTest(resource, o_post=o_post, user=user):
+                        self.assertIsNone(
+                            model.query.filter_by(**o_post).first())
 
-                record = json.loads(result.data)['record']
+                        result = c.post(f'/{endpoint}',
+                                        data=json.dumps(o_post),
+                                        headers=self.get_headers(user))
 
-                self.assertEqual(201, result.status_code)
+                        record = json.loads(result.data)['record']
 
-                self.assertIsNotNone(model.query.filter_by(
-                    id=record['id']).first())
+                        self.assertEqual(201, result.status_code)
 
-                self.check_record(b_obj, record)
+                        self.assertIsNotNone(model.query.filter_by(
+                            id=record['id']).first())
 
-    def test_post_without_authentication(self, model, b_obj, endpoint, user):
+                        self.check_record(o_post, record, parsed_model)
+
+                        self.clear_db()
+
+    def test_post_without_authentication(self):
         """
         Test that POST requests to a resource's endpoint return
         status code 401 if the user is not authenticated.
         """
-        with self.app() as c:
+        with self.client() as c:
             with self.app_context():
-                result = c.post(endpoint,
-                                data=json.dumps(b_obj),
-                                headers=self.get_headers(self.fake_user))
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user('fake')
+                    o_post, o_put = self.get_b_object(b_obj)
 
-                self.assertEqual(401, result.status_code)
+                    with self.subTest(resource, o_post=o_post, user=user):
+                        result = c.post(f'/{endpoint}',
+                                        data=json.dumps(o_post),
+                                        headers=self.get_headers(user))
 
-    def test_post_not_unique(self, model, b_obj, endpoint, user):
+                        self.assertEqual(401, result.status_code)
+
+                        self.clear_db()
+
+    def test_post_not_unique(self):
         """
         Test that POST requests to a resource's endpoint return
         status code 400 when violating a UNIQUE constraint.
         """
-        with self.app() as c:
+        with self.client() as c:
             with self.app_context():
-                # POST the object to the database.
-                c.post(endpoint,
-                       data=json.dumps(b_obj),
-                       headers=self.get_headers(user))
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+                    parsed_model = model.parse_model()
+                    o_post, o_put = self.get_b_object(b_obj)
 
-                # Send duplicated POST request.
-                result = c.post(endpoint,
-                                data=json.dumps(b_obj),
-                                headers=self.get_headers(user))
+                    if parsed_model['unique']:
+                        with self.subTest(resource, o_post=o_post, user=user):
+                            self.assertIsNone(
+                                model.query.filter_by(**o_post).first())
 
-                self.assertEqual(400, result.status_code)
+                            # POST object to db.
+                            result = c.post(f'/{endpoint}',
+                                            data=json.dumps(o_post),
+                                            headers=self.get_headers(user))
+
+                            self.assertEqual(201, result.status_code)
+
+                            result = c.post(f'/{endpoint}',
+                                            data=json.dumps(o_post),
+                                            headers=self.get_headers(user))
+
+                            self.assertEqual(400, result.status_code)
+
+                            self.clear_db()
+
+    def test_get_with_authentication(self):
+        """
+        Test that GET requests to a resource's endpoint return
+        the correct record if the user is authenticated.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+                    parsed_model = model.parse_model()
+                    o_post, o_put = self.get_b_object(b_obj)
+
+                    with self.subTest(resource, o_post=o_post, user=user):
+                        # POST the object to the database and get the id.
+                        result = c.post(f'/{endpoint}',
+                                        data=json.dumps(o_post),
+                                        headers=self.get_headers(user))
+                        _id = json.loads(result.data)['record']['id']
+
+                        # Make GET request.
+                        result = c.get(f'/{endpoint}/{_id}',
+                                       headers=self.get_headers(user))
+
+                        record = json.loads(result.data)['record']
+
+                        self.assertEqual(200, result.status_code)
+
+                        self.check_record(o_post, record, parsed_model)
+
+                        self.clear_db()
+
+    def test_get_without_authentication(self):
+        """
+        Test that GET requests to a resource's endpoint return
+        status code 401 if the user is not authenticated.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user('fake')
+
+                    with self.subTest(resource, user=user):
+                        result = c.get(f'/{endpoint}/999',
+                                       headers=self.get_headers(user))
+
+                        self.assertEqual(401, result.status_code)
+
+                        self.clear_db()
+
+    def test_get_not_found(self):
+        """
+        Test that GET requests to a resource's endpoint return status
+        code 404 if the record is not in the database.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+
+                    with self.subTest(resource, user=user):
+                        result = c.get(f'/{endpoint}/999',
+                                       headers=self.get_headers(user))
+
+                        self.assertEqual(404, result.status_code)
+
+                        self.clear_db()
+
+    def test_put_with_authentication(self):
+        """
+        Test that PUT requests to a resource's endpoint return
+        status code 200 and the correct record.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+                    parsed_model = model.parse_model()
+                    o_post, o_put = self.get_b_object(b_obj)
+
+                    with self.subTest(resource, o_put=o_put, user=user):
+                        # POST the object to the database and get the id.
+                        result = c.post(f'/{endpoint}',
+                                        data=json.dumps(o_post),
+                                        headers=self.get_headers(user))
+                        _id = json.loads(result.data)['record']['id']
+
+                        result = c.put(f'/{endpoint}/{_id}',
+                                       data=json.dumps(o_put),
+                                       headers=self.get_headers(user))
+
+                        record = json.loads(result.data)['record']
+
+                        self.assertEqual(200, result.status_code)
+
+                        self.check_record(o_put, record, parsed_model)
+
+                        self.clear_db()
+
+    def test_put_without_authentication(self):
+        """
+        Test that PUT requests to a resource's endpoint return
+        status code 401 if the user is not authenticated.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user('fake')
+                    o_post, o_put = self.get_b_object(b_obj)
+
+                    with self.subTest(resource, o_put=o_put, user=user):
+                        result = c.put(f'/{endpoint}/999',
+                                       data=json.dumps(o_put),
+                                       headers=self.get_headers(user))
+
+                        self.assertEqual(401, result.status_code)
+
+                        self.clear_db()
+
+    def test_put_not_unique(self):
+        """
+        Test that PUT requests to a resource's endpoint return
+        status code 400 when violating a UNIQUE constraint.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+                    parsed_model = model.parse_model()
+                    o_post, o_put = self.get_b_object(b_obj)
+
+                    with self.subTest(resource, o_put=o_put, user=user):
+                        # POST the object to the database and get the id.
+                        result = c.post(f'/{endpoint}',
+                                        data=json.dumps(o_post),
+                                        headers=self.get_headers(user))
+                        _id = json.loads(result.data)['record']['id']
+
+                        # POST a new object to the database.
+                        result = c.post(f'/{endpoint}',
+                                        data=json.dumps(o_put),
+                                        headers=self.get_headers(user))
+
+                        # PUT into original object data that violates
+                        # unique contraint.
+                        result = c.put(f'/{endpoint}/{_id}',
+                                       data=json.dumps(o_put),
+                                       headers=self.get_headers(user))
+
+                        self.assertEqual(400, result.status_code)
+
+                        self.clear_db()
+
+    def test_put_not_found(self):
+        """
+        Test that PUT requests to a resource's endpoint return status
+        code 404 if the record is not in the database.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+                    o_post, o_put = self.get_b_object(b_obj)
+
+                    with self.subTest(resource, o_put=o_put, user=user):
+                        result = c.put(f'/{endpoint}/999',
+                                       data=json.dumps(o_put),
+                                       headers=self.get_headers(user))
+
+                        self.assertEqual(404, result.status_code)
+
+                        self.clear_db()
+
+    def test_delete_with_authentication(self):
+        """
+        Test that a DELETE requests to a resource's endpoint return
+        status code 200 if the user is authenticated.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+                    o_post, o_put = self.get_b_object(b_obj)
+
+                    with self.subTest(resource, o_post=o_post, user=user):
+                        # POST the object to the database and get the id.
+                        result = c.post(f'/{endpoint}',
+                                        data=json.dumps(o_post),
+                                        headers=self.get_headers(user))
+                        _id = json.loads(result.data)['record']['id']
+
+                        result = c.delete(f'/{endpoint}/{_id}',
+                                          headers=self.get_headers(user))
+
+                        self.assertEqual(200, result.status_code)
+
+                        self.clear_db()
+
+    def test_delete_without_authentication(self):
+        """
+        Test that a DELETE requests to a resource's endpoint return
+        status code 401 if the user is not authenticated.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user('fake')
+
+                    with self.subTest(resource, user=user):
+                        result = c.delete(f'/{endpoint}/999',
+                                          headers=self.get_headers(user))
+
+                        self.assertEqual(401, result.status_code)
+
+                        self.clear_db()
+
+    def test_delete_not_found(self):
+        """
+        Test that a DELETE requests to a resource's endpoint return
+        status code 404 if the record is not in the database.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+
+                    with self.subTest(resource, user=user):
+                        result = c.delete(f'/{endpoint}/999',
+                                          headers=self.get_headers(user))
+
+                        self.assertEqual(404, result.status_code)
+
+                        self.clear_db()
+
+    def test_activate_inactivate_with_authentication(self):
+        """
+        Test that PUT requests to the resource's endpoint with is_active=False
+        and is_active=True toggle the is_active state for the record.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+                    parsed_model = model.parse_model()
+                    o_post, o_put = self.get_b_object(b_obj)
+
+                    if 'is_active' in parsed_model['keys']:
+                        with self.subTest(resource, o_post=o_post, user=user):
+                            # POST the object to the database and get the id.
+                            result = c.post(f'/{endpoint}',
+                                            data=json.dumps(o_post),
+                                            headers=self.get_headers(user))
+                            _id = json.loads(result.data)['record']['id']
+
+                            # Make record inactive
+                            result = c.put(f'/activate_{endpoint}/{_id}',
+                                           data=json.dumps({
+                                               'is_active': False
+                                           }),
+                                           headers=self.get_headers(user))
+
+                            self.assertEqual(200, result.status_code)
+
+                            self.assertEqual('El registro fue inactivado.',
+                                             json.loads(result.data)['message'])
+
+                            # Make record active.
+                            result = c.put(f'/activate_{endpoint}/{_id}',
+                                           data=json.dumps({
+                                               'is_active': True
+                                           }),
+                                           headers=self.get_headers(user))
+
+                            self.assertEqual(200, result.status_code)
+
+                            self.assertEqual('El registro fue activado.',
+                                             json.loads(result.data)['message'])
+
+                            self.clear_db()
+
+    def test_activate_inactivate_active_inactive(self):
+        """
+        Test that PUT requests to the resource's endpoint with is_active=True
+        and is_active=False return status code 400 if the record is already
+        active or inactive.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+                    parsed_model = model.parse_model()
+                    o_post, o_put = self.get_b_object(b_obj)
+
+                    if 'is_active' in parsed_model['keys']:
+                        with self.subTest(resource, o_post=o_post, user=user):
+                            # POST the object to the database and get the id.
+                            result = c.post(f'/{endpoint}',
+                                            data=json.dumps(o_post),
+                                            headers=self.get_headers(user))
+                            _id = json.loads(result.data)['record']['id']
+
+                            # Try to activate an active record.
+                            result = c.put(f'/activate_{endpoint}/{_id}',
+                                           data=json.dumps({
+                                               'is_active': True
+                                           }),
+                                           headers=self.get_headers(user))
+
+                            self.assertEqual(400, result.status_code)
+
+                            self.assertEqual('El registro ya estaba activo.',
+                                             json.loads(result.data)['message'])
+
+                            # Make record inactive.
+                            c.put(f'/activate_{endpoint}/{_id}',
+                                  data=json.dumps({
+                                      'is_active': False
+                                  }),
+                                  headers=self.get_headers(user))
+
+                            # Try to inactivate an inactive record.
+                            result = c.put(f'/activate_{endpoint}/{_id}',
+                                           data=json.dumps({
+                                               'is_active': False
+                                           }),
+                                           headers=self.get_headers(user))
+
+                            self.assertEqual(400, result.status_code)
+
+                            self.assertEqual('El registro ya estaba inactivo.',
+                                             json.loads(result.data)['message'])
+
+                            self.clear_db()
+
+    def test_activate_without_authentication(self):
+        """
+        Test that a PUT requests to the resource's endpoint return
+        status code 401 if user is not authenticated.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user('fake')
+                    parsed_model = model.parse_model()
+
+                    if 'is_active' in parsed_model['keys']:
+                        with self.subTest(resource, user=user):
+                            result = c.put(f'/activate_{endpoint}/999',
+                                           data=json.dumps({
+                                               'is_active': True
+                                           }),
+                                           headers=self.get_headers(user))
+
+                            self.assertEqual(401, result.status_code)
+
+                            self.clear_db()
+
+    def test_activate_not_found(self):
+        """
+        Test that a PUT requests to the resource's endpoint return
+        status code 404 if the record is not in the database.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+                    parsed_model = model.parse_model()
+
+                    if 'is_active' in parsed_model['keys']:
+                        with self.subTest(resource, user=user):
+                            result = c.put(f'/activate_{endpoint}/999',
+                                           data=json.dumps({
+                                               'is_active': True
+                                           }),
+                                           headers=self.get_headers(user))
+
+                            self.assertEqual(404, result.status_code)
+
+                            self.clear_db()
+
+    def test_list_with_authentication(self):
+        """
+        Test that GET requests to the resource's endpoint return the list
+        of records if the user is authenticated.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user(user_type)
+                    o_post, o_put = self.get_b_object(b_obj)
+
+                    with self.subTest(resource, o_post=o_post, user=user):
+                        # POST the object to the database and get the id.
+                        result = c.post(f'/{endpoint}',
+                                        data=json.dumps(o_post),
+                                        headers=self.get_headers(user))
+                        _id = json.loads(result.data)['record']['id']
+
+                        result = c.get(f'/{endpoint}s',
+                                       headers=self.get_headers(user))
+
+                        _list = json.loads(result.data)['list']
+
+                        self.assertEqual(200, result.status_code)
+
+                        self.assertIn(model.query.filter_by(id=_id)
+                                      .first()
+                                      .to_dict(), _list)
+
+                        self.clear_db()
+
+    def test_list_without_authentication(self):
+        """
+        Test that GET requests to the resource's endpoint return status
+        code 401 if the user is not authenticated.
+        """
+        with self.client() as c:
+            with self.app_context():
+                for params in self.get_system_test_params():
+                    resource, model, b_obj, endpoint, user_type = params
+                    user = self.get_test_user('fake')
+
+                    with self.subTest(resource, user=user):
+                        result = c.get(f'/{endpoint}s',
+                                       headers=self.get_headers(user))
+
+                        self.assertEqual(401, result.status_code)
+
+                        self.clear_db()

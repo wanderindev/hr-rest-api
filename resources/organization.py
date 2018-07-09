@@ -1,7 +1,3 @@
-from flask_jwt import current_identity, jwt_required
-from flask_restful import reqparse, Resource
-from sqlalchemy import exc
-
 from models.organization import OrganizationModel
 from resources.mixin import ActivateMixin, ListMixin, ResourceMixin
 
