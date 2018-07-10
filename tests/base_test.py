@@ -480,6 +480,28 @@ class BaseTest(TestCase):
                 None,
                 'countries',
                 'test'
+            ),
+            (
+                'Passport Resource',
+                PassportModel,
+                (
+                    {
+                        'passport_number': '123456',
+                        'issue_date': '2018-01-01',
+                        'expiration_date': '2019-01-01',
+                        'employee_id': self.get_employee,
+                        'country_id': 1
+                    },
+                    {
+                        'passport_number': '654321',
+                        'issue_date': '2018-01-31',
+                        'expiration_date': '2019-01-31',
+                        'employee_id': self.get_employee,
+                        'country_id': 2
+                    }
+                ),
+                'passport',
+                'test'
             )
         ]
 

@@ -33,3 +33,12 @@ class PassportModel(ModelMixin, db.Model):
         if passport:
             if EmployeeModel.find_by_id(passport.employee_id, user):
                 return passport
+
+    @classmethod
+    def find_all(cls, user, employee_id):
+        from models.employee import EmployeeModel
+
+        records = cls.query.filter_by(employee_id=employee_id).all()
+
+        if records and EmployeeModel.find_by_id(employee_id, user):
+            return records

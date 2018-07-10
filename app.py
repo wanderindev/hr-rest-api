@@ -19,7 +19,7 @@ from resources.health_permit import HealthPermit, HealthPermits
 from resources.marital_status import MaritalStatuses
 from resources.organization import ActivateOrganization, Organization, \
     Organizations
-from resources.passport import Passport
+from resources.passport import Passport, Passports
 from resources.payment import Payment
 from resources.payment_detail import PaymentDetail
 from resources.schedule import Schedule
@@ -129,7 +129,9 @@ def create_app(config_file=None):
 
     api.add_resource(Passport,
                      '/passport',
-                     '/passport/<int:passport_id>')
+                     '/passport/<int:_id>')
+    api.add_resource(Passports,
+                     '/passports/<int:employee_id>')
 
     api.add_resource(UniformItem,
                      '/uniform_item',

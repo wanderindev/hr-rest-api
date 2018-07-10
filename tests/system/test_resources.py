@@ -522,7 +522,7 @@ class TestResources(BaseTest):
                     o_post, o_put = self.get_b_object(b_obj)
 
                     with self.subTest(resource, o_post=o_post, user=user):
-                        if endpoint == 'marital_statuses' or 'countries':
+                        if endpoint in ['marital_statuses', 'countries']:
                             result = c.get(f'/{endpoint}',
                                            headers=self.get_headers(user))
                         else:
