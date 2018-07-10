@@ -115,8 +115,20 @@ class EmployeeModel(ModelMixin, db.Model):
     def find_by_id(cls, _id, user):
         from models.department import DepartmentModel
 
-        empl = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if empl:
-            if DepartmentModel.find_by_id(empl.department_id, user):
-                return empl
+        if record:
+            if DepartmentModel.find_by_id(record.department_id, user):
+                return record
+
+    @classmethod
+    def find_all(cls, user):
+        from models.department import DepartmentModel
+
+        departments = DepartmentModel.find_all(user)
+        ids = []
+
+        for department in departments:
+            ids.append(department.id)
+
+        return cls.query.filter(cls.department_id.in_(ids)).all()

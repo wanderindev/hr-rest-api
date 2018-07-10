@@ -11,7 +11,7 @@ from resources.deduction_detail import DeductionDetail
 from resources.department import ActivateDepartment, Department, Departments
 from resources.dependent import Dependent
 from resources.emergency_contact import EmergencyContact
-from resources.employee import ActivateEmployee, Employee
+from resources.employee import ActivateEmployee, Employee, Employees
 from resources.employment_position import ActivateEmploymentPosition, \
     EmploymentPosition, EmploymentPositions
 from resources.family_relation import FamilyRelationList
@@ -106,9 +106,11 @@ def create_app(config_file=None):
 
     api.add_resource(Employee,
                      '/employee',
-                     '/employee/<int:employee_id>')
+                     '/employee/<int:_id>')
     api.add_resource(ActivateEmployee,
-                     '/activate_employee/<int:employee_id>')
+                     '/activate_employee/<int:_id>')
+    api.add_resource(Employees,
+                     '/employees')
 
     api.add_resource(EmergencyContact,
                      '/emergency_contact',

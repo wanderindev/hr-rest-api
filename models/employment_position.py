@@ -42,11 +42,11 @@ class EmploymentPositionModel(ModelMixin, db.Model):
     def find_by_id(cls, _id, user):
         from models.organization import OrganizationModel
 
-        e_p = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if e_p:
-            if OrganizationModel.find_by_id(e_p.organization_id, user):
-                return e_p
+        if record:
+            if OrganizationModel.find_by_id(record.organization_id, user):
+                return record
 
     @classmethod
     def find_all(cls, user):

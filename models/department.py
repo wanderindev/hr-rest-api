@@ -31,11 +31,11 @@ class DepartmentModel(ModelMixin, db.Model):
     def find_by_id(cls, _id, user):
         from models.organization import OrganizationModel
 
-        dept = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if dept:
-            if OrganizationModel.find_by_id(dept.organization_id, user):
-                return dept
+        if record:
+            if OrganizationModel.find_by_id(record.organization_id, user):
+                return record
 
     @classmethod
     def find_all(cls, user):

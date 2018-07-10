@@ -366,7 +366,69 @@ class BaseTest(TestCase):
                 ),
                 'shift',
                 'test'
-            )
+            ),
+            (
+                'Employee Resource',
+                EmployeeModel,
+                (
+                    {
+                        'first_name': 'f_n',
+                        'second_name': 's_n',
+                        'first_surname': 'f_sn',
+                        'second_surname': 's_sn',
+                        'national_id_number': '1-11-111',
+                        'is_panamanian': True,
+                        'date_of_birth': '2000-01-31',
+                        'gender': 'Hombre',
+                        'address': 'Panamá',
+                        'home_phone': '222-2222',
+                        'mobile_phone': '6666-6666',
+                        'email': 'f_n@f_sn.com',
+                        'type_of_contract': 'Definido',
+                        'employment_date': '2018-01-01',
+                        'contract_expiration_date': '2018-01-31',
+                        'termination_date': '2018-01-15',
+                        'termination_reason': 'Período de Prueba',
+                        'salary_per_payment_period': 104,
+                        'representation_expenses_per_payment_period': 0,
+                        'payment_method': 'ACH',
+                        'is_active': True,
+                        'marital_status_id': 1,
+                        'department_id': self.get_department,
+                        'position_id': self.get_employment_position,
+                        'shift_id': self.get_shift
+                    },
+                    {
+                        'first_name': 'new_f_n',
+                        'second_name': 'new_s_n',
+                        'first_surname': 'new_f_sn',
+                        'second_surname': 'new_s_sn',
+                        'national_id_number': 'N-1-11-111',
+                        'is_panamanian': False,
+                        'date_of_birth': '2001-01-31',
+                        'gender': 'Mujer',
+                        'address': 'Chiriquí',
+                        'home_phone': '333-3333',
+                        'mobile_phone': '6666-7777',
+                        'email': 'new_f_n@new_f_sn.com',
+                        'type_of_contract': 'Indefinido',
+                        'employment_date': '2019-01-01',
+                        'contract_expiration_date': '2019-01-31',
+                        'termination_date': '2019-01-15',
+                        'termination_reason': 'Renuncia',
+                        'salary_per_payment_period': 208,
+                        'representation_expenses_per_payment_period': 100,
+                        'payment_method': 'Cheque',
+                        'is_active': True,
+                        'marital_status_id': 2,
+                        'department_id': self.get_department,
+                        'position_id': self.get_employment_position,
+                        'shift_id': self.get_shift
+                    }
+                ),
+                'employee',
+                'test'
+            ),
         ]
 
     @staticmethod

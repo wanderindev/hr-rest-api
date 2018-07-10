@@ -148,11 +148,11 @@ class ShiftModel(ModelMixin, db.Model):
     def find_by_id(cls, _id, user):
         from models.organization import OrganizationModel
 
-        shift = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if shift:
-            if OrganizationModel.find_by_id(shift.organization_id, user):
-                return shift
+        if record:
+            if OrganizationModel.find_by_id(record.organization_id, user):
+                return record
 
     @classmethod
     def find_all(cls, user):
