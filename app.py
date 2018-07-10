@@ -10,7 +10,7 @@ from resources.deduction import ActivateDeduction, Deduction
 from resources.deduction_detail import DeductionDetail
 from resources.department import ActivateDepartment, Department, Departments
 from resources.dependent import Dependent
-from resources.emergency_contact import EmergencyContact
+from resources.emergency_contact import EmergencyContact, EmergencyContacts
 from resources.employee import ActivateEmployee, Employee, Employees
 from resources.employment_position import ActivateEmploymentPosition, \
     EmploymentPosition, EmploymentPositions
@@ -114,7 +114,9 @@ def create_app(config_file=None):
 
     api.add_resource(EmergencyContact,
                      '/emergency_contact',
-                     '/emergency_contact/<int:contact_id>')
+                     '/emergency_contact/<int:_id>')
+    api.add_resource(EmergencyContacts,
+                     '/emergency_contacts/<int:employee_id>')
 
     api.add_resource(HealthPermit,
                      '/health_permit',

@@ -236,7 +236,7 @@ class BaseTest(TestCase):
                 'test'
             ),
             (
-                'Employment Position Resource',
+                'EmploymentPosition Resource',
                 EmploymentPositionModel,
                 (
                     {
@@ -430,7 +430,7 @@ class BaseTest(TestCase):
                 'test'
             ),
             (
-                'Health Permit Resource',
+                'HealthPermit Resource',
                 HealthPermitModel,
                 (
                     {
@@ -447,6 +447,30 @@ class BaseTest(TestCase):
                     }
                 ),
                 'health_permit',
+                'test'
+            ),
+            (
+                'EmergencyContact Resource',
+                EmergencyContactModel,
+                (
+                    {
+                        'first_name': 'f_n',
+                        'last_name': 'l_n',
+                        'home_phone': '111-1111',
+                        'work_phone': '222-2222',
+                        'mobile_phone': '6666-6666',
+                        'employee_id': self.get_employee
+                    },
+                    {
+                        'first_name': 'new_f_n',
+                        'last_name': 'new_l_n',
+                        'home_phone': '333-3333',
+                        'work_phone': '444-4444',
+                        'mobile_phone': '6666-7777',
+                        'employee_id': self.get_employee
+                    }
+                ),
+                'emergency_contact',
                 'test'
             ),
         ]

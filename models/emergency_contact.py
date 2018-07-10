@@ -33,3 +33,12 @@ class EmergencyContactModel(ModelMixin, db.Model):
         if e_cont:
             if EmployeeModel.find_by_id(e_cont.employee_id, user):
                 return e_cont
+
+    @classmethod
+    def find_all(cls, user, employee_id):
+        from models.employee import EmployeeModel
+
+        records = cls.query.filter_by(employee_id=employee_id).all()
+
+        if records and EmployeeModel.find_by_id(employee_id, user):
+            return records
