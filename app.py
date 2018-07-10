@@ -26,7 +26,7 @@ from resources.schedule import Schedule
 from resources.schedule_detail import ScheduleDetail
 from resources.shift import ActivateShift, Shift, Shifts
 from resources.uniform_item import UniformItem, UniformItems
-from resources.uniform_requirement import UniformRequirement
+from resources.uniform_requirement import UniformRequirement, UniformRequirements
 from resources.uniform_size import UniformSize, UniformSizes
 from resources.user import ActivateUser, User
 from security import authenticate, identity
@@ -148,6 +148,8 @@ def create_app(config_file=None):
     api.add_resource(UniformRequirement,
                      '/uniform_requirement',
                      '/uniform_requirement/<int:_id>')
+    api.add_resource(UniformRequirements,
+                     '/uniform_requirements/<int:_id>')
 
     api.add_resource(BankList,
                      '/banks')

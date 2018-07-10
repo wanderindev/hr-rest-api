@@ -534,6 +534,24 @@ class BaseTest(TestCase):
                 ),
                 'uniform_size',
                 'test'
+            ),
+            (
+                'UniformRequirement Resource',
+                UniformRequirementModel,
+                (
+                    {
+                        'employee_id': self.get_employee,
+                        'uniform_item_id': self.get_uniform_item,
+                        'uniform_size_id': self.get_uniform_size
+                    },
+                    {
+                        'employee_id': self.get_employee,
+                        'uniform_item_id': self.get_uniform_item,
+                        'uniform_size_id': self.get_uniform_size
+                    }
+                ),
+                'uniform_requirement',
+                'test'
             )
         ]
 

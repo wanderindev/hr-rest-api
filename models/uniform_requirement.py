@@ -27,9 +27,18 @@ class UniformRequirementModel(ModelMixin, db.Model):
         from models.employee import EmployeeModel
         from models.uniform_item import UniformItemModel
 
-        req = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if req:
-            if UniformItemModel.find_by_id(req.uniform_item_id, user) and \
-                    EmployeeModel.find_by_id(req.employee_id, user):
-                return req
+        if record:
+            if UniformItemModel.find_by_id(record.uniform_item_id, user) and \
+                    EmployeeModel.find_by_id(record.employee_id, user):
+                return record
+
+    @classmethod
+    def find_all(cls, user, employee_id):
+        from models.employee import EmployeeModel
+
+        records = cls.query.filter_by(employee_id=employee_id).all()
+
+        if records and EmployeeModel.find_by_id(employee_id, user):
+            return records
