@@ -4,7 +4,7 @@ from flask_restful import Api
 
 from resources.bank import BankList
 from resources.bank_account import ActivateBankAccount, BankAccount
-from resources.country import CountryList
+from resources.country import Countries
 from resources.creditor import ActivateCreditor, Creditor
 from resources.deduction import ActivateDeduction, Deduction
 from resources.deduction_detail import DeductionDetail
@@ -124,7 +124,7 @@ def create_app(config_file=None):
     api.add_resource(HealthPermits,
                      '/health_permits/<int:employee_id>')
 
-    api.add_resource(CountryList,
+    api.add_resource(Countries,
                      '/countries')
 
     api.add_resource(Passport,

@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash
 from app import create_app
 from db import db
 from models.bank_account import BankAccountModel
+from models.country import CountryModel
 from models.creditor import CreditorModel
 from models.deduction import DeductionModel
 from models.deduction_detail import DeductionDetailModel
@@ -473,6 +474,13 @@ class BaseTest(TestCase):
                 'emergency_contact',
                 'test'
             ),
+            (
+                'Country Resource',
+                CountryModel,
+                None,
+                'countries',
+                'test'
+            )
         ]
 
     @staticmethod

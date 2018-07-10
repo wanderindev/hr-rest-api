@@ -19,5 +19,5 @@ class CountryModel(ModelMixin, db.Model):
         self.nationality = nationality
 
     @classmethod
-    def find_all(cls):
+    def find_all(cls, user):
         return cls.query.order_by('country_name').all()
