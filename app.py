@@ -3,7 +3,8 @@ from flask_jwt import JWT
 from flask_restful import Api
 
 from resources.bank import Banks
-from resources.bank_account import ActivateBankAccount, BankAccount
+from resources.bank_account import ActivateBankAccount, BankAccount, \
+    BankAccounts
 from resources.country import Countries
 from resources.creditor import ActivateCreditor, Creditor
 from resources.deduction import ActivateDeduction, Deduction
@@ -160,6 +161,8 @@ def create_app(config_file=None):
                      '/bank_account/<int:_id>')
     api.add_resource(ActivateBankAccount,
                      '/activate_bank_account/<int:_id>')
+    api.add_resource(BankAccounts,
+                     '/bank_accounts/<int:_id>')
 
     api.add_resource(FamilyRelationList,
                      '/family_relations')

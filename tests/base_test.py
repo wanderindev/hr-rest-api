@@ -554,10 +554,32 @@ class BaseTest(TestCase):
                 'test'
             ),
             (
-                'Bank Resource',
+                'Banks Resource',
                 UniformRequirementModel,
                 None,
                 'banks',
+                'test'
+            ),
+            (
+                'BankAccount Resource',
+                BankAccountModel,
+                (
+                    {
+                        'account_number': '1234',
+                        'account_type': 'Corriente',
+                        'is_active': True,
+                        'employee_id': self.get_employee,
+                        'bank_id': 1
+                    },
+                    {
+                        'account_number': '4321',
+                        'account_type': 'Ahorro',
+                        'is_active': True,
+                        'employee_id': self.get_employee,
+                        'bank_id': 2,
+                    }
+                ),
+                'bank_account',
                 'test'
             )
         ]
