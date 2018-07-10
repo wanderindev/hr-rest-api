@@ -27,7 +27,7 @@ from resources.schedule_detail import ScheduleDetail
 from resources.shift import ActivateShift, Shift, Shifts
 from resources.uniform_item import UniformItem, UniformItems
 from resources.uniform_requirement import UniformRequirement
-from resources.uniform_size import UniformSize
+from resources.uniform_size import UniformSize, UniformSizes
 from resources.user import ActivateUser, User
 from security import authenticate, identity
 
@@ -116,13 +116,13 @@ def create_app(config_file=None):
                      '/emergency_contact',
                      '/emergency_contact/<int:_id>')
     api.add_resource(EmergencyContacts,
-                     '/emergency_contacts/<int:employee_id>')
+                     '/emergency_contacts/<int:_id>')
 
     api.add_resource(HealthPermit,
                      '/health_permit',
                      '/health_permit/<int:_id>')
     api.add_resource(HealthPermits,
-                     '/health_permits/<int:employee_id>')
+                     '/health_permits/<int:_id>')
 
     api.add_resource(Countries,
                      '/countries')
@@ -131,7 +131,7 @@ def create_app(config_file=None):
                      '/passport',
                      '/passport/<int:_id>')
     api.add_resource(Passports,
-                     '/passports/<int:employee_id>')
+                     '/passports/<int:_id>')
 
     api.add_resource(UniformItem,
                      '/uniform_item',
@@ -142,6 +142,8 @@ def create_app(config_file=None):
     api.add_resource(UniformSize,
                      '/uniform_size',
                      '/uniform_size/<int:_id>')
+    api.add_resource(UniformSizes,
+                     '/uniform_sizes/<int:_id>')
 
     api.add_resource(UniformRequirement,
                      '/uniform_requirement',

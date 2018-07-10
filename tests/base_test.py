@@ -518,6 +518,22 @@ class BaseTest(TestCase):
                 ),
                 'uniform_item',
                 'test'
+            ),
+            (
+                'UniformSize Resource',
+                UniformSizeModel,
+                (
+                    {
+                        'size_description': 'test_u_s',
+                        'uniform_item_id': self.get_uniform_item
+                    },
+                    {
+                        'size_description': 'new_test_u_s',
+                        'uniform_item_id': self.get_uniform_item
+                    }
+                ),
+                'uniform_size',
+                'test'
             )
         ]
 

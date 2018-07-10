@@ -19,8 +19,17 @@ class UniformSizeModel(ModelMixin, db.Model):
     def find_by_id(cls, _id, user):
         from models.uniform_item import UniformItemModel
 
-        size = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if size:
-            if UniformItemModel.find_by_id(size.uniform_item_id, user):
-                return size
+        if record:
+            if UniformItemModel.find_by_id(record.uniform_item_id, user):
+                return record
+
+    @classmethod
+    def find_all(cls, user, item_id):
+        from models.uniform_item import UniformItemModel
+
+        records = cls.query.filter_by(uniform_item_id=item_id).all()
+
+        if records and UniformItemModel.find_by_id(item_id, user):
+            return records

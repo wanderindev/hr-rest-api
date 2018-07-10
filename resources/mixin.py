@@ -154,9 +154,9 @@ class ActivateMixin(Resource):
 
 class ListMixin(Resource):
     @jwt_required()
-    def get(self, employee_id=None):
-        if employee_id:
-            _list = self.model.find_all(current_identity, employee_id)
+    def get(self, _id=None):
+        if _id:
+            _list = self.model.find_all(current_identity, _id)
         else:
             _list = self.model.find_all(current_identity)
         if _list:

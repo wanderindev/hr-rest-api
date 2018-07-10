@@ -536,6 +536,10 @@ class TestResources(BaseTest):
                                 result = c.get(f'/{endpoint}s'
                                                f'/{o_post["employee_id"]}',
                                                headers=self.get_headers(user))
+                            if 'uniform_item_id' in parsed_model['keys']:
+                                result = c.get(f'/{endpoint}s'
+                                               f'/{o_post["uniform_item_id"]}',
+                                               headers=self.get_headers(user))
                             else:
                                 result = c.get(f'/{endpoint}s',
                                                headers=self.get_headers(user))
