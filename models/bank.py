@@ -17,5 +17,5 @@ class BankModel(ModelMixin, db.Model):
         self.bank_name = bank_name
 
     @classmethod
-    def find_all(cls):
+    def find_all(cls, user):
         return cls.query.order_by('bank_name').all()

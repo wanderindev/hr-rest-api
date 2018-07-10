@@ -552,6 +552,13 @@ class BaseTest(TestCase):
                 ),
                 'uniform_requirement',
                 'test'
+            ),
+            (
+                'Bank Resource',
+                UniformRequirementModel,
+                None,
+                'banks',
+                'test'
             )
         ]
 

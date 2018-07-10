@@ -2,7 +2,7 @@ from flask import Flask
 from flask_jwt import JWT
 from flask_restful import Api
 
-from resources.bank import BankList
+from resources.bank import Banks
 from resources.bank_account import ActivateBankAccount, BankAccount
 from resources.country import Countries
 from resources.creditor import ActivateCreditor, Creditor
@@ -26,7 +26,8 @@ from resources.schedule import Schedule
 from resources.schedule_detail import ScheduleDetail
 from resources.shift import ActivateShift, Shift, Shifts
 from resources.uniform_item import UniformItem, UniformItems
-from resources.uniform_requirement import UniformRequirement, UniformRequirements
+from resources.uniform_requirement import UniformRequirement, \
+    UniformRequirements
 from resources.uniform_size import UniformSize, UniformSizes
 from resources.user import ActivateUser, User
 from security import authenticate, identity
@@ -151,7 +152,7 @@ def create_app(config_file=None):
     api.add_resource(UniformRequirements,
                      '/uniform_requirements/<int:_id>')
 
-    api.add_resource(BankList,
+    api.add_resource(Banks,
                      '/banks')
 
     api.add_resource(BankAccount,
