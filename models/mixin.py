@@ -37,30 +37,6 @@ class ModelMixin(object):
             db.session.commit()
 
     @classmethod
-    def find_all(cls, user):
-        return cls.get_records(user)
-
-    @classmethod
-    def find_by_id(cls, _id, user):
-        record = cls.query.filter_by(id=_id).first()
-
-        if cls.is_authorized(user, record):
-            return record
-
-        return None
-
-    @classmethod
-    def get_records(cls, user):
-        if (hasattr(cls, 'organization_name') and user.is_super) or \
-                hasattr(cls, 'status_feminine'):
-            return cls.query.all()
-        elif hasattr(cls, 'organization_id'):
-            return cls.query.filter_by(
-                organization_id=user.organization_id).all()
-
-        return None
-
-    @classmethod
     def get_unique_constraints(cls):
         u_contraints = []
         if hasattr(cls, '__table_args__'):
@@ -77,17 +53,6 @@ class ModelMixin(object):
     def inactivate(self):
         self.is_active = False
         self.save_to_db()
-
-    @classmethod
-    def is_authorized(cls, user, record=None):
-        if record:
-            if hasattr(cls, 'organization_name') and \
-                    (user.is_super or record.id == user.organization_id):
-                return True
-            elif hasattr(cls, 'organization_id') and \
-                    record.organization_id == user.organization_id:
-                return True
-        return False
 
     @classmethod
     def parse_model(cls):

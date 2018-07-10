@@ -17,3 +17,7 @@ class MaritalStatusModel(ModelMixin, db.Model):
     def __init__(self, status_feminine, status_masculine):
         self.status_feminine = status_feminine
         self.status_masculine = status_masculine
+
+    @classmethod
+    def find_all(cls, user):
+        return cls.query.order_by('status_feminine').all()

@@ -47,3 +47,13 @@ class OrganizationModel(ModelMixin, db.Model):
     def __init__(self, organization_name, is_active):
         self.organization_name = organization_name
         self.is_active = is_active
+
+    @classmethod
+    def find_by_id(cls, _id, user):
+        if user.is_super or user.organization_id == _id:
+            return cls.query.filter_by(id=_id).first()
+
+    @classmethod
+    def find_all(cls, user):
+        if user.is_super:
+            return cls.query.all()

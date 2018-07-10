@@ -37,3 +37,17 @@ class EmploymentPositionModel(ModelMixin, db.Model):
         self.minimum_hourly_wage = minimum_hourly_wage
         self.is_active = is_active
         self.organization_id = organization_id
+
+    @classmethod
+    def find_by_id(cls, _id, user):
+        from models.organization import OrganizationModel
+
+        e_p = cls.query.filter_by(id=_id).first()
+
+        if e_p:
+            if OrganizationModel.find_by_id(e_p.organization_id, user):
+                return e_p
+
+    @classmethod
+    def find_all(cls, user):
+        return cls.query.filter_by(organization_id=user.organization_id).all()
