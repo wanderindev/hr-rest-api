@@ -25,7 +25,7 @@ from resources.payment_detail import PaymentDetail
 from resources.schedule import Schedule
 from resources.schedule_detail import ScheduleDetail
 from resources.shift import ActivateShift, Shift, Shifts
-from resources.uniform_item import UniformItem
+from resources.uniform_item import UniformItem, UniformItems
 from resources.uniform_requirement import UniformRequirement
 from resources.uniform_size import UniformSize
 from resources.user import ActivateUser, User
@@ -135,62 +135,64 @@ def create_app(config_file=None):
 
     api.add_resource(UniformItem,
                      '/uniform_item',
-                     '/uniform_item/<int:item_id>')
+                     '/uniform_item/<int:_id>')
+    api.add_resource(UniformItems,
+                     '/uniform_items')
 
     api.add_resource(UniformSize,
                      '/uniform_size',
-                     '/uniform_size/<int:size_id>')
+                     '/uniform_size/<int:_id>')
 
     api.add_resource(UniformRequirement,
                      '/uniform_requirement',
-                     '/uniform_requirement/<int:requirement_id>')
+                     '/uniform_requirement/<int:_id>')
 
     api.add_resource(BankList,
                      '/banks')
 
     api.add_resource(BankAccount,
                      '/bank_account',
-                     '/bank_account/<int:account_id>')
+                     '/bank_account/<int:_id>')
     api.add_resource(ActivateBankAccount,
-                     '/activate_bank_account/<int:account_id>')
+                     '/activate_bank_account/<int:_id>')
 
     api.add_resource(FamilyRelationList,
                      '/family_relations')
 
     api.add_resource(Dependent,
                      '/dependent',
-                     '/dependent/<int:dependent_id>')
+                     '/dependent/<int:_id>')
 
     api.add_resource(Schedule,
                      '/schedule',
-                     '/schedule/<int:schedule_id>')
+                     '/schedule/<int:_id>')
 
     api.add_resource(ScheduleDetail,
                      '/schedule_detail',
-                     '/schedule_detail/<int:detail_id>')
+                     '/schedule_detail/<int:_id>')
 
     api.add_resource(Payment,
                      '/payment',
-                     '/payment/<int:payment_id>')
+                     '/payment/<int:_id>')
 
     api.add_resource(PaymentDetail,
                      '/payment_detail',
-                     '/payment_detail/<int:detail_id>')
+                     '/payment_detail/<int:_id>')
 
     api.add_resource(Creditor,
                      '/creditor',
-                     '/creditor/<int:creditor_id>')
+                     '/creditor/<int:_id>')
     api.add_resource(ActivateCreditor,
-                     '/activate_creditor/<int:creditor_id>')
+                     '/activate_creditor/<int:_id>')
 
     api.add_resource(Deduction,
                      '/deduction',
-                     '/deduction/<int:deduction_id>')
+                     '/deduction/<int:_id>')
     api.add_resource(ActivateDeduction,
-                     '/activate_deduction/<int:deduction_id>')
+                     '/activate_deduction/<int:_id>')
 
     api.add_resource(DeductionDetail,
                      '/deduction_detail',
-                     '/deduction_detail/<int:detail_id>')
+                     '/deduction_detail/<int:_id>')
 
     return app

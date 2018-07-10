@@ -28,11 +28,11 @@ class PassportModel(ModelMixin, db.Model):
     def find_by_id(cls, _id, user):
         from models.employee import EmployeeModel
 
-        passport = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if passport:
-            if EmployeeModel.find_by_id(passport.employee_id, user):
-                return passport
+        if record:
+            if EmployeeModel.find_by_id(record.employee_id, user):
+                return record
 
     @classmethod
     def find_all(cls, user, employee_id):

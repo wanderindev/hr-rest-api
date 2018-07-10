@@ -502,6 +502,22 @@ class BaseTest(TestCase):
                 ),
                 'passport',
                 'test'
+            ),
+            (
+                'UniformItem Resource',
+                UniformItemModel,
+                (
+                    {
+                        'item_name': 'test_u_i',
+                        'organization_id': self.get_organization
+                    },
+                    {
+                        'item_name': 'new_test_u_i',
+                        'organization_id': self.get_organization
+                    }
+                ),
+                'uniform_item',
+                'test'
             )
         ]
 
