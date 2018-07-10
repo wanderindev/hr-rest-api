@@ -154,9 +154,11 @@ class ActivateMixin(Resource):
 
 class ListMixin(Resource):
     @jwt_required()
-    def get(self):
-        _list = self.model.find_all(current_identity)
-
+    def get(self, employee_id=None):
+        if employee_id:
+            _list = self.model.find_all(current_identity, employee_id)
+        else:
+            _list = self.model.find_all(current_identity)
         if _list:
             return {'list': list(map(lambda x: x.to_dict(), _list))}
 

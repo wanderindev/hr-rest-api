@@ -518,21 +518,13 @@ class TestResources(BaseTest):
                 for params in self.get_system_test_params():
                     resource, model, b_obj, endpoint, user_type = params
                     user = self.get_test_user(user_type)
+                    parsed_model = model.parse_model()
                     o_post, o_put = self.get_b_object(b_obj)
 
                     with self.subTest(resource, o_post=o_post, user=user):
                         if endpoint == 'marital_statuses':
                             result = c.get(f'/{endpoint}',
                                            headers=self.get_headers(user))
-
-                            self.assertEqual(200, result.status_code)
-
-                            self.assertGreater(
-                                len(json.loads(result.data)['list']),
-                                0
-                            )
-
-                            self.clear_db()
                         else:
                             # POST the object to the database and get the id.
                             result = c.post(f'/{endpoint}',
@@ -540,18 +532,21 @@ class TestResources(BaseTest):
                                             headers=self.get_headers(user))
                             _id = json.loads(result.data)['record']['id']
 
-                            result = c.get(f'/{endpoint}s',
-                                           headers=self.get_headers(user))
+                            if 'employee_id' in parsed_model['keys']:
+                                result = c.get(f'/{endpoint}s'
+                                               f'/{o_post["employee_id"]}',
+                                               headers=self.get_headers(user))
+                            else:
+                                result = c.get(f'/{endpoint}s',
+                                               headers=self.get_headers(user))
 
-                            _list = json.loads(result.data)['list']
+                        _list = json.loads(result.data)['list']
 
-                            self.assertEqual(200, result.status_code)
+                        self.assertEqual(200, result.status_code)
 
-                            self.assertIn(model.query.filter_by(id=_id)
-                                          .first()
-                                          .to_dict(), _list)
+                        self.assertGreater(len(_list), 0)
 
-                            self.clear_db()
+                        self.clear_db()
 
     def test_list_without_authentication(self):
         """
@@ -563,14 +558,21 @@ class TestResources(BaseTest):
                 for params in self.get_system_test_params():
                     resource, model, b_obj, endpoint, user_type = params
                     user = self.get_test_user('fake')
+                    parsed_model = model.parse_model()
+                    o_post, o_put = self.get_b_object(b_obj)
 
                     with self.subTest(resource, user=user):
                         if endpoint == 'marital_statuses':
                             result = c.get(f'/{endpoint}',
                                            headers=self.get_headers(user))
                         else:
-                            result = c.get(f'/{endpoint}s',
-                                           headers=self.get_headers(user))
+                            if 'employee_id' in parsed_model['keys']:
+                                result = c.get(f'/{endpoint}s'
+                                               f'/{o_post["employee_id"]}',
+                                               headers=self.get_headers(user))
+                            else:
+                                result = c.get(f'/{endpoint}s',
+                                               headers=self.get_headers(user))
 
                         self.assertEqual(401, result.status_code)
 

@@ -429,6 +429,26 @@ class BaseTest(TestCase):
                 'employee',
                 'test'
             ),
+            (
+                'Health Permit Resource',
+                HealthPermitModel,
+                (
+                    {
+                        'health_permit_type': 'Verde',
+                        'issue_date': '2018-01-01',
+                        'expiration_date': '2019-01-01',
+                        'employee_id': self.get_employee
+                    },
+                    {
+                        'health_permit_type': 'Blanco',
+                        'issue_date': '2018-01-31',
+                        'expiration_date': '2019-01-31',
+                        'employee_id': self.get_employee
+                    }
+                ),
+                'health_permit',
+                'test'
+            ),
         ]
 
     @staticmethod

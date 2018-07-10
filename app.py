@@ -15,7 +15,7 @@ from resources.employee import ActivateEmployee, Employee, Employees
 from resources.employment_position import ActivateEmploymentPosition, \
     EmploymentPosition, EmploymentPositions
 from resources.family_relation import FamilyRelationList
-from resources.health_permit import HealthPermit
+from resources.health_permit import HealthPermit, HealthPermits
 from resources.marital_status import MaritalStatuses
 from resources.organization import ActivateOrganization, Organization, \
     Organizations
@@ -118,7 +118,9 @@ def create_app(config_file=None):
 
     api.add_resource(HealthPermit,
                      '/health_permit',
-                     '/health_permit/<int:permit_id>')
+                     '/health_permit/<int:_id>')
+    api.add_resource(HealthPermits,
+                     '/health_permits/<int:employee_id>')
 
     api.add_resource(CountryList,
                      '/countries')
