@@ -9,6 +9,7 @@ class BankAccount(ResourceMixin):
 
 class ActivateBankAccount(ActivateMixin):
     model = BankAccountModel
+    parsed_model = model.parse_model()
 
 
 class BankAccounts(ListMixin):

@@ -529,11 +529,10 @@ class TestResources(BaseTest):
                             result = c.get(f'/{endpoint}',
                                            headers=self.get_headers(user))
                         else:
-                            # POST the object to the database and get the id.
-                            result = c.post(f'/{endpoint}',
-                                            data=json.dumps(o_post),
-                                            headers=self.get_headers(user))
-                            _id = json.loads(result.data)['record']['id']
+                            # POST the object to the database.
+                            c.post(f'/{endpoint}',
+                                   data=json.dumps(o_post),
+                                   headers=self.get_headers(user))
 
                             if 'employee_id' in parsed_model['keys']:
                                 result = c.get(f'/{endpoint}s'
@@ -542,6 +541,10 @@ class TestResources(BaseTest):
                             elif 'uniform_item_id' in parsed_model['keys']:
                                 result = c.get(f'/{endpoint}s'
                                                f'/{o_post["uniform_item_id"]}',
+                                               headers=self.get_headers(user))
+                            elif 'department_id' in parsed_model['keys']:
+                                result = c.get(f'/{endpoint}s'
+                                               f'/{o_post["department_id"]}',
                                                headers=self.get_headers(user))
                             else:
                                 result = c.get(f'/{endpoint}s',

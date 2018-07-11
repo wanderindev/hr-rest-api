@@ -617,6 +617,22 @@ class BaseTest(TestCase):
                 ),
                 'dependent',
                 'test'
+            ),
+            (
+                'Schedule Resource',
+                ScheduleModel,
+                (
+                    {
+                        'start_date': '2018-01-01',
+                        'department_id': self.get_department
+                    },
+                    {
+                        'start_date': '2018-01-31',
+                        'department_id': self.get_department
+                    }
+                ),
+                'schedule',
+                'test'
             )
         ]
 

@@ -23,7 +23,7 @@ from resources.organization import ActivateOrganization, Organization, \
 from resources.passport import Passport, Passports
 from resources.payment import Payment
 from resources.payment_detail import PaymentDetail
-from resources.schedule import Schedule
+from resources.schedule import Schedule, Schedules
 from resources.schedule_detail import ScheduleDetail
 from resources.shift import ActivateShift, Shift, Shifts
 from resources.uniform_item import UniformItem, UniformItems
@@ -176,6 +176,8 @@ def create_app(config_file=None):
     api.add_resource(Schedule,
                      '/schedule',
                      '/schedule/<int:_id>')
+    api.add_resource(Schedules,
+                     '/schedules/<int:_id>')
 
     api.add_resource(ScheduleDetail,
                      '/schedule_detail',

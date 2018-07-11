@@ -1,3 +1,5 @@
+from sqlalchemy import UniqueConstraint
+
 from db import db
 from models.department import DepartmentModel
 from models.schedule_detail import ScheduleDetailModel
@@ -6,6 +8,9 @@ from models.mixin import ModelMixin
 
 class ScheduleModel(ModelMixin, db.Model):
     __tablename__ = 'schedule'
+    __table_args__ = (UniqueConstraint('department_id', 'start_date',
+                                       name='schedule_department_id_'
+                                            'start_date_uindex'),)
 
     id = db.Column(db.Integer, primary_key=True)
     start_date = db.Column(db.Date, nullable=False)
@@ -23,8 +28,17 @@ class ScheduleModel(ModelMixin, db.Model):
 
     @classmethod
     def find_by_id(cls, _id, user):
-        sch = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if sch:
-            if DepartmentModel.find_by_id(sch.department_id, user):
-                return sch
+        if record:
+            if DepartmentModel.find_by_id(record.department_id, user):
+                return record
+
+    @classmethod
+    def find_all(cls, user, department_id):
+        from models.department import DepartmentModel
+
+        records = cls.query.filter_by(department_id=department_id).all()
+
+        if records and DepartmentModel.find_by_id(department_id, user):
+            return records
