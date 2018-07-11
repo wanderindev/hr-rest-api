@@ -10,7 +10,7 @@ from resources.creditor import ActivateCreditor, Creditor
 from resources.deduction import ActivateDeduction, Deduction
 from resources.deduction_detail import DeductionDetail
 from resources.department import ActivateDepartment, Department, Departments
-from resources.dependent import Dependent
+from resources.dependent import Dependent, Dependents
 from resources.emergency_contact import EmergencyContact, EmergencyContacts
 from resources.employee import ActivateEmployee, Employee, Employees
 from resources.employment_position import ActivateEmploymentPosition, \
@@ -170,6 +170,8 @@ def create_app(config_file=None):
     api.add_resource(Dependent,
                      '/dependent',
                      '/dependent/<int:_id>')
+    api.add_resource(Dependents,
+                     '/dependents/<int:_id>')
 
     api.add_resource(Schedule,
                      '/schedule',

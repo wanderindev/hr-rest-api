@@ -589,6 +589,34 @@ class BaseTest(TestCase):
                 None,
                 'family_relations',
                 'test'
+            ),
+            (
+                'Dependent Resource',
+                DependentModel,
+                (
+                    {
+                        'first_name': 'f_n',
+                        'second_name': 's_n',
+                        'first_surname': 'f_sn',
+                        'second_surname': 's_sn',
+                        'gender': 'Mujer',
+                        'date_of_birth': '2018-01-01',
+                        'employee_id': self.get_employee,
+                        'family_relation_id': 1
+                    },
+                    {
+                        'first_name': 'new_f_n',
+                        'second_name': 'new_s_n',
+                        'first_surname': 'new_f_sn',
+                        'second_surname': 'new_s_sn',
+                        'gender': 'Hombre',
+                        'date_of_birth': '2018-01-31',
+                        'employee_id': self.get_employee,
+                        'family_relation_id': 2
+                    }
+                ),
+                'dependent',
+                'test'
             )
         ]
 

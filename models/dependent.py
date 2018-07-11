@@ -35,8 +35,17 @@ class DependentModel(ModelMixin, db.Model):
     def find_by_id(cls, _id, user):
         from models.employee import EmployeeModel
 
-        depen = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if depen:
-            if EmployeeModel.find_by_id(depen.employee_id, user):
-                return depen
+        if record:
+            if EmployeeModel.find_by_id(record.employee_id, user):
+                return record
+
+    @classmethod
+    def find_all(cls, user, employee_id):
+        from models.employee import EmployeeModel
+
+        records = cls.query.filter_by(employee_id=employee_id).all()
+
+        if records and EmployeeModel.find_by_id(employee_id, user):
+            return records
