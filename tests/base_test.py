@@ -219,6 +219,7 @@ class BaseTest(TestCase):
                     {
                         'username': 'test_u',
                         'password': 'test_p',
+                        'password_hash': generate_password_hash('test_p'),
                         'email': 'test_u@test_o.com',
                         'organization_id': 1,
                         'is_super': True,
@@ -228,6 +229,7 @@ class BaseTest(TestCase):
                     {
                         'username': 'new_test_u',
                         'password': 'new_test_p',
+                        'password_hash': generate_password_hash('new_test_p'),
                         'email': 'new_test_u@test_o.com',
                         'organization_id': 1,
                         'is_super': False,
