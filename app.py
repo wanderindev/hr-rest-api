@@ -30,7 +30,7 @@ from resources.uniform_item import UniformItem, UniformItems
 from resources.uniform_requirement import UniformRequirement, \
     UniformRequirements
 from resources.uniform_size import UniformSize, UniformSizes
-from resources.user import ActivateUser, User
+from resources.user import ActivateUser, User, Users
 from security import authenticate, identity
 
 
@@ -75,9 +75,11 @@ def create_app(config_file=None):
 
     api.add_resource(User,
                      '/user',
-                     '/user/<string:username>')
+                     '/user/<int:_id>')
     api.add_resource(ActivateUser,
-                     '/activate_user/<string:username>')
+                     '/activate_user/<int:_id>')
+    api.add_resource(Users,
+                     '/users')
 
     api.add_resource(Department,
                      '/department',

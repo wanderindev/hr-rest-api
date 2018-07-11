@@ -182,7 +182,7 @@ class BaseTest(TestCase):
     def check_record(self, expected, record, parsed_model):
         """Assert that all columns in a record contain the expected values"""
         for key in parsed_model['keys']:
-            if record[key] is not None:
+            if hasattr(record, key):
                 if key in parsed_model['int']:
                     self.assertEqual(expected[key], int(record[key]))
                 elif key in parsed_model['float']:
@@ -210,6 +210,32 @@ class BaseTest(TestCase):
                     }
                 ),
                 'organization',
+                'root'
+            ),
+            (
+                'User Resource',
+                AppUserModel,
+                (
+                    {
+                        'username': 'test_u',
+                        'password': 'test_p',
+                        'email': 'test_u@test_o.com',
+                        'organization_id': 1,
+                        'is_super': True,
+                        'is_owner': True,
+                        'is_active': True
+                    },
+                    {
+                        'username': 'new_test_u',
+                        'password': 'new_test_p',
+                        'email': 'new_test_u@test_o.com',
+                        'organization_id': 1,
+                        'is_super': False,
+                        'is_owner': False,
+                        'is_active': False
+                    }
+                ),
+                'user',
                 'root'
             ),
             (
@@ -742,14 +768,15 @@ class BaseTest(TestCase):
                         'creditor_name': 'test_cr',
                         'phone_number': '123-4567',
                         'email': 'test@test_cr.com',
-                        'organization_id': self.get_organization().id,
+                        'organization_id': self.get_organization,
                         'is_active': True
                     },
                     {
                         'creditor_name': 'new_test_cr',
                         'phone_number': '456-7890',
                         'email': 'test@new_test_cr.com',
-                        'organization_id': self.cr_dict['organization_id']
+                        'organization_id': self.get_organization,
+                        'is_active': True
                     }
                 ),
                 'creditor',

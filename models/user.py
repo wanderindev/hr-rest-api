@@ -1,4 +1,4 @@
-from sqlalchemy import text
+from sqlalchemy import text, UniqueConstraint
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from db import db
@@ -7,6 +7,11 @@ from models.mixin import ModelMixin
 
 class AppUserModel(ModelMixin, db.Model):
     __tablename__ = 'app_user'
+    __table_args__ = (UniqueConstraint('username',
+                                       name='app_user_username_uindex'),
+                      UniqueConstraint('email',
+                                       name='app_user_email_uindex')
+                      )
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), nullable=False, unique=True)
@@ -39,13 +44,21 @@ class AppUserModel(ModelMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     @classmethod
-    def find_by_id(cls, _id):
+    def find_by_id(cls, _id, user=None):
         from models.organization import OrganizationModel
 
-        user = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if OrganizationModel.find_by_id(user.organization_id, user):
-            return user
+        if record:
+            if user:
+                if OrganizationModel.find_by_id(record.organization_id, user):
+                    return record
+            else:
+                return record
+
+    @classmethod
+    def find_all(cls, user):
+        return cls.query.filter_by(organization_id=user.organization_id).all()
 
     @classmethod
     def find_by_username(cls, username):

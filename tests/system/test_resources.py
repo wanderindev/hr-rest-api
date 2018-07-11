@@ -28,8 +28,14 @@ class TestResources(BaseTest):
 
                     if o_post is not None:
                         with self.subTest(resource, o_post=o_post, user=user):
-                            self.assertIsNone(
-                                model.query.filter_by(**o_post).first())
+                            if 'password' in parsed_model['keys']:
+                                o = dict(o_post)
+                                o.pop('password')
+                                self.assertIsNone(
+                                    model.query.filter_by(**o).first())
+                            else:
+                                self.assertIsNone(
+                                    model.query.filter_by(**o_post).first())
 
                             result = c.post(f'/{endpoint}',
                                             data=json.dumps(o_post),
@@ -83,8 +89,14 @@ class TestResources(BaseTest):
 
                     if parsed_model['unique']:
                         with self.subTest(resource, o_post=o_post, user=user):
-                            self.assertIsNone(
-                                model.query.filter_by(**o_post).first())
+                            if 'password' in parsed_model['keys']:
+                                o = dict(o_post)
+                                o.pop('password')
+                                self.assertIsNone(
+                                    model.query.filter_by(**o).first())
+                            else:
+                                self.assertIsNone(
+                                    model.query.filter_by(**o_post).first())
 
                             # POST object to db.
                             result = c.post(f'/{endpoint}',
@@ -200,7 +212,7 @@ class TestResources(BaseTest):
                             result = c.put(f'/{endpoint}/{_id}',
                                            data=json.dumps(o_put),
                                            headers=self.get_headers(user))
-
+                            print(result.data)
                             record = json.loads(result.data)['record']
 
                             self.assertEqual(200, result.status_code)

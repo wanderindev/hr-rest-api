@@ -67,7 +67,8 @@ class ModelMixin(object):
         }
 
         for col in cls.__table__.columns:
-            if col.key != 'id':
+            if col.key not in ['id', 'created_on', 'current_login',
+                               'last_login', 'login_count']:
                 parsed_model['keys'].append(col.key)
                 if col.unique:
                     parsed_model['unique'].append(col.key)
@@ -83,6 +84,10 @@ class ModelMixin(object):
                     parsed_model['str'].append(col.key)
 
         parsed_model['unique'] = cls.get_unique_constraints()
+
+        if cls.__tablename__ == 'app_user':
+            parsed_model['keys'].append('password')
+            parsed_model['str'].append('password')
 
         return parsed_model
 
