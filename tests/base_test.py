@@ -754,6 +754,34 @@ class BaseTest(TestCase):
                 ),
                 'creditor',
                 'test'
+            ),
+            (
+                'Deduction Resource',
+                DeductionModel,
+                (
+                    {
+                        'start_date': '2018-01-01',
+                        'end_date': '2018-01-31',
+                        'deduction_per_payment_period': 123.45,
+                        'payment_method': 'Cheque',
+                        'deduct_in_december': True,
+                        'is_active': True,
+                        'employee_id': self.get_employee,
+                        'creditor_id': self.get_creditor
+                    },
+                    {
+                        'start_date': '2018-02-01',
+                        'end_date': '2018-02-28',
+                        'deduction_per_payment_period': 45.67,
+                        'payment_method': 'Efectivo',
+                        'deduct_in_december': False,
+                        'is_active': True,
+                        'employee_id': self.get_employee,
+                        'creditor_id': self.get_creditor
+                    }
+                ),
+                'deduction',
+                'test'
             )
         ]
 
