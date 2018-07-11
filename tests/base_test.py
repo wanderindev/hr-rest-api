@@ -633,6 +633,64 @@ class BaseTest(TestCase):
                 ),
                 'schedule',
                 'test'
+            ),
+            (
+                'ScheduleDetail Resource',
+                ScheduleDetailModel,
+                (
+                    {
+                        'day_1_start': '2018-01-01T06:00:00',
+                        'day_1_end': '2018-01-01T14:00:00',
+                        'day_1_comment': 'comment 1',
+                        'day_2_start': '2018-01-02T06:00:00',
+                        'day_2_end': '2018-01-02T14:00:00',
+                        'day_2_comment': 'comment 2',
+                        'day_3_start': '2018-01-03T06:00:00',
+                        'day_3_end': '2018-01-03T14:00:00',
+                        'day_3_comment': 'comment 3',
+                        'day_4_start': '2018-01-04T06:00:00',
+                        'day_4_end': '2018-01-04T14:00:00',
+                        'day_4_comment': 'comment 4',
+                        'day_5_start': None,
+                        'day_5_end': None,
+                        'day_5_comment': None,
+                        'day_6_start': '2018-01-06T22:00:00',
+                        'day_6_end': '2018-01-07T06:00:00',
+                        'day_6_comment': 'comment 6',
+                        'day_7_start': '2018-01-07T22:00:00',
+                        'day_7_end': '2018-01-08T06:00:00',
+                        'day_7_comment': 'comment 7',
+                        'employee_id': self.get_employee,
+                        'schedule_id': self.get_schedule
+                    },
+                    {
+                        'day_1_start': '2018-02-01T06:00:00',
+                        'day_1_end': '2018-02-01T14:00:00',
+                        'day_1_comment': 'comment 1',
+                        'day_2_start': '2018-02-02T06:00:00',
+                        'day_2_end': '2018-02-02T14:00:00',
+                        'day_2_comment': 'comment 2',
+                        'day_3_start': '2018-02-03T06:00:00',
+                        'day_3_end': '2018-02-03T14:00:00',
+                        'day_3_comment': 'comment 3',
+                        'day_4_start': '2018-02-04T06:00:00',
+                        'day_4_end': '2018-02-04T14:00:00',
+                        'day_4_comment': 'comment 4',
+                        'day_5_start': None,
+                        'day_5_end': None,
+                        'day_5_comment': None,
+                        'day_6_start': '2018-02-06T22:00:00',
+                        'day_6_end': '2018-02-07T06:00:00',
+                        'day_6_comment': 'comment 6',
+                        'day_7_start': '2018-02-07T22:00:00',
+                        'day_7_end': '2018-02-08T06:00:00',
+                        'day_7_comment': 'comment 7',
+                        'employee_id': self.get_employee,
+                        'schedule_id': self.get_schedule
+                    }
+                ),
+                'schedule_detail',
+                'test'
             )
         ]
 

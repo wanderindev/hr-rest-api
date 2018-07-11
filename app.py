@@ -24,7 +24,7 @@ from resources.passport import Passport, Passports
 from resources.payment import Payment
 from resources.payment_detail import PaymentDetail
 from resources.schedule import Schedule, Schedules
-from resources.schedule_detail import ScheduleDetail
+from resources.schedule_detail import ScheduleDetail, ScheduleDetails
 from resources.shift import ActivateShift, Shift, Shifts
 from resources.uniform_item import UniformItem, UniformItems
 from resources.uniform_requirement import UniformRequirement, \
@@ -182,6 +182,8 @@ def create_app(config_file=None):
     api.add_resource(ScheduleDetail,
                      '/schedule_detail',
                      '/schedule_detail/<int:_id>')
+    api.add_resource(ScheduleDetails,
+                     '/schedule_details/<int:_id>')
 
     api.add_resource(Payment,
                      '/payment',

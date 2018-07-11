@@ -534,7 +534,11 @@ class TestResources(BaseTest):
                                    data=json.dumps(o_post),
                                    headers=self.get_headers(user))
 
-                            if 'employee_id' in parsed_model['keys']:
+                            if 'schedule_id' in parsed_model['keys']:
+                                result = c.get(f'/{endpoint}s'
+                                               f'/{o_post["schedule_id"]}',
+                                               headers=self.get_headers(user))
+                            elif 'employee_id' in parsed_model['keys']:
                                 result = c.get(f'/{endpoint}s'
                                                f'/{o_post["employee_id"]}',
                                                headers=self.get_headers(user))
