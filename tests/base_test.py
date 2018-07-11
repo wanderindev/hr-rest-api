@@ -782,6 +782,24 @@ class BaseTest(TestCase):
                 ),
                 'deduction',
                 'test'
+            ),
+            (
+                'DeductionDetail Resource',
+                DeductionDetailModel,
+                (
+                    {
+                        'deducted_amount': 67.89,
+                        'payment_id': self.get_payment,
+                        'deduction_id': self.get_deduction
+                    },
+                    {
+                        'deducted_amount': 89.01,
+                        'payment_id': self.get_payment,
+                        'deduction_id': self.get_deduction
+                    }
+                ),
+                'deduction_detail',
+                'test'
             )
         ]
 

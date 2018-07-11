@@ -23,8 +23,17 @@ class DeductionDetailModel(ModelMixin, db.Model):
     def find_by_id(cls, _id, user):
         from models.deduction import DeductionModel
 
-        d_d = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if d_d:
-            if DeductionModel.find_by_id(d_d.deduction_id, user):
-                return d_d
+        if record:
+            if DeductionModel.find_by_id(record.deduction_id, user):
+                return record
+
+    @classmethod
+    def find_all(cls, user, payment_id):
+        from models.payment import PaymentModel
+
+        records = cls.query.filter_by(payment_id=payment_id).all()
+
+        if records and PaymentModel.find_by_id(payment_id, user):
+            return records
