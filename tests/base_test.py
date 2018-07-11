@@ -733,6 +733,27 @@ class BaseTest(TestCase):
                 ),
                 'payment_detail',
                 'test'
+            ),
+            (
+                'Creditor Resource',
+                CreditorModel,
+                (
+                    {
+                        'creditor_name': 'test_cr',
+                        'phone_number': '123-4567',
+                        'email': 'test@test_cr.com',
+                        'organization_id': self.get_organization().id,
+                        'is_active': True
+                    },
+                    {
+                        'creditor_name': 'new_test_cr',
+                        'phone_number': '456-7890',
+                        'email': 'test@new_test_cr.com',
+                        'organization_id': self.cr_dict['organization_id']
+                    }
+                ),
+                'creditor',
+                'test'
             )
         ]
 

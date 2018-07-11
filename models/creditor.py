@@ -1,11 +1,15 @@
+from sqlalchemy import UniqueConstraint
+
 from db import db
 from models.deduction import DeductionModel
 from models.mixin import ModelMixin
 
 
-
 class CreditorModel(ModelMixin, db.Model):
     __tablename__ = 'creditor'
+    __table_args__ = (UniqueConstraint('creditor_name', 'organization_id',
+                                       name='creditor_creditor_name_'
+                                            'organization_id_uindex'),)
 
     id = db.Column(db.Integer, primary_key=True)
     creditor_name = db.Column(db.String(80), nullable=False)
@@ -32,8 +36,12 @@ class CreditorModel(ModelMixin, db.Model):
     def find_by_id(cls, _id, user):
         from models.organization import OrganizationModel
 
-        cred = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if cred:
-            if OrganizationModel.find_by_id(cred.organization_id, user):
-                return cred
+        if record:
+            if OrganizationModel.find_by_id(record.organization_id, user):
+                return record
+
+    @classmethod
+    def find_all(cls, user):
+        return cls.query.filter_by(organization_id=user.organization_id).all()
