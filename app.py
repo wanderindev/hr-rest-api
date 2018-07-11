@@ -15,7 +15,7 @@ from resources.emergency_contact import EmergencyContact, EmergencyContacts
 from resources.employee import ActivateEmployee, Employee, Employees
 from resources.employment_position import ActivateEmploymentPosition, \
     EmploymentPosition, EmploymentPositions
-from resources.family_relation import FamilyRelationList
+from resources.family_relation import FamilyRelations
 from resources.health_permit import HealthPermit, HealthPermits
 from resources.marital_status import MaritalStatuses
 from resources.organization import ActivateOrganization, Organization, \
@@ -164,7 +164,7 @@ def create_app(config_file=None):
     api.add_resource(BankAccounts,
                      '/bank_accounts/<int:_id>')
 
-    api.add_resource(FamilyRelationList,
+    api.add_resource(FamilyRelations,
                      '/family_relations')
 
     api.add_resource(Dependent,

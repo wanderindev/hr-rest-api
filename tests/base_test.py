@@ -15,6 +15,7 @@ from models.dependent import DependentModel
 from models.emergency_contact import EmergencyContactModel
 from models.employee import EmployeeModel
 from models.employment_position import EmploymentPositionModel
+from models.family_relation import FamilyRelationModel
 from models.health_permit import HealthPermitModel
 from models.marital_status import MaritalStatusModel
 from models.organization import OrganizationModel
@@ -580,6 +581,13 @@ class BaseTest(TestCase):
                     }
                 ),
                 'bank_account',
+                'test'
+            ),
+            (
+                'FamilyRelation Resource',
+                FamilyRelationModel,
+                None,
+                'family_relations',
                 'test'
             )
         ]
