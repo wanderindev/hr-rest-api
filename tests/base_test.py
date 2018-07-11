@@ -691,6 +691,24 @@ class BaseTest(TestCase):
                 ),
                 'schedule_detail',
                 'test'
+            ),
+            (
+                'Payment Resource',
+                PaymentModel,
+                (
+                    {
+                        'payment_date': '2018-01-01',
+                        'document_number': '1234-abc',
+                        'employee_id': self.get_employee
+                    },
+                    {
+                        'payment_date': '2018-02-01',
+                        'document_number': '1234-def',
+                        'employee_id': self.get_employee
+                    }
+                ),
+                'payment',
+                'test'
             )
         ]
 
