@@ -29,8 +29,17 @@ class PaymentDetailModel(ModelMixin, db.Model):
     def find_by_id(cls, _id, user):
         from models.payment import PaymentModel
 
-        pmt_d = cls.query.filter_by(id=_id).first()
+        record = cls.query.filter_by(id=_id).first()
 
-        if pmt_d:
-            if PaymentModel.find_by_id(pmt_d.payment_id, user):
-                return pmt_d
+        if record:
+            if PaymentModel.find_by_id(record.payment_id, user):
+                return record
+
+    @classmethod
+    def find_all(cls, user, payment_id):
+        from models.payment import PaymentModel
+
+        records = cls.query.filter_by(payment_id=payment_id).all()
+
+        if records and PaymentModel.find_by_id(payment_id, user):
+            return records

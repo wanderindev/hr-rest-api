@@ -709,6 +709,30 @@ class BaseTest(TestCase):
                 ),
                 'payment',
                 'test'
+            ),
+            (
+                'PaymentDetail Resource',
+                PaymentDetailModel,
+                (
+                    {
+                        'payment_type': 'Salario Regular',
+                        'gross_payment': 1234.56,
+                        'ss_deduction': 123.45,
+                        'se_deduction': 12.34,
+                        'isr_deduction': 1.23,
+                        'payment_id': self.get_payment
+                    },
+                    {
+                        'payment_type': 'Vacación',
+                        'gross_payment': 2345.67,
+                        'ss_deduction': 234.56,
+                        'se_deduction': 23.45,
+                        'isr_deduction': 2.34,
+                        'payment_id': self.get_payment
+                    }
+                ),
+                'payment_detail',
+                'test'
             )
         ]
 

@@ -538,6 +538,10 @@ class TestResources(BaseTest):
                                 result = c.get(f'/{endpoint}s'
                                                f'/{o_post["schedule_id"]}',
                                                headers=self.get_headers(user))
+                            elif 'payment_id' in parsed_model['keys']:
+                                result = c.get(f'/{endpoint}s'
+                                               f'/{o_post["payment_id"]}',
+                                               headers=self.get_headers(user))
                             elif 'employee_id' in parsed_model['keys']:
                                 result = c.get(f'/{endpoint}s'
                                                f'/{o_post["employee_id"]}',

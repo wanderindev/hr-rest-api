@@ -22,7 +22,7 @@ from resources.organization import ActivateOrganization, Organization, \
     Organizations
 from resources.passport import Passport, Passports
 from resources.payment import Payment, Payments
-from resources.payment_detail import PaymentDetail
+from resources.payment_detail import PaymentDetail, PaymentDetails
 from resources.schedule import Schedule, Schedules
 from resources.schedule_detail import ScheduleDetail, ScheduleDetails
 from resources.shift import ActivateShift, Shift, Shifts
@@ -194,6 +194,8 @@ def create_app(config_file=None):
     api.add_resource(PaymentDetail,
                      '/payment_detail',
                      '/payment_detail/<int:_id>')
+    api.add_resource(PaymentDetails,
+                     '/payment_details/<int:_id>')
 
     api.add_resource(Creditor,
                      '/creditor',
