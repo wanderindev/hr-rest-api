@@ -1,6 +1,6 @@
 FROM python:3.7.0-alpine3.8
 
-MAINTAINER Javier Feliu <javier@feliu.io>
+MAINTAINER Javier Feliu <jfeliu@nuvanz.com>
 
 RUN apk update \
   && apk add --virtual build-deps gcc python3-dev musl-dev \
