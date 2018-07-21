@@ -6,7 +6,7 @@ RUN apk update \
   && apk add --virtual build-deps gcc python3-dev musl-dev \
   && apk add postgresql-dev
 
-ENV INSTALL_PATH /rest-api
+ENV INSTALL_PATH /rest
 RUN mkdir -p $INSTALL_PATH
 
 WORKDIR $INSTALL_PATH
