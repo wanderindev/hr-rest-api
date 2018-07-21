@@ -562,7 +562,7 @@ class TestResources(BaseTest):
                                 result = c.get(f'/{endpoint}s'
                                                f'/{o_post["uniform_item_id"]}',
                                                headers=self.get_headers(user))
-                            elif 'department_id' in parsed_model['keys']:
+                            elif 'department_id' in parsed_model['keys'] and endpoint is not 'employee':
                                 result = c.get(f'/{endpoint}s'
                                                f'/{o_post["department_id"]}',
                                                headers=self.get_headers(user))

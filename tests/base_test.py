@@ -121,7 +121,7 @@ class BaseTest(TestCase):
                 except Exception as e:
                     # Returns fake token for testing purposes if user
                     # is not in the database.
-                    print(e)
+                    # TODO: catch a specific exception.
                     return {
                         'Content-Type': 'application/json',
                         'Authorization': 'JWT FaKeToKeN!!'
