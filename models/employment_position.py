@@ -9,12 +9,12 @@ class EmploymentPositionModel(ModelMixin, db.Model):
     __tablename__ = 'employment_position'
     __table_args__ = (UniqueConstraint('position_name_feminine',
                                        'organization_id',
-                                       name='employment_position_position_name_'
-                                            'feminine_organization_id_uindex'),
+                                       name='employment_position_p_name_feminine_'
+                                            'organization_id_uindex'),
                       UniqueConstraint('position_name_masculine',
                                        'organization_id',
-                                       name='employment_position_position_name_'
-                                            'masculine_organization_id_uindex')
+                                       name='employment_position_p_name_masculine_'
+                                            'organization_id_uindex')
                       )
 
     id = db.Column(db.Integer, primary_key=True)
