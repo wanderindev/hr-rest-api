@@ -5,6 +5,7 @@ from models.bank_account import BankAccountModel
 
 class BankModel(ModelMixin, db.Model):
     __tablename__ = 'bank'
+    exclude_from_update = ()
 
     id = db.Column(db.Integer, primary_key=True)
     bank_name = db.Column(db.String(80), nullable=False)

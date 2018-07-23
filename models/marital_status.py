@@ -5,6 +5,7 @@ from models.mixin import ModelMixin
 
 class MaritalStatusModel(ModelMixin, db.Model):
     __tablename__ = 'marital_status'
+    exclude_from_update = ()
 
     id = db.Column(db.Integer, primary_key=True)
     status_feminine = db.Column(db.String(25), nullable=False)

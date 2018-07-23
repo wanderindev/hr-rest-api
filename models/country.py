@@ -5,6 +5,7 @@ from models.passport import PassportModel
 
 class CountryModel(ModelMixin, db.Model):
     __tablename__ = 'country'
+    exclude_from_update = ()
 
     id = db.Column(db.Integer, primary_key=True)
     country_name = db.Column(db.String(80), nullable=False)

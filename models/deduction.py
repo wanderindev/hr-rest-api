@@ -6,6 +6,7 @@ from models.mixin import ModelMixin
 
 class DeductionModel(ModelMixin, db.Model):
     __tablename__ = 'deduction'
+    exclude_from_update = ('employee_id', 'is_active')
 
     id = db.Column(db.Integer, primary_key=True)
     start_date = db.Column(db.Date, nullable=False)

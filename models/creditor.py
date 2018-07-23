@@ -10,6 +10,7 @@ class CreditorModel(ModelMixin, db.Model):
     __table_args__ = (UniqueConstraint('creditor_name', 'organization_id',
                                        name='creditor_creditor_name_'
                                             'organization_id_uindex'),)
+    exclude_from_update = ('organization_id', 'is_active')
 
     id = db.Column(db.Integer, primary_key=True)
     creditor_name = db.Column(db.String(80), nullable=False)

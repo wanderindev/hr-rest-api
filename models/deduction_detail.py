@@ -4,6 +4,7 @@ from models.mixin import ModelMixin
 
 class DeductionDetailModel(ModelMixin, db.Model):
     __tablename__ = 'deduction_detail'
+    exclude_from_update = ('deduction_id',)
 
     id = db.Column(db.Integer, primary_key=True)
     deducted_amount = db.Column(db.Numeric(7, 2), nullable=False)

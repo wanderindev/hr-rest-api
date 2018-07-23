@@ -6,6 +6,7 @@ from models.payment_detail import PaymentDetailModel
 
 class PaymentModel(ModelMixin, db.Model):
     __tablename__ = 'payment'
+    exclude_from_update = ('employee_id',)
 
     id = db.Column(db.Integer, primary_key=True)
     payment_date = db.Column(db.Date, nullable=False)

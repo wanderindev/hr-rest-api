@@ -13,6 +13,7 @@ class ShiftModel(ModelMixin, db.Model):
     __table_args__ = (UniqueConstraint('shift_name', 'organization_id',
                                        name='shift_shift_name_organization_id_'
                                             'uindex'),)
+    exclude_from_update = ('organization_id', 'is_active')
 
     id = db.Column(db.Integer, primary_key=True)
     shift_name = db.Column(db.String(80), nullable=False)

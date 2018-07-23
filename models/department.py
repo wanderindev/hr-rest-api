@@ -10,6 +10,7 @@ class DepartmentModel(ModelMixin, db.Model):
     __table_args__ = (UniqueConstraint('department_name', 'organization_id',
                                        name='department_department_name_'
                                             'organization_id_uindex'),)
+    exclude_from_update = ('organization_id', 'is_active')
 
     id = db.Column(db.Integer, primary_key=True)
     department_name = db.Column(db.String(80), nullable=False)

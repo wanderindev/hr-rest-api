@@ -5,6 +5,7 @@ from models.mixin import ModelMixin
 
 class HealthPermitModel(ModelMixin, db.Model):
     __tablename__ = 'health_permit'
+    exclude_from_update = ('employee_id',)
 
     id = db.Column(db.Integer, primary_key=True)
     health_permit_type = db.Column(HEALTH_PERMIT_TYPE, nullable=False)

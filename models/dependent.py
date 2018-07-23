@@ -5,6 +5,7 @@ from models.mixin import ModelMixin
 
 class DependentModel(ModelMixin, db.Model):
     __tablename__ = 'dependent'
+    exclude_from_update = ('employee_id',)
 
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(40), nullable=False)

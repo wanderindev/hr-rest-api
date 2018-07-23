@@ -15,6 +15,7 @@ class OrganizationModel(ModelMixin, db.Model):
     __table_args__ = (UniqueConstraint('organization_name',
                                        name='organization_'
                                             'organization_name_uindex'),)
+    exclude_from_update = ()
 
     id = db.Column(db.Integer, primary_key=True)
     organization_name = db.Column(db.String(80), nullable=False)

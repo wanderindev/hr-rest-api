@@ -12,6 +12,7 @@ class AppUserModel(ModelMixin, db.Model):
                       UniqueConstraint('email',
                                        name='app_user_email_uindex')
                       )
+    exclude_from_update = ('organization_id', 'is_active')
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), nullable=False, unique=True)

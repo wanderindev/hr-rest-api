@@ -86,7 +86,9 @@ class ModelMixin(object):
         parsed_model['unique'] = cls.get_unique_constraints()
 
         if cls.__tablename__ == 'app_user':
+            # noinspection PyTypeChecker
             parsed_model['keys'].append('password')
+            # noinspection PyTypeChecker
             parsed_model['str'].append('password')
 
         return parsed_model
@@ -110,11 +112,11 @@ class ModelMixin(object):
 
         return output
 
-    def update(self, data, exclude=()):
+    def update(self, data):
         for key, value in data.items():
             if key is 'password':
                 setattr(self, 'password_hash', self.get_password_hash(value))
-            elif key not in exclude:
+            elif key not in self.exclude_from_update:
                 setattr(self, key, value)
         self.save_to_db()
 

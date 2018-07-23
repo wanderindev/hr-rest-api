@@ -11,6 +11,7 @@ class ScheduleModel(ModelMixin, db.Model):
     __table_args__ = (UniqueConstraint('department_id', 'start_date',
                                        name='schedule_department_id_'
                                             'start_date_uindex'),)
+    exclude_from_update = ('department_id',)
 
     id = db.Column(db.Integer, primary_key=True)
     start_date = db.Column(db.Date, nullable=False)

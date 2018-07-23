@@ -4,6 +4,7 @@ from models.mixin import ModelMixin
 
 class PassportModel(ModelMixin, db.Model):
     __tablename__ = 'passport'
+    exclude_from_update = ('employee_id',)
 
     id = db.Column(db.Integer, primary_key=True)
     passport_number = db.Column(db.String(40), nullable=False)

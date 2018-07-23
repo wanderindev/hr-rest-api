@@ -5,6 +5,7 @@ from models.mixin import ModelMixin
 
 class PaymentDetailModel(ModelMixin, db.Model):
     __tablename__ = 'payment_detail'
+    exclude_from_update = ('payment_id',)
 
     id = db.Column(db.Integer, primary_key=True)
     payment_type = db.Column(PAYMENT_TYPE, nullable=False)
