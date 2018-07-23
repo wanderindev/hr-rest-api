@@ -27,6 +27,7 @@ from models.uniform_size import UniformSizeModel
 from models.user import AppUserModel
 
 ORGANIZATION = {
+    'resources': ['Organization', 'ActivateOrganization', 'Organizations'],
     'model': OrganizationModel,
     'required_objects': [],
     'post_objects': [
@@ -54,6 +55,7 @@ ORGANIZATION = {
 }
 
 USER = {
+    'resources': ['User', 'ActivateUser', 'Users'],
     'model': AppUserModel,
     'required_objects': [ORGANIZATION],
     'post_objects': [
@@ -125,6 +127,7 @@ USER = {
 }
 
 DEPARTMENT = {
+    'resources': ['Department', 'ActivateDepartment', 'Departments'],
     'model': DepartmentModel,
     'required_objects': [ORGANIZATION],
     'post_objects': [
@@ -161,6 +164,7 @@ DEPARTMENT = {
 }
 
 MARITAL_STATUS = {
+    'resources': [None, None, 'MaritalStatuses'],
     'model': MaritalStatusModel,
     'required_objects': [],
     'post_objects': [],
@@ -170,6 +174,7 @@ MARITAL_STATUS = {
 }
 
 EMPLOYMENT_POSITION = {
+    'resources': ['EmploymentPosition', 'ActivateEmploymentPosition', 'EmploymentPositions'],
     'model': EmploymentPositionModel,
     'required_objects': [ORGANIZATION],
     'post_objects': [
@@ -223,6 +228,7 @@ EMPLOYMENT_POSITION = {
 }
 
 SHIFT_R = {
+    'resources': ['Shift', 'ActivateShift', 'Shifts'],
     'model': ShiftModel,
     'required_objects': [ORGANIZATION],
     'post_objects': [
@@ -294,6 +300,7 @@ SHIFT_R = {
 }
 
 SHIFT_F = {
+    'resources': ['Shift', 'ActivateShift', 'Shifts'],
     'model': ShiftModel,
     'required_objects': [ORGANIZATION],
     'post_objects': [
@@ -478,6 +485,7 @@ SHIFT_F = {
 }
 
 EMPLOYEE = {
+    'resources': ['Employee', 'ActivateEmployee', 'Employees'],
     'model': EmployeeModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R],
     'post_objects': [
@@ -570,6 +578,7 @@ EMPLOYEE = {
 }
 
 HEALTH_PERMIT = {
+    'resources': ['HealthPermit', None, 'HealthPermits'],
     'model': HealthPermitModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
@@ -599,6 +608,7 @@ HEALTH_PERMIT = {
 }
 
 EMERGENCY_CONTACT = {
+    'resources': ['EmergencyContact', None, 'EmergencyContacts'],
     'model': EmergencyContactModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
@@ -634,6 +644,7 @@ EMERGENCY_CONTACT = {
 }
 
 COUNTRY = {
+    'resources': [None, None, 'Countries'],
     'model': CountryModel,
     'required_objects': [],
     'post_objects': [],
@@ -643,6 +654,7 @@ COUNTRY = {
 }
 
 PASSPORT = {
+    'resources': ['Passport', None, 'Passports'],
     'model': PassportModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
@@ -675,6 +687,7 @@ PASSPORT = {
 }
 
 UNIFORM_ITEM = {
+    'resources': ['UniformItem', None, 'UniformItems'],
     'model': UniformItemModel,
     'required_objects': [ORGANIZATION],
     'post_objects': [
@@ -686,7 +699,7 @@ UNIFORM_ITEM = {
             'item_name': 'test_u_i_1',
             'organization_id': 0
         },
-{
+        {
             'item_name': 'test_u_i_0',
             'organization_id': 1
         }
@@ -706,6 +719,7 @@ UNIFORM_ITEM = {
 }
 
 UNIFORM_SIZE = {
+    'resources': ['UniformSize', None, 'UniformSizes'],
     'model': UniformSizeModel,
     'required_objects': [ORGANIZATION, UNIFORM_ITEM],
     'post_objects': [
@@ -737,6 +751,7 @@ UNIFORM_SIZE = {
 }
 
 UNIFORM_REQUIREMENT = {
+    'resources': ['UniformRequirement', None, 'UniformRequirements'],
     'model': UniformRequirementModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE, UNIFORM_ITEM, UNIFORM_SIZE],
     'post_objects': [
@@ -773,6 +788,7 @@ UNIFORM_REQUIREMENT = {
 }
 
 BANK = {
+    'resources': [None, None, 'Banks'],
     'model': BankModel,
     'required_objects': [],
     'post_objects': [],
@@ -782,6 +798,7 @@ BANK = {
 }
 
 BANK_ACCOUNT = {
+    'resources': ['BankAccount', 'ActivateBankAccount', 'BankAccounts'],
     'model': BankAccountModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
@@ -835,6 +852,7 @@ BANK_ACCOUNT = {
 }
 
 FAMILY_RELATION = {
+    'resources': [None, None, 'FamilyRelations'],
     'model': FamilyRelationModel,
     'required_objects': [],
     'post_objects': [],
@@ -844,6 +862,7 @@ FAMILY_RELATION = {
 }
 
 DEPENDENT = {
+    'resources': ['Dependent', None, 'Dependents'],
     'model': DependentModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
@@ -885,6 +904,7 @@ DEPENDENT = {
 }
 
 SCHEDULE = {
+    'resources': ['Schedule', None, 'Schedules'],
     'model': ScheduleModel,
     'required_objects': [ORGANIZATION, DEPARTMENT],
     'post_objects': [
@@ -916,6 +936,7 @@ SCHEDULE = {
 }
 
 SCHEDULE_DETAIL = {
+    'resources': ['ScheduleDetail', None, 'ScheduleDetails'],
     'model': ScheduleDetailModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, SCHEDULE, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
@@ -1052,6 +1073,7 @@ SCHEDULE_DETAIL = {
 }
 
 PAYMENT = {
+    'resources': ['Payment', None, 'Payments'],
     'model': PaymentModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
@@ -1078,6 +1100,7 @@ PAYMENT = {
 }
 
 PAYMENT_DETAIL = {
+    'resources': ['PaymentDetail', None, 'PaymentDetails'],
     'model': PaymentDetailModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE, PAYMENT],
     'post_objects': [
@@ -1113,6 +1136,7 @@ PAYMENT_DETAIL = {
 }
 
 CREDITOR = {
+    'resources': ['Creditor', 'ActivateCreditor', 'Creditors'],
     'model': CreditorModel,
     'required_objects': [ORGANIZATION],
     'post_objects': [
@@ -1130,7 +1154,7 @@ CREDITOR = {
             'organization_id': 0,
             'is_active': True
         },
-{
+        {
             'creditor_name': 'test_cr_0',
             'phone_number': '123-4567',
             'email': 'test@test_cr_0.com',
@@ -1159,6 +1183,7 @@ CREDITOR = {
 }
 
 DEDUCTION = {
+    'resources': ['Deduction', 'ActivateDeduction', 'Deductions'],
     'model': DeductionModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
@@ -1200,6 +1225,7 @@ DEDUCTION = {
 }
 
 DEDUCTION_DETAIL = {
+    'resources': ['DeductionDetail', None, 'DeductionDetails'],
     'model': DeductionDetailModel,
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE, PAYMENT, DEDUCTION],
     'post_objects': [
