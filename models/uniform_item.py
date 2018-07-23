@@ -9,7 +9,7 @@ class UniformItemModel(ModelMixin, db.Model):
     __tablename__ = 'uniform_item'
     __table_args__ = (UniqueConstraint('item_name', 'organization_id',
                                        name='uniform_item_item_name_organization_id_uindex'),)
-
+    exclude_from_update = ('organization_id',)
 
     id = db.Column(db.Integer, primary_key=True)
     item_name = db.Column(db.String(80), nullable=False)

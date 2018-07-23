@@ -9,6 +9,7 @@ class BankAccountModel(ModelMixin, db.Model):
     __tablename__ = 'bank_account'
     __table_args__ = (UniqueConstraint('account_number', 'employee_id', 'bank_id',
                                        name='bank_account_account_number_employee_id_bank_id_uindex'),)
+    exclude_from_update = ('employee_id',)
 
     id = db.Column(db.Integer, primary_key=True)
     account_number = db.Column(db.String(50), nullable=False)
