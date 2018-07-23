@@ -1,10 +1,13 @@
-from db import db
+from sqlalchemy import UniqueConstraint
 
+from db import db
 from models.mixin import ModelMixin
 
 
 class UniformRequirementModel(ModelMixin, db.Model):
     __tablename__ = 'uniform_requirement'
+    __table_args__ = (UniqueConstraint('employee_id', 'uniform_item_id',
+                                       name='uniform_requirement_employee_id_uniform_item_id_uindex'),)
 
     id = db.Column(db.Integer, primary_key=True)
     employee_id = db.Column(db.Integer,
