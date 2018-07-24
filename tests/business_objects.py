@@ -51,11 +51,11 @@ ORGANIZATION = {
         }
     ],
     'endpoints': ['organization', 'activate_organization', 'organizations'],
-    'users': ['root']
+    'user_type': 'root'
 }
 
 USER = {
-    'resources': ['User', 'ActivateUser', 'Users'],
+    'resources': ['user_type', 'ActivateUser', 'Users'],
     'model': AppUserModel,
     'required_objects': [ORGANIZATION],
     'post_objects': [
@@ -64,7 +64,7 @@ USER = {
             'password': 'test_p',
             'password_hash': generate_password_hash('test_p'),
             'email': 'test_u_0@test_o_0.com',
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'is_super': True,
             'is_owner': True,
             'is_active': True
@@ -74,7 +74,7 @@ USER = {
             'password': 'test_p',
             'password_hash': generate_password_hash('test_p'),
             'email': 'test_u_1@test_o_0.com',
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'is_super': True,
             'is_owner': True,
             'is_active': True
@@ -84,7 +84,7 @@ USER = {
             'password': 'test_p',
             'password_hash': generate_password_hash('test_p'),
             'email': 'test_u_2@test_o_0.com',
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'is_super': True,
             'is_owner': True,
             'is_active': True
@@ -96,7 +96,7 @@ USER = {
             'password': 'new_test_p',
             'password_hash': generate_password_hash('new_test_p'),
             'email': 'new_test_u_0@test_o_0.com',
-            'organization_id': 1,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
             'is_super': False,
             'is_owner': False,
             'is_active': False
@@ -106,7 +106,7 @@ USER = {
             'password': 'new_test_p',
             'password_hash': generate_password_hash('test_p'),
             'email': 'new_test_u_1@test_o_0.com',
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'is_super': False,
             'is_owner': False,
             'is_active': True
@@ -116,14 +116,14 @@ USER = {
             'password': 'new_test_p',
             'password_hash': generate_password_hash('test_p'),
             'email': 'test_u_0@test_o_0.com',
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'is_super': False,
             'is_owner': False,
             'is_active': True
         }
     ],
-    'endpoints': ['user', 'activate_user', 'users'],
-    'users': ['root']
+    'endpoints': ['user_type', 'activate_user', 'users'],
+    'user_type': 'root'
 }
 
 DEPARTMENT = {
@@ -133,34 +133,34 @@ DEPARTMENT = {
     'post_objects': [
         {
             'department_name': 'test_d_0',
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'is_active': True
         },
         {
             'department_name': 'test_d_1',
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'is_active': True
         },
         {
             'department_name': 'test_d_0',
-            'organization_id': 1,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
             'is_active': True
         }
     ],
     'put_objects': [
         {
             'department_name': 'new_test_d_0',
-            'organization_id': 1,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
             'is_active': False
         },
         {
             'department_name': 'test_d_0',
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'is_active': True
         }
     ],
     'endpoints': ['department', 'activate_department', 'departments'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 MARITAL_STATUS = {
@@ -170,7 +170,7 @@ MARITAL_STATUS = {
     'post_objects': [],
     'put_objects': [],
     'endpoints': [None, None, 'marital_statuses'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 EMPLOYMENT_POSITION = {
@@ -183,21 +183,21 @@ EMPLOYMENT_POSITION = {
             'position_name_masculine': 'test_e_p_m_0',
             'minimum_hourly_wage': 1.00,
             'is_active': True,
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
         },
         {
             'position_name_feminine': 'test_e_p_f_1',
             'position_name_masculine': 'test_e_p_m_1',
             'minimum_hourly_wage': 1.00,
             'is_active': True,
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
         },
         {
             'position_name_feminine': 'test_e_p_f_0',
             'position_name_masculine': 'test_e_p_m_0',
             'minimum_hourly_wage': 1.00,
             'is_active': True,
-            'organization_id': 1,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
         }
     ],
     'put_objects': [
@@ -206,25 +206,25 @@ EMPLOYMENT_POSITION = {
             'position_name_masculine': 'new_test_e_p_m',
             'minimum_hourly_wage': 2.00,
             'is_active': False,
-            'organization_id': 1,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
         },
         {
             'position_name_feminine': 'test_e_p_f_0',
             'position_name_masculine': 'new_test_e_p_m_0',
             'minimum_hourly_wage': 2.00,
             'is_active': True,
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
         },
         {
             'position_name_feminine': 'new_test_e_p_f_0',
             'position_name_masculine': 'test_e_p_m_0',
             'minimum_hourly_wage': 2.00,
             'is_active': True,
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
         }
     ],
     'endpoints': ['employment_position', 'activate_employment_position', 'employment_positions'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 SHIFT_R = {
@@ -240,7 +240,7 @@ SHIFT_R = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'rotation_start_hour': '06:00:00',
             'rotation_end_hour': '21:00:00'
         },
@@ -252,7 +252,7 @@ SHIFT_R = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'rotation_start_hour': '06:00:00',
             'rotation_end_hour': '21:00:00'
         },
@@ -264,7 +264,7 @@ SHIFT_R = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': 1,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
             'rotation_start_hour': '06:00:00',
             'rotation_end_hour': '21:00:00'
         }
@@ -278,7 +278,7 @@ SHIFT_R = {
             'break_length': '01:00:00',
             'is_break_included_in_shift': True,
             'is_active': False,
-            'organization_id': 1,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
             'rotation_start_hour': '00:00:00',
             'rotation_end_hour': '15:00:00'
         },
@@ -290,13 +290,13 @@ SHIFT_R = {
             'break_length': '01:00:00',
             'is_break_included_in_shift': True,
             'is_active': True,
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'rotation_start_hour': '00:00:00',
             'rotation_end_hour': '15:00:00'
         }
     ],
     'endpoints': ['shift', 'activate_shift', 'shifts'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 SHIFT_F = {
@@ -312,7 +312,7 @@ SHIFT_F = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'fixed_start_hour_monday': '08:00:00',
             'fixed_start_break_hour_monday': '12:00:00',
             'fixed_end_break_hour_monday': '12:30:00',
@@ -345,7 +345,7 @@ SHIFT_F = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'fixed_start_hour_monday': '08:00:00',
             'fixed_start_break_hour_monday': '12:00:00',
             'fixed_end_break_hour_monday': '12:30:00',
@@ -378,7 +378,7 @@ SHIFT_F = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': 1,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
             'fixed_start_hour_monday': '08:00:00',
             'fixed_start_break_hour_monday': '12:00:00',
             'fixed_end_break_hour_monday': '12:30:00',
@@ -413,7 +413,7 @@ SHIFT_F = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': False,
-            'organization_id': 1,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
             'fixed_start_hour_sunday': '09:00:00',
             'fixed_start_break_hour_sunday': '13:00:00',
             'fixed_end_break_hour_sunday': '13:30:00',
@@ -450,7 +450,7 @@ SHIFT_F = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'fixed_start_hour_sunday': '09:00:00',
             'fixed_start_break_hour_sunday': '13:00:00',
             'fixed_end_break_hour_sunday': '13:30:00',
@@ -481,7 +481,7 @@ SHIFT_F = {
         }
     ],
     'endpoints': ['shift', 'activate_shift', 'shifts'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 EMPLOYEE = {
@@ -512,9 +512,9 @@ EMPLOYEE = {
             'payment_method': 'ACH',
             'is_active': True,
             'marital_status_id': 1,
-            'department_id': 0,
-            'position_id': 0,
-            'shift_id': 0
+            'department_id': ('get_department', DEPARTMENT['post_objects'][0]),
+            'position_id': ('get_employment_position', EMPLOYMENT_POSITION['post_objects'][0]),
+            'shift_id': ('get_shift', SHIFT_R['post_objects'][0])
         },
         {
             'first_name': 'f_n_1',
@@ -539,9 +539,9 @@ EMPLOYEE = {
             'payment_method': 'Efectivo',
             'is_active': True,
             'marital_status_id': 1,
-            'department_id': 0,
-            'position_id': 0,
-            'shift_id': 0
+            'department_id': ('get_department', DEPARTMENT['post_objects'][0]),
+            'position_id': ('get_employment_position', EMPLOYMENT_POSITION['post_objects'][0]),
+            'shift_id': ('get_shift', SHIFT_R['post_objects'][0])
         }
     ],
     'put_objects': [
@@ -568,13 +568,13 @@ EMPLOYEE = {
             'payment_method': 'Cheque',
             'is_active': True,
             'marital_status_id': 2,
-            'department_id': 1,
-            'position_id': 1,
-            'shift_id': 1
+            'department_id': ('get_department', DEPARTMENT['post_objects'][1]),
+            'position_id': ('get_employment_position', EMPLOYMENT_POSITION['post_objects'][1]),
+            'shift_id': ('get_shift', SHIFT_R['post_objects'][1])
         }
     ],
     'endpoints': ['employee', 'activate_employee', 'employees'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 HEALTH_PERMIT = {
@@ -586,13 +586,13 @@ HEALTH_PERMIT = {
             'health_permit_type': 'Verde',
             'issue_date': '2018-01-01',
             'expiration_date': '2019-01-01',
-            'employee_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
         },
         {
             'health_permit_type': 'Blanco',
             'issue_date': '2018-01-31',
             'expiration_date': '2019-01-31',
-            'employee_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
         }
     ],
     'put_objects': [
@@ -600,11 +600,11 @@ HEALTH_PERMIT = {
             'health_permit_type': 'Blanco',
             'issue_date': '2018-01-31',
             'expiration_date': '2019-01-31',
-            'employee_id': 1
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1])
         }
     ],
     'endpoints': ['health_permit', None, 'health_permits'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 EMERGENCY_CONTACT = {
@@ -618,7 +618,7 @@ EMERGENCY_CONTACT = {
             'home_phone': '111-1111',
             'work_phone': '222-2222',
             'mobile_phone': '6666-6666',
-            'employee_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
         },
         {
             'first_name': 'f_n_1',
@@ -626,7 +626,7 @@ EMERGENCY_CONTACT = {
             'home_phone': '111-1111',
             'work_phone': '222-2222',
             'mobile_phone': '6666-6666',
-            'employee_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
         }
     ],
     'put_objects': [
@@ -636,11 +636,11 @@ EMERGENCY_CONTACT = {
             'home_phone': '333-3333',
             'work_phone': '444-4444',
             'mobile_phone': '6666-7777',
-            'employee_id': 1
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1])
         }
     ],
     'endpoints': ['emergency_contact', None, 'emergency_contacts'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 COUNTRY = {
@@ -650,7 +650,7 @@ COUNTRY = {
     'post_objects': [],
     'put_objects': [],
     'endpoints': [None, None, 'countries'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 PASSPORT = {
@@ -662,14 +662,14 @@ PASSPORT = {
             'passport_number': '123456',
             'issue_date': '2018-01-01',
             'expiration_date': '2019-01-01',
-            'employee_id': 0,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
             'country_id': 1
         },
         {
             'passport_number': '654321',
             'issue_date': '2018-01-01',
             'expiration_date': '2019-01-01',
-            'employee_id': 1,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
             'country_id': 2
         }
     ],
@@ -678,12 +678,12 @@ PASSPORT = {
             'passport_number': '654321',
             'issue_date': '2018-01-31',
             'expiration_date': '2019-01-31',
-            'employee_id': 1,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
             'country_id': 2
         }
     ],
     'endpoints': ['passport', None, 'passports'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 UNIFORM_ITEM = {
@@ -693,29 +693,29 @@ UNIFORM_ITEM = {
     'post_objects': [
         {
             'item_name': 'test_u_i_0',
-            'organization_id': 0
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0])
         },
         {
             'item_name': 'test_u_i_1',
-            'organization_id': 0
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0])
         },
         {
             'item_name': 'test_u_i_0',
-            'organization_id': 1
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1])
         }
     ],
     'put_objects': [
         {
             'item_name': 'new_test_u_i_0',
-            'organization_id': 1
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1])
         },
         {
             'item_name': 'test_u_i_0',
-            'organization_id': 0
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0])
         }
     ],
     'endpoints': ['uniform_item', None, 'uniform_item'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 UNIFORM_SIZE = {
@@ -725,29 +725,29 @@ UNIFORM_SIZE = {
     'post_objects': [
         {
             'size_description': 'test_u_s_0',
-            'uniform_item_id': 0
+            'uniform_item_id': ('get_uniform_item', 0)
         },
         {
             'size_description': 'test_u_s_1',
-            'uniform_item_id': 1
+            'uniform_item_id': ('get_uniform_item', 1)
         },
         {
             'size_description': 'test_u_s_0',
-            'uniform_item_id': 1
+            'uniform_item_id': ('get_uniform_item', 1)
         }
     ],
     'put_objects': [
         {
             'size_description': 'new_test_u_s',
-            'uniform_item_id': 1
+            'uniform_item_id': ('get_uniform_item', 1)
         },
         {
             'size_description': 'test_u_s_0',
-            'uniform_item_id': 0
+            'uniform_item_id': ('get_uniform_item', 0)
         }
     ],
     'endpoints': ['uniform_size', None, 'uniform_sizes'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 UNIFORM_REQUIREMENT = {
@@ -756,35 +756,35 @@ UNIFORM_REQUIREMENT = {
     'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE, UNIFORM_ITEM, UNIFORM_SIZE],
     'post_objects': [
         {
-            'employee_id': 0,
-            'uniform_item_id': 0,
-            'uniform_size_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'uniform_item_id': ('get_uniform_item', 0),
+            'uniform_size_id': ('get_uniform_size', 0)
         },
         {
-            'employee_id': 0,
-            'uniform_item_id': 1,
-            'uniform_size_id': 1
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'uniform_item_id': ('get_uniform_item', 1),
+            'uniform_size_id': ('get_uniform_size', 1)
         },
         {
-            'employee_id': 1,
-            'uniform_item_id': 1,
-            'uniform_size_id': 1
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
+            'uniform_item_id': ('get_uniform_item', 1),
+            'uniform_size_id': ('get_uniform_size', 1)
         }
     ],
     'put_objects': [
         {
-            'employee_id': 1,
-            'uniform_item_id': 0,
-            'uniform_size_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
+            'uniform_item_id': ('get_uniform_item', 0),
+            'uniform_size_id': ('get_uniform_size', 0)
         },
         {
-            'employee_id': 0,
-            'uniform_item_id': 0,
-            'uniform_size_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'uniform_item_id': ('get_uniform_item', 0),
+            'uniform_size_id': ('get_uniform_size', 0)
         }
     ],
     'endpoints': ['uniform_requirement', None, 'uniform_requirements'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 BANK = {
@@ -794,7 +794,7 @@ BANK = {
     'post_objects': [],
     'put_objects': [],
     'endpoints': [None, None, 'banks'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 BANK_ACCOUNT = {
@@ -806,28 +806,28 @@ BANK_ACCOUNT = {
             'account_number': '1234',
             'account_type': 'Corriente',
             'is_active': True,
-            'employee_id': 0,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
             'bank_id': 1
         },
         {
             'account_number': '4321',
             'account_type': 'Ahorros',
             'is_active': True,
-            'employee_id': 0,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
             'bank_id': 1
         },
         {
             'account_number': '1234',
             'account_type': 'Corriente',
             'is_active': True,
-            'employee_id': 1,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
             'bank_id': 1
         },
         {
             'account_number': '1234',
             'account_type': 'Corriente',
             'is_active': True,
-            'employee_id': 0,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
             'bank_id': 2
         }
     ],
@@ -836,19 +836,19 @@ BANK_ACCOUNT = {
             'account_number': '4321',
             'account_type': 'Ahorro',
             'is_active': False,
-            'employee_id': 1,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
             'bank_id': 2,
         },
         {
             'account_number': '1234',
             'account_type': 'Corriente',
             'is_active': True,
-            'employee_id': 0,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
             'bank_id': 1,
         }
     ],
     'endpoints': ['bank_account', 'activate_bank_account', 'bank_accounts'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 FAMILY_RELATION = {
@@ -858,7 +858,7 @@ FAMILY_RELATION = {
     'post_objects': [],
     'put_objects': [],
     'endpoints': [None, None, 'family_relations'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 DEPENDENT = {
@@ -873,7 +873,7 @@ DEPENDENT = {
             'second_surname': 's_sn_0',
             'gender': 'Mujer',
             'date_of_birth': '2018-01-01',
-            'employee_id': 0,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
             'family_relation_id': 1
         },
         {
@@ -883,7 +883,7 @@ DEPENDENT = {
             'second_surname': 's_sn_1',
             'gender': 'Mujer',
             'date_of_birth': '2018-01-01',
-            'employee_id': 0,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
             'family_relation_id': 2
         }
     ],
@@ -895,12 +895,12 @@ DEPENDENT = {
             'second_surname': 'new_s_sn_0',
             'gender': 'Hombre',
             'date_of_birth': '2018-01-31',
-            'employee_id': 1,
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
             'family_relation_id': 2
         }
     ],
     'endpoints': ['dependent', None, 'dependents'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 SCHEDULE = {
@@ -910,29 +910,29 @@ SCHEDULE = {
     'post_objects': [
         {
             'start_date': '2018-01-01',
-            'department_id': 0
+            'department_id': ('get_department', DEPARTMENT['post_objects'][0])
         },
         {
             'start_date': '2018-01-08',
-            'department_id': 0
+            'department_id': ('get_department', DEPARTMENT['post_objects'][0])
         },
         {
             'start_date': '2018-01-01',
-            'department_id': 1
+            'department_id': ('get_department', DEPARTMENT['post_objects'][1])
         }
     ],
     'put_objects': [
         {
             'start_date': '2018-01-31',
-            'department_id': 0
+            'department_id': ('get_department', DEPARTMENT['post_objects'][0])
         },
         {
             'start_date': '2018-01-01',
-            'department_id': 0
+            'department_id': ('get_department', DEPARTMENT['post_objects'][0])
         }
     ],
     'endpoints': ['schedule', None, 'schedules'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 SCHEDULE_DETAIL = {
@@ -962,8 +962,8 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-07T22:00:00',
             'day_7_end': '2018-01-08T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': 0,
-            'schedule_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'schedule_id': ('get_schedule', 0)
         },
         {
             'day_1_start': '2018-01-08T06:00:00',
@@ -987,8 +987,8 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-17T22:00:00',
             'day_7_end': '2018-01-17T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': 1,
-            'schedule_id': 1
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
+            'schedule_id': ('get_schedule', 1)
         },
         {
             'day_1_start': '2018-01-01T06:00:00',
@@ -1012,8 +1012,8 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-07T22:00:00',
             'day_7_end': '2018-01-08T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': 1,
-            'schedule_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
+            'schedule_id': ('get_schedule', 0)
         }
     ],
     'put_objects': [
@@ -1039,8 +1039,8 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-17T22:00:00',
             'day_7_end': '2018-01-17T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': 0,
-            'schedule_id': 1
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'schedule_id': ('get_schedule', 1)
         },
         {
             'day_1_start': '2018-01-01T06:00:00',
@@ -1064,12 +1064,12 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-07T22:00:00',
             'day_7_end': '2018-01-08T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': 1,
-            'schedule_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
+            'schedule_id': ('get_schedule', 0)
         }
     ],
     'endpoints': ['schedule_detail', None, 'schedule_details'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 PAYMENT = {
@@ -1080,23 +1080,23 @@ PAYMENT = {
         {
             'payment_date': '2018-01-01',
             'document_number': '1234-abc',
-            'employee_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
         },
         {
             'payment_date': '2018-01-15',
             'document_number': '4321-abc',
-            'employee_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
         }
     ],
     'put_objects': [
         {
             'payment_date': '2018-02-01',
             'document_number': '1234-def',
-            'employee_id': 1
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1])
         }
     ],
     'endpoints': ['payment', None, 'payments'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 PAYMENT_DETAIL = {
@@ -1110,7 +1110,7 @@ PAYMENT_DETAIL = {
             'ss_deduction': 123.45,
             'se_deduction': 12.34,
             'isr_deduction': 1.23,
-            'payment_id': 0
+            'payment_id': ('get_payment', PAYMENT['post_objects'][0])
         },
         {
             'payment_type': 'Vacación',
@@ -1118,7 +1118,7 @@ PAYMENT_DETAIL = {
             'ss_deduction': 23.45,
             'se_deduction': 2.34,
             'isr_deduction': 0.23,
-            'payment_id': 0
+            'payment_id': ('get_payment', PAYMENT['post_objects'][0])
         }
     ],
     'put_objects': [
@@ -1128,11 +1128,11 @@ PAYMENT_DETAIL = {
             'ss_deduction': 234.56,
             'se_deduction': 23.45,
             'isr_deduction': 2.34,
-            'payment_id': 1
+            'payment_id': ('get_payment', PAYMENT['post_objects'][1])
         }
     ],
     'endpoints': ['payment_detail', None, 'payment_details'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 CREDITOR = {
@@ -1144,21 +1144,21 @@ CREDITOR = {
             'creditor_name': 'test_cr_0',
             'phone_number': '123-4567',
             'email': 'test@test_cr_0.com',
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'is_active': True
         },
         {
             'creditor_name': 'test_cr_1',
             'phone_number': '123-4567',
             'email': 'test@test_cr_1.com',
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'is_active': True
         },
         {
             'creditor_name': 'test_cr_0',
             'phone_number': '123-4567',
             'email': 'test@test_cr_0.com',
-            'organization_id': 1,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
             'is_active': True
         }
     ],
@@ -1167,19 +1167,19 @@ CREDITOR = {
             'creditor_name': 'new_test_cr_0',
             'phone_number': '456-7890',
             'email': 'test@new_test_cr_0.com',
-            'organization_id': 1,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
             'is_active': False
         },
         {
             'creditor_name': 'new_test_cr_0',
             'phone_number': '456-7890',
             'email': 'test@new_test_cr_0.com',
-            'organization_id': 0,
+            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
             'is_active': True
         }
     ],
     'endpoints': ['creditor', 'activate_creditor', 'creditors'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 DEDUCTION = {
@@ -1194,8 +1194,8 @@ DEDUCTION = {
             'payment_method': 'Cheque',
             'deduct_in_december': True,
             'is_active': True,
-            'employee_id': 0,
-            'creditor_id': 0
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'creditor_id': ('get_creditor', CREDITOR['post_objects'][0])
         },
         {
             'start_date': '2018-02-01',
@@ -1204,8 +1204,8 @@ DEDUCTION = {
             'payment_method': 'Transferencia',
             'deduct_in_december': False,
             'is_active': True,
-            'employee_id': 0,
-            'creditor_id': 1
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'creditor_id': ('get_creditor', CREDITOR['post_objects'][1])
         }
     ],
     'put_objects': [
@@ -1216,12 +1216,12 @@ DEDUCTION = {
             'payment_method': 'Efectivo',
             'deduct_in_december': False,
             'is_active': False,
-            'employee_id': 1,
-            'creditor_id': 1
+            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
+            'creditor_id': ('get_creditor', CREDITOR['post_objects'][1])
         }
     ],
     'endpoints': ['deduction', 'activate_deduction', 'deductions'],
-    'users': ['test']
+    'user_type': 'test'
 }
 
 DEDUCTION_DETAIL = {
@@ -1231,22 +1231,49 @@ DEDUCTION_DETAIL = {
     'post_objects': [
         {
             'deducted_amount': 123.45,
-            'payment_id': 0,
-            'deduction_id': 0
+            'payment_id': ('get_payment', PAYMENT['post_objects'][0]),
+            'deduction_id': ('get_deduction', DEDUCTION['post_objects'][0])
         },
         {
             'deducted_amount': 321.45,
-            'payment_id': 0,
-            'deduction_id': 1
+            'payment_id': ('get_payment', PAYMENT['post_objects'][0]),
+            'deduction_id': ('get_deduction', DEDUCTION['post_objects'][1])
         }
     ],
     'put_objects': [
         {
             'deducted_amount': 89.01,
-            'payment_id': 1,
-            'deduction_id': 1
+            'payment_id': ('get_payment', PAYMENT['post_objects'][1]),
+            'deduction_id': ('get_deduction', DEDUCTION['post_objects'][1])
         }
     ],
     'endpoints': ['deduction_detail', None, 'deduction_detail'],
-    'users': ['test']
+    'user_type': 'test'
 }
+
+
+def get_sys_test_params(b_obj, res_type=0):
+    """
+    Returns the parameters needed to run a system test.
+
+    :param 
+        b_obj (dict): Object containing the test parameters.
+        res_type (int): Type of resource being tested (0 for record, 1 for activate, 2 for list).
+    :return:
+        resource (str): Name of the resource being tested.
+        model (db.Model): SQLAlchemy model related to the resource.
+        required_objects (list): List of business objects that must exist in the db prior to running the test.
+        post_objects (list): List of objects for testing the post method of the resource.
+        put_objects (list): List of objects for testing the put method of the resource.
+        endpoint (str): Endpoint that will receive the request.
+        user_type (str): The type of user that will be sending the request.
+    """
+    resource = b_obj['resources'][res_type]
+    model = b_obj['model']
+    required_objects = b_obj['required_objects']
+    post_objects = b_obj['post_objects']
+    put_objects = b_obj['put_objects']
+    endpoint = b_obj['endpoints'][res_type]
+    user_type = b_obj['user_type']
+    
+    return resource, model, required_objects, post_objects, put_objects, endpoint, user_type
