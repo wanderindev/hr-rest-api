@@ -1,3 +1,5 @@
+from Lib import copy
+
 from werkzeug.security import generate_password_hash
 
 from models.bank import BankModel
@@ -29,7 +31,6 @@ from models.user import AppUserModel
 ORGANIZATION = {
     'resources': ['Organization', 'ActivateOrganization', 'Organizations'],
     'model': OrganizationModel,
-    'required_objects': [],
     'post_objects': [
         {
             'organization_name': 'test_o_0',
@@ -55,16 +56,15 @@ ORGANIZATION = {
 }
 
 USER = {
-    'resources': ['user_type', 'ActivateUser', 'Users'],
+    'resources': ['User', 'ActivateUser', 'Users'],
     'model': AppUserModel,
-    'required_objects': [ORGANIZATION],
     'post_objects': [
         {
             'username': 'test_u_0',
             'password': 'test_p',
             'password_hash': generate_password_hash('test_p'),
             'email': 'test_u_0@test_o_0.com',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_super': True,
             'is_owner': True,
             'is_active': True
@@ -74,7 +74,7 @@ USER = {
             'password': 'test_p',
             'password_hash': generate_password_hash('test_p'),
             'email': 'test_u_1@test_o_0.com',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_super': True,
             'is_owner': True,
             'is_active': True
@@ -84,7 +84,7 @@ USER = {
             'password': 'test_p',
             'password_hash': generate_password_hash('test_p'),
             'email': 'test_u_2@test_o_0.com',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_super': True,
             'is_owner': True,
             'is_active': True
@@ -96,7 +96,7 @@ USER = {
             'password': 'new_test_p',
             'password_hash': generate_password_hash('new_test_p'),
             'email': 'new_test_u_0@test_o_0.com',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
             'is_super': False,
             'is_owner': False,
             'is_active': False
@@ -106,7 +106,7 @@ USER = {
             'password': 'new_test_p',
             'password_hash': generate_password_hash('test_p'),
             'email': 'new_test_u_1@test_o_0.com',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_super': False,
             'is_owner': False,
             'is_active': True
@@ -116,88 +116,85 @@ USER = {
             'password': 'new_test_p',
             'password_hash': generate_password_hash('test_p'),
             'email': 'test_u_0@test_o_0.com',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_super': False,
             'is_owner': False,
             'is_active': True
         }
     ],
-    'endpoints': ['user_type', 'activate_user', 'users'],
+    'endpoints': ['user', 'activate_user', 'users'],
     'user_type': 'root'
 }
 
 DEPARTMENT = {
     'resources': ['Department', 'ActivateDepartment', 'Departments'],
     'model': DepartmentModel,
-    'required_objects': [ORGANIZATION],
     'post_objects': [
         {
             'department_name': 'test_d_0',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_active': True
         },
         {
             'department_name': 'test_d_1',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_active': True
         },
         {
             'department_name': 'test_d_0',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
             'is_active': True
         }
     ],
     'put_objects': [
         {
             'department_name': 'new_test_d_0',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
             'is_active': False
         },
         {
             'department_name': 'test_d_0',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_active': True
         }
     ],
     'endpoints': ['department', 'activate_department', 'departments'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 MARITAL_STATUS = {
     'resources': [None, None, 'MaritalStatuses'],
     'model': MaritalStatusModel,
-    'required_objects': [],
     'post_objects': [],
     'put_objects': [],
     'endpoints': [None, None, 'marital_statuses'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 EMPLOYMENT_POSITION = {
     'resources': ['EmploymentPosition', 'ActivateEmploymentPosition', 'EmploymentPositions'],
     'model': EmploymentPositionModel,
-    'required_objects': [ORGANIZATION],
     'post_objects': [
         {
             'position_name_feminine': 'test_e_p_f_0',
             'position_name_masculine': 'test_e_p_m_0',
             'minimum_hourly_wage': 1.00,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
         },
         {
             'position_name_feminine': 'test_e_p_f_1',
             'position_name_masculine': 'test_e_p_m_1',
             'minimum_hourly_wage': 1.00,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
         },
         {
             'position_name_feminine': 'test_e_p_f_0',
             'position_name_masculine': 'test_e_p_m_0',
             'minimum_hourly_wage': 1.00,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
         }
     ],
     'put_objects': [
@@ -206,31 +203,30 @@ EMPLOYMENT_POSITION = {
             'position_name_masculine': 'new_test_e_p_m',
             'minimum_hourly_wage': 2.00,
             'is_active': False,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
         },
         {
             'position_name_feminine': 'test_e_p_f_0',
             'position_name_masculine': 'new_test_e_p_m_0',
             'minimum_hourly_wage': 2.00,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
         },
         {
             'position_name_feminine': 'new_test_e_p_f_0',
             'position_name_masculine': 'test_e_p_m_0',
             'minimum_hourly_wage': 2.00,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
         }
     ],
     'endpoints': ['employment_position', 'activate_employment_position', 'employment_positions'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 SHIFT_R = {
     'resources': ['Shift', 'ActivateShift', 'Shifts'],
     'model': ShiftModel,
-    'required_objects': [ORGANIZATION],
     'post_objects': [
         {
             'shift_name': 'test_s_r_0',
@@ -240,7 +236,7 @@ SHIFT_R = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'rotation_start_hour': '06:00:00',
             'rotation_end_hour': '21:00:00'
         },
@@ -252,7 +248,7 @@ SHIFT_R = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'rotation_start_hour': '06:00:00',
             'rotation_end_hour': '21:00:00'
         },
@@ -264,7 +260,7 @@ SHIFT_R = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
             'rotation_start_hour': '06:00:00',
             'rotation_end_hour': '21:00:00'
         }
@@ -278,7 +274,7 @@ SHIFT_R = {
             'break_length': '01:00:00',
             'is_break_included_in_shift': True,
             'is_active': False,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
             'rotation_start_hour': '00:00:00',
             'rotation_end_hour': '15:00:00'
         },
@@ -290,19 +286,18 @@ SHIFT_R = {
             'break_length': '01:00:00',
             'is_break_included_in_shift': True,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'rotation_start_hour': '00:00:00',
             'rotation_end_hour': '15:00:00'
         }
     ],
     'endpoints': ['shift', 'activate_shift', 'shifts'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 SHIFT_F = {
     'resources': ['Shift', 'ActivateShift', 'Shifts'],
     'model': ShiftModel,
-    'required_objects': [ORGANIZATION],
     'post_objects': [
         {
             'shift_name': 'test_s_f_0',
@@ -312,7 +307,7 @@ SHIFT_F = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'fixed_start_hour_monday': '08:00:00',
             'fixed_start_break_hour_monday': '12:00:00',
             'fixed_end_break_hour_monday': '12:30:00',
@@ -345,7 +340,7 @@ SHIFT_F = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'fixed_start_hour_monday': '08:00:00',
             'fixed_start_break_hour_monday': '12:00:00',
             'fixed_end_break_hour_monday': '12:30:00',
@@ -378,7 +373,7 @@ SHIFT_F = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
             'fixed_start_hour_monday': '08:00:00',
             'fixed_start_break_hour_monday': '12:00:00',
             'fixed_end_break_hour_monday': '12:30:00',
@@ -413,7 +408,7 @@ SHIFT_F = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': False,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
             'fixed_start_hour_sunday': '09:00:00',
             'fixed_start_break_hour_sunday': '13:00:00',
             'fixed_end_break_hour_sunday': '13:30:00',
@@ -450,7 +445,7 @@ SHIFT_F = {
             'break_length': '00:30:00',
             'is_break_included_in_shift': False,
             'is_active': True,
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'fixed_start_hour_sunday': '09:00:00',
             'fixed_start_break_hour_sunday': '13:00:00',
             'fixed_end_break_hour_sunday': '13:30:00',
@@ -481,13 +476,12 @@ SHIFT_F = {
         }
     ],
     'endpoints': ['shift', 'activate_shift', 'shifts'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 EMPLOYEE = {
     'resources': ['Employee', 'ActivateEmployee', 'Employees'],
     'model': EmployeeModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R],
     'post_objects': [
         {
             'first_name': 'f_n_0',
@@ -512,9 +506,9 @@ EMPLOYEE = {
             'payment_method': 'ACH',
             'is_active': True,
             'marital_status_id': 1,
-            'department_id': ('get_department', DEPARTMENT['post_objects'][0]),
-            'position_id': ('get_employment_position', EMPLOYMENT_POSITION['post_objects'][0]),
-            'shift_id': ('get_shift', SHIFT_R['post_objects'][0])
+            'department_id': (DEPARTMENT['model'], DEPARTMENT['post_objects'][0]),
+            'position_id': (EMPLOYMENT_POSITION['model'], EMPLOYMENT_POSITION['post_objects'][0]),
+            'shift_id': (SHIFT_R['model'], SHIFT_R['post_objects'][0])
         },
         {
             'first_name': 'f_n_1',
@@ -539,9 +533,9 @@ EMPLOYEE = {
             'payment_method': 'Efectivo',
             'is_active': True,
             'marital_status_id': 1,
-            'department_id': ('get_department', DEPARTMENT['post_objects'][0]),
-            'position_id': ('get_employment_position', EMPLOYMENT_POSITION['post_objects'][0]),
-            'shift_id': ('get_shift', SHIFT_R['post_objects'][0])
+            'department_id': (DEPARTMENT['model'], DEPARTMENT['post_objects'][0]),
+            'position_id': (EMPLOYMENT_POSITION['model'], EMPLOYMENT_POSITION['post_objects'][0]),
+            'shift_id': (SHIFT_R['model'], SHIFT_R['post_objects'][0])
         }
     ],
     'put_objects': [
@@ -568,31 +562,30 @@ EMPLOYEE = {
             'payment_method': 'Cheque',
             'is_active': True,
             'marital_status_id': 2,
-            'department_id': ('get_department', DEPARTMENT['post_objects'][1]),
-            'position_id': ('get_employment_position', EMPLOYMENT_POSITION['post_objects'][1]),
-            'shift_id': ('get_shift', SHIFT_R['post_objects'][1])
+            'department_id': (DEPARTMENT['model'], DEPARTMENT['post_objects'][1]),
+            'position_id': (EMPLOYMENT_POSITION['model'], EMPLOYMENT_POSITION['post_objects'][1]),
+            'shift_id': (SHIFT_R['model'], SHIFT_R['post_objects'][1])
         }
     ],
     'endpoints': ['employee', 'activate_employee', 'employees'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 HEALTH_PERMIT = {
     'resources': ['HealthPermit', None, 'HealthPermits'],
     'model': HealthPermitModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
         {
             'health_permit_type': 'Verde',
             'issue_date': '2018-01-01',
             'expiration_date': '2019-01-01',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
         },
         {
             'health_permit_type': 'Blanco',
             'issue_date': '2018-01-31',
             'expiration_date': '2019-01-31',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
         }
     ],
     'put_objects': [
@@ -600,17 +593,16 @@ HEALTH_PERMIT = {
             'health_permit_type': 'Blanco',
             'issue_date': '2018-01-31',
             'expiration_date': '2019-01-31',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1])
         }
     ],
     'endpoints': ['health_permit', None, 'health_permits'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 EMERGENCY_CONTACT = {
     'resources': ['EmergencyContact', None, 'EmergencyContacts'],
     'model': EmergencyContactModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
         {
             'first_name': 'f_n_0',
@@ -618,7 +610,7 @@ EMERGENCY_CONTACT = {
             'home_phone': '111-1111',
             'work_phone': '222-2222',
             'mobile_phone': '6666-6666',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
         },
         {
             'first_name': 'f_n_1',
@@ -626,7 +618,7 @@ EMERGENCY_CONTACT = {
             'home_phone': '111-1111',
             'work_phone': '222-2222',
             'mobile_phone': '6666-6666',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
         }
     ],
     'put_objects': [
@@ -636,40 +628,38 @@ EMERGENCY_CONTACT = {
             'home_phone': '333-3333',
             'work_phone': '444-4444',
             'mobile_phone': '6666-7777',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1])
         }
     ],
     'endpoints': ['emergency_contact', None, 'emergency_contacts'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 COUNTRY = {
     'resources': [None, None, 'Countries'],
     'model': CountryModel,
-    'required_objects': [],
     'post_objects': [],
     'put_objects': [],
     'endpoints': [None, None, 'countries'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 PASSPORT = {
     'resources': ['Passport', None, 'Passports'],
     'model': PassportModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
         {
             'passport_number': '123456',
             'issue_date': '2018-01-01',
             'expiration_date': '2019-01-01',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
             'country_id': 1
         },
         {
             'passport_number': '654321',
             'issue_date': '2018-01-01',
             'expiration_date': '2019-01-01',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
             'country_id': 2
         }
     ],
@@ -678,156 +668,151 @@ PASSPORT = {
             'passport_number': '654321',
             'issue_date': '2018-01-31',
             'expiration_date': '2019-01-31',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
             'country_id': 2
         }
     ],
     'endpoints': ['passport', None, 'passports'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 UNIFORM_ITEM = {
     'resources': ['UniformItem', None, 'UniformItems'],
     'model': UniformItemModel,
-    'required_objects': [ORGANIZATION],
     'post_objects': [
         {
             'item_name': 'test_u_i_0',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0])
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0])
         },
         {
             'item_name': 'test_u_i_1',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0])
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0])
         },
         {
             'item_name': 'test_u_i_0',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1])
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1])
         }
     ],
     'put_objects': [
         {
             'item_name': 'new_test_u_i_0',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1])
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1])
         },
         {
             'item_name': 'test_u_i_0',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0])
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0])
         }
     ],
     'endpoints': ['uniform_item', None, 'uniform_item'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 UNIFORM_SIZE = {
     'resources': ['UniformSize', None, 'UniformSizes'],
     'model': UniformSizeModel,
-    'required_objects': [ORGANIZATION, UNIFORM_ITEM],
     'post_objects': [
         {
             'size_description': 'test_u_s_0',
-            'uniform_item_id': ('get_uniform_item', 0)
+            'uniform_item_id': (UNIFORM_ITEM['model'], 0)
         },
         {
             'size_description': 'test_u_s_1',
-            'uniform_item_id': ('get_uniform_item', 1)
+            'uniform_item_id': (UNIFORM_ITEM['model'], 1)
         },
         {
             'size_description': 'test_u_s_0',
-            'uniform_item_id': ('get_uniform_item', 1)
+            'uniform_item_id': (UNIFORM_ITEM['model'], 1)
         }
     ],
     'put_objects': [
         {
             'size_description': 'new_test_u_s',
-            'uniform_item_id': ('get_uniform_item', 1)
+            'uniform_item_id': (UNIFORM_ITEM['model'], 1)
         },
         {
             'size_description': 'test_u_s_0',
-            'uniform_item_id': ('get_uniform_item', 0)
+            'uniform_item_id': (UNIFORM_ITEM['model'], 0)
         }
     ],
     'endpoints': ['uniform_size', None, 'uniform_sizes'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 UNIFORM_REQUIREMENT = {
     'resources': ['UniformRequirement', None, 'UniformRequirements'],
     'model': UniformRequirementModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE, UNIFORM_ITEM, UNIFORM_SIZE],
     'post_objects': [
         {
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
-            'uniform_item_id': ('get_uniform_item', 0),
-            'uniform_size_id': ('get_uniform_size', 0)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
+            'uniform_item_id': (UNIFORM_ITEM['model'], 0),
+            'uniform_size_id': (UNIFORM_SIZE['model'], 0)
         },
         {
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
-            'uniform_item_id': ('get_uniform_item', 1),
-            'uniform_size_id': ('get_uniform_size', 1)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
+            'uniform_item_id': (UNIFORM_ITEM['model'], 1),
+            'uniform_size_id': (UNIFORM_SIZE['model'], 1)
         },
         {
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
-            'uniform_item_id': ('get_uniform_item', 1),
-            'uniform_size_id': ('get_uniform_size', 1)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
+            'uniform_item_id': (UNIFORM_ITEM['model'], 1),
+            'uniform_size_id': (UNIFORM_SIZE['model'], 1)
         }
     ],
     'put_objects': [
         {
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
-            'uniform_item_id': ('get_uniform_item', 0),
-            'uniform_size_id': ('get_uniform_size', 0)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
+            'uniform_item_id': (UNIFORM_ITEM['model'], 0),
+            'uniform_size_id': (UNIFORM_SIZE['model'], 0)
         },
         {
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
-            'uniform_item_id': ('get_uniform_item', 0),
-            'uniform_size_id': ('get_uniform_size', 0)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
+            'uniform_item_id': (UNIFORM_ITEM['model'], 0),
+            'uniform_size_id': (UNIFORM_SIZE['model'], 0)
         }
     ],
     'endpoints': ['uniform_requirement', None, 'uniform_requirements'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 BANK = {
     'resources': [None, None, 'Banks'],
     'model': BankModel,
-    'required_objects': [],
     'post_objects': [],
     'put_objects': [],
     'endpoints': [None, None, 'banks'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 BANK_ACCOUNT = {
     'resources': ['BankAccount', 'ActivateBankAccount', 'BankAccounts'],
     'model': BankAccountModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
         {
             'account_number': '1234',
             'account_type': 'Corriente',
             'is_active': True,
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
             'bank_id': 1
         },
         {
             'account_number': '4321',
             'account_type': 'Ahorros',
             'is_active': True,
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
             'bank_id': 1
         },
         {
             'account_number': '1234',
             'account_type': 'Corriente',
             'is_active': True,
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
             'bank_id': 1
         },
         {
             'account_number': '1234',
             'account_type': 'Corriente',
             'is_active': True,
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
             'bank_id': 2
         }
     ],
@@ -836,35 +821,33 @@ BANK_ACCOUNT = {
             'account_number': '4321',
             'account_type': 'Ahorro',
             'is_active': False,
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
             'bank_id': 2,
         },
         {
             'account_number': '1234',
             'account_type': 'Corriente',
             'is_active': True,
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
             'bank_id': 1,
         }
     ],
     'endpoints': ['bank_account', 'activate_bank_account', 'bank_accounts'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 FAMILY_RELATION = {
     'resources': [None, None, 'FamilyRelations'],
     'model': FamilyRelationModel,
-    'required_objects': [],
     'post_objects': [],
     'put_objects': [],
     'endpoints': [None, None, 'family_relations'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 DEPENDENT = {
     'resources': ['Dependent', None, 'Dependents'],
     'model': DependentModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
         {
             'first_name': 'f_n_0',
@@ -873,7 +856,7 @@ DEPENDENT = {
             'second_surname': 's_sn_0',
             'gender': 'Mujer',
             'date_of_birth': '2018-01-01',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
             'family_relation_id': 1
         },
         {
@@ -883,7 +866,7 @@ DEPENDENT = {
             'second_surname': 's_sn_1',
             'gender': 'Mujer',
             'date_of_birth': '2018-01-01',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
             'family_relation_id': 2
         }
     ],
@@ -895,50 +878,48 @@ DEPENDENT = {
             'second_surname': 'new_s_sn_0',
             'gender': 'Hombre',
             'date_of_birth': '2018-01-31',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
             'family_relation_id': 2
         }
     ],
     'endpoints': ['dependent', None, 'dependents'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 SCHEDULE = {
     'resources': ['Schedule', None, 'Schedules'],
     'model': ScheduleModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT],
     'post_objects': [
         {
             'start_date': '2018-01-01',
-            'department_id': ('get_department', DEPARTMENT['post_objects'][0])
+            'department_id': (DEPARTMENT['model'], DEPARTMENT['post_objects'][0])
         },
         {
             'start_date': '2018-01-08',
-            'department_id': ('get_department', DEPARTMENT['post_objects'][0])
+            'department_id': (DEPARTMENT['model'], DEPARTMENT['post_objects'][0])
         },
         {
             'start_date': '2018-01-01',
-            'department_id': ('get_department', DEPARTMENT['post_objects'][1])
+            'department_id': (DEPARTMENT['model'], DEPARTMENT['post_objects'][1])
         }
     ],
     'put_objects': [
         {
             'start_date': '2018-01-31',
-            'department_id': ('get_department', DEPARTMENT['post_objects'][0])
+            'department_id': (DEPARTMENT['model'], DEPARTMENT['post_objects'][0])
         },
         {
             'start_date': '2018-01-01',
-            'department_id': ('get_department', DEPARTMENT['post_objects'][0])
+            'department_id': (DEPARTMENT['model'], DEPARTMENT['post_objects'][0])
         }
     ],
     'endpoints': ['schedule', None, 'schedules'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 SCHEDULE_DETAIL = {
     'resources': ['ScheduleDetail', None, 'ScheduleDetails'],
     'model': ScheduleDetailModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, SCHEDULE, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
         {
             'day_1_start': '2018-01-01T06:00:00',
@@ -962,8 +943,8 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-07T22:00:00',
             'day_7_end': '2018-01-08T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
-            'schedule_id': ('get_schedule', 0)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
+            'schedule_id': (SCHEDULE['model'], 0)
         },
         {
             'day_1_start': '2018-01-08T06:00:00',
@@ -987,8 +968,8 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-17T22:00:00',
             'day_7_end': '2018-01-17T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
-            'schedule_id': ('get_schedule', 1)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
+            'schedule_id': (SCHEDULE['model'], 1)
         },
         {
             'day_1_start': '2018-01-01T06:00:00',
@@ -1012,8 +993,8 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-07T22:00:00',
             'day_7_end': '2018-01-08T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
-            'schedule_id': ('get_schedule', 0)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
+            'schedule_id': (SCHEDULE['model'], 0)
         }
     ],
     'put_objects': [
@@ -1039,8 +1020,8 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-17T22:00:00',
             'day_7_end': '2018-01-17T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
-            'schedule_id': ('get_schedule', 1)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
+            'schedule_id': (SCHEDULE['model'], 1)
         },
         {
             'day_1_start': '2018-01-01T06:00:00',
@@ -1064,45 +1045,43 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-07T22:00:00',
             'day_7_end': '2018-01-08T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
-            'schedule_id': ('get_schedule', 0)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
+            'schedule_id': (SCHEDULE['model'], 0)
         }
     ],
     'endpoints': ['schedule_detail', None, 'schedule_details'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 PAYMENT = {
     'resources': ['Payment', None, 'Payments'],
     'model': PaymentModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
         {
             'payment_date': '2018-01-01',
             'document_number': '1234-abc',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
         },
         {
             'payment_date': '2018-01-15',
             'document_number': '4321-abc',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
         }
     ],
     'put_objects': [
         {
             'payment_date': '2018-02-01',
             'document_number': '1234-def',
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1])
         }
     ],
     'endpoints': ['payment', None, 'payments'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 PAYMENT_DETAIL = {
     'resources': ['PaymentDetail', None, 'PaymentDetails'],
     'model': PaymentDetailModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE, PAYMENT],
     'post_objects': [
         {
             'payment_type': 'Salario Regular',
@@ -1132,33 +1111,32 @@ PAYMENT_DETAIL = {
         }
     ],
     'endpoints': ['payment_detail', None, 'payment_details'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 CREDITOR = {
     'resources': ['Creditor', 'ActivateCreditor', 'Creditors'],
     'model': CreditorModel,
-    'required_objects': [ORGANIZATION],
     'post_objects': [
         {
             'creditor_name': 'test_cr_0',
             'phone_number': '123-4567',
             'email': 'test@test_cr_0.com',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_active': True
         },
         {
             'creditor_name': 'test_cr_1',
             'phone_number': '123-4567',
             'email': 'test@test_cr_1.com',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_active': True
         },
         {
             'creditor_name': 'test_cr_0',
             'phone_number': '123-4567',
             'email': 'test@test_cr_0.com',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
             'is_active': True
         }
     ],
@@ -1167,25 +1145,24 @@ CREDITOR = {
             'creditor_name': 'new_test_cr_0',
             'phone_number': '456-7890',
             'email': 'test@new_test_cr_0.com',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][1]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
             'is_active': False
         },
         {
             'creditor_name': 'new_test_cr_0',
             'phone_number': '456-7890',
             'email': 'test@new_test_cr_0.com',
-            'organization_id': ('get_organization', ORGANIZATION['post_objects'][0]),
+            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_active': True
         }
     ],
     'endpoints': ['creditor', 'activate_creditor', 'creditors'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 DEDUCTION = {
     'resources': ['Deduction', 'ActivateDeduction', 'Deductions'],
     'model': DeductionModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE],
     'post_objects': [
         {
             'start_date': '2018-01-01',
@@ -1194,8 +1171,8 @@ DEDUCTION = {
             'payment_method': 'Cheque',
             'deduct_in_december': True,
             'is_active': True,
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
-            'creditor_id': ('get_creditor', CREDITOR['post_objects'][0])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
+            'creditor_id': (CREDITOR['model'], CREDITOR['post_objects'][0])
         },
         {
             'start_date': '2018-02-01',
@@ -1204,8 +1181,8 @@ DEDUCTION = {
             'payment_method': 'Transferencia',
             'deduct_in_december': False,
             'is_active': True,
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][0]),
-            'creditor_id': ('get_creditor', CREDITOR['post_objects'][1])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
+            'creditor_id': (CREDITOR['model'], CREDITOR['post_objects'][1])
         }
     ],
     'put_objects': [
@@ -1216,18 +1193,17 @@ DEDUCTION = {
             'payment_method': 'Efectivo',
             'deduct_in_december': False,
             'is_active': False,
-            'employee_id': ('get_employee', EMPLOYEE['post_objects'][1]),
-            'creditor_id': ('get_creditor', CREDITOR['post_objects'][1])
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
+            'creditor_id': (CREDITOR['model'], CREDITOR['post_objects'][1])
         }
     ],
     'endpoints': ['deduction', 'activate_deduction', 'deductions'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
 DEDUCTION_DETAIL = {
     'resources': ['DeductionDetail', None, 'DeductionDetails'],
     'model': DeductionDetailModel,
-    'required_objects': [ORGANIZATION, DEPARTMENT, EMPLOYMENT_POSITION, SHIFT_R, EMPLOYEE, PAYMENT, DEDUCTION],
     'post_objects': [
         {
             'deducted_amount': 123.45,
@@ -1248,17 +1224,122 @@ DEDUCTION_DETAIL = {
         }
     ],
     'endpoints': ['deduction_detail', None, 'deduction_detail'],
-    'user_type': 'test'
+    'user_type': 'test_0'
 }
 
+CREDENTIALS = {
+    'root': {
+        'username': 'jfeliu',
+        'password': '1234'
+    },
+    'test_0': {
+        'username': 'test_0',
+        'password': 'test_p'
+    },
+    'test_1': {
+        'username': 'test_1',
+        'password': 'test_p'
+    },
+    'fake': {
+        'username': 'fake_u',
+        'password': 'fake_p'
+    }
+}
 
-def get_sys_test_params(b_obj, res_type=0):
+OBJECTS_TO_TEST = [ORGANIZATION, USER, DEPARTMENT, MARITAL_STATUS, EMPLOYMENT_POSITION, SHIFT_R, SHIFT_F,
+                   EMPLOYEE, HEALTH_PERMIT, EMERGENCY_CONTACT, COUNTRY, PASSPORT, UNIFORM_ITEM, UNIFORM_SIZE,
+                   UNIFORM_REQUIREMENT, BANK, BANK_ACCOUNT, FAMILY_RELATION, DEPENDENT, SCHEDULE,
+                   SCHEDULE_DETAIL, PAYMENT, PAYMENT_DETAIL, CREDITOR, DEDUCTION, DEDUCTION_DETAIL]
+
+def create_test_user(user_type):
     """
-    Returns the parameters needed to run a system test.
+    Create a user in the db and return its credentials.
 
-    :param 
-        b_obj (dict): Object containing the test parameters.
-        res_type (int): Type of resource being tested (0 for record, 1 for activate, 2 for list).
+    :param user_type: String representing the type of user
+    :type user_type: str
+    :return: Dictionary with the username and password of the user that was created
+    :rtype: dict
+    """
+    credentials = CREDENTIALS[user_type]
+    org: dict = ORGANIZATION['post_objects'][0]
+
+    if user_type != 'root' and user_type != 'fake':
+        # Only add test users to the db since root user is already
+        # seeded and fake user should not be able to authenticate.
+        if user_type == 'test_1':
+            org = ORGANIZATION['post_objects'][1]
+
+        organization_id = get_item_from_db(ORGANIZATION['model'], org).id
+
+        _ = get_item_from_db(USER['model'], {
+            'username': credentials['username'],
+            'password': credentials['password'],
+            'password_hash': generate_password_hash(credentials['password']),
+            'email': f'{credentials["username"]}@test_o.com',
+            'organization_id': organization_id,
+            'is_super': user_type == 'super',
+            'is_owner': True,
+            'is_active': True
+        })
+
+    return credentials
+
+
+def get_item_from_db(model, kwargs):
+    """
+    Return an instance of a SQLAlchemy model.
+
+    Returns the instance from the db if it is there.  If not, instantiates a
+    new object, saves it to the db, and returns it.
+
+    :param model: The SQLAlchemy model which will be instantiated and returned
+    :param kwargs: A dictionary with the information needed to instantiate the model
+    :type model: db.Model
+    :type kwargs: dict
+    :returns: An instance of a SQLAlchemy model
+    :rtype: db.Model
+    """
+    # Instances of AppUserModel need to be treated differently because password
+    # is needed for instantiation but it is not a column in the model.
+    if model is AppUserModel:
+        inst = model.query.filter_by(username=kwargs['username']).first()
+    else:
+        inst = model.query.filter_by(**kwargs).first()
+
+    if inst:
+        # Return the instance if item is already in the db.
+        return inst
+
+    # Instantiate and save to the db.
+    inst = model(**kwargs)
+    inst.save_to_db()
+
+    return model.query.filter_by(id=inst.id).first()
+
+
+def get_object_list(obj_list, num_p):
+    if num_p == 'first':
+        return [solve_obj_dependencies(obj_list[0])]
+    elif num_p == 'all':
+        return [solve_obj_dependencies(obj) for obj in obj_list]
+
+    return None
+
+
+def get_sys_test_params(b_obj, res_type=0, num_post='none', num_put='none'):
+    """
+    Return the parameters needed to run a system test.
+
+    :param b_obj: Object containing the test parameters
+    :param res_type: Type of resource being tested (0 for record, 1 for activate, 2 for list)
+    :param num_post: Number of items from the post_objects list that will be returned ('none' will return 0
+        items, 'first' will return the first item, 'all' will return all items)
+    :param num_put: Number of items from the put_objects list that will be returned ('none' will return 0
+        items, 'first' will return the first item, 'all' will return all items)
+    :type b_obj: dict
+    :type res_type: int
+    :type num_post: str
+    :type num_put: str
     :return:
         resource (str): Name of the resource being tested.
         model (db.Model): SQLAlchemy model related to the resource.
@@ -1270,10 +1351,52 @@ def get_sys_test_params(b_obj, res_type=0):
     """
     resource = b_obj['resources'][res_type]
     model = b_obj['model']
-    required_objects = b_obj['required_objects']
-    post_objects = b_obj['post_objects']
-    put_objects = b_obj['put_objects']
     endpoint = b_obj['endpoints'][res_type]
-    user_type = b_obj['user_type']
+    post_objects = None
+    put_objects = None
+
+    if endpoint:
+        post_objects = get_object_list(b_obj['post_objects'], num_post)
+        put_objects = get_object_list(b_obj['put_objects'], num_put)
+
+    user = create_test_user(b_obj['user_type'])
     
-    return resource, model, required_objects, post_objects, put_objects, endpoint, user_type
+    return resource, model, post_objects, put_objects, endpoint, user
+
+
+def solve_obj_dependencies(child_obj):
+    """
+    Check if an object depends on another object.  If it does, create the parent object in the db
+    (if it is not already there) and add the parent object's id to a corresponding property in the
+    child object.
+
+    Note:  Parent objects might depend on other object so they are recursively sent to this function
+    so their dependencies can be resolved.
+
+    :param child_obj: Dictionary representing the child object
+    :type child_obj: dict
+    :return: A dictionary representing the child object with the references to all of its parent's id resolved
+    :rtype: dict
+    """
+
+    # Make deep copy of the object to avoid modifying the original object
+    # since it need to be used in subsequent subtests.
+    child_copy = copy.deepcopy(child_obj)
+
+    # Check all properties of the object.
+    for k, v in child_copy.items():
+        # Parent object are represented by a Tuple, the first element is its
+        # SQLAlchemy model and the second element is a dict with the kwargs
+        # needed to instantiate the model.
+        if type(v) is tuple:
+            model, _dict = v
+            # Recursively solve any dependencies in the kwargs.
+            kwargs = solve_obj_dependencies(_dict)
+
+            # Create and get the parent object.
+            parent_obj = get_item_from_db(model, kwargs)
+
+            # Add the parent's id to the child object.
+            child_copy[k] = parent_obj.id
+
+    return child_copy
