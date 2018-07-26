@@ -9,7 +9,7 @@ class ScheduleDetailModel(ModelMixin, db.Model):
     __table_args__ = (UniqueConstraint('employee_id', 'schedule_id',
                                        name='schedule_detail_employee_id_'
                                             'schedule_id_uindex'),)
-    exclude_from_update = ('employee_id', 'schedule_id')
+    exclude_from_update = ('schedule_id')
 
     id = db.Column(db.Integer, primary_key=True)
     day_1_start = db.Column(db.DateTime)
