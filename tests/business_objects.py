@@ -1,4 +1,5 @@
-from Lib import copy
+from Lib.copy import deepcopy
+from Lib.functools import lru_cache
 
 from werkzeug.security import generate_password_hash
 
@@ -703,7 +704,7 @@ UNIFORM_ITEM = {
             'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0])
         }
     ],
-    'endpoints': ['uniform_item', None, 'uniform_item'],
+    'endpoints': ['uniform_item', None, 'uniform_items'],
     'user_type': 'test_0'
 }
 
@@ -713,25 +714,25 @@ UNIFORM_SIZE = {
     'post_objects': [
         {
             'size_description': 'test_u_s_0',
-            'uniform_item_id': (UNIFORM_ITEM['model'], 0)
+            'uniform_item_id': (UNIFORM_ITEM['model'], UNIFORM_ITEM['post_objects'][0])
         },
         {
             'size_description': 'test_u_s_1',
-            'uniform_item_id': (UNIFORM_ITEM['model'], 1)
+            'uniform_item_id': (UNIFORM_ITEM['model'], UNIFORM_ITEM['post_objects'][1])
         },
         {
             'size_description': 'test_u_s_0',
-            'uniform_item_id': (UNIFORM_ITEM['model'], 1)
+            'uniform_item_id': (UNIFORM_ITEM['model'], UNIFORM_ITEM['post_objects'][1])
         }
     ],
     'put_objects': [
         {
             'size_description': 'new_test_u_s',
-            'uniform_item_id': (UNIFORM_ITEM['model'], 1)
+            'uniform_item_id': (UNIFORM_ITEM['model'], UNIFORM_ITEM['post_objects'][1])
         },
         {
             'size_description': 'test_u_s_0',
-            'uniform_item_id': (UNIFORM_ITEM['model'], 0)
+            'uniform_item_id': (UNIFORM_ITEM['model'], UNIFORM_ITEM['post_objects'][0])
         }
     ],
     'endpoints': ['uniform_size', None, 'uniform_sizes'],
@@ -744,30 +745,30 @@ UNIFORM_REQUIREMENT = {
     'post_objects': [
         {
             'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
-            'uniform_item_id': (UNIFORM_ITEM['model'], 0),
-            'uniform_size_id': (UNIFORM_SIZE['model'], 0)
+            'uniform_item_id': (UNIFORM_ITEM['model'], UNIFORM_ITEM['post_objects'][0]),
+            'uniform_size_id': (UNIFORM_SIZE['model'], UNIFORM_SIZE['post_objects'][0])
         },
         {
             'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
-            'uniform_item_id': (UNIFORM_ITEM['model'], 1),
-            'uniform_size_id': (UNIFORM_SIZE['model'], 1)
+            'uniform_item_id': (UNIFORM_ITEM['model'], UNIFORM_ITEM['post_objects'][1]),
+            'uniform_size_id': (UNIFORM_SIZE['model'], UNIFORM_SIZE['post_objects'][1])
         },
         {
             'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
-            'uniform_item_id': (UNIFORM_ITEM['model'], 1),
-            'uniform_size_id': (UNIFORM_SIZE['model'], 1)
+            'uniform_item_id': (UNIFORM_ITEM['model'], UNIFORM_ITEM['post_objects'][1]),
+            'uniform_size_id': (UNIFORM_SIZE['model'], UNIFORM_SIZE['post_objects'][1])
         }
     ],
     'put_objects': [
         {
             'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
-            'uniform_item_id': (UNIFORM_ITEM['model'], 0),
-            'uniform_size_id': (UNIFORM_SIZE['model'], 0)
+            'uniform_item_id': (UNIFORM_ITEM['model'], UNIFORM_ITEM['post_objects'][0]),
+            'uniform_size_id': (UNIFORM_SIZE['model'], UNIFORM_SIZE['post_objects'][0])
         },
         {
             'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
-            'uniform_item_id': (UNIFORM_ITEM['model'], 0),
-            'uniform_size_id': (UNIFORM_SIZE['model'], 0)
+            'uniform_item_id': (UNIFORM_ITEM['model'], UNIFORM_ITEM['post_objects'][0]),
+            'uniform_size_id': (UNIFORM_SIZE['model'], UNIFORM_SIZE['post_objects'][0])
         }
     ],
     'endpoints': ['uniform_requirement', None, 'uniform_requirements'],
@@ -792,20 +793,6 @@ BANK_ACCOUNT = {
             'account_type': 'Corriente',
             'is_active': True,
             'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
-            'bank_id': 1
-        },
-        {
-            'account_number': '4321',
-            'account_type': 'Ahorros',
-            'is_active': True,
-            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
-            'bank_id': 1
-        },
-        {
-            'account_number': '1234',
-            'account_type': 'Corriente',
-            'is_active': True,
-            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
             'bank_id': 1
         },
         {
@@ -944,7 +931,7 @@ SCHEDULE_DETAIL = {
             'day_7_end': '2018-01-08T06:00:00',
             'day_7_comment': 'comment 7',
             'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
-            'schedule_id': (SCHEDULE['model'], 0)
+            'schedule_id': (SCHEDULE['model'], SCHEDULE['post_objects'][0])
         },
         {
             'day_1_start': '2018-01-08T06:00:00',
@@ -969,32 +956,7 @@ SCHEDULE_DETAIL = {
             'day_7_end': '2018-01-17T06:00:00',
             'day_7_comment': 'comment 7',
             'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
-            'schedule_id': (SCHEDULE['model'], 1)
-        },
-        {
-            'day_1_start': '2018-01-01T06:00:00',
-            'day_1_end': '2018-01-01T14:00:00',
-            'day_1_comment': 'comment 1',
-            'day_2_start': '2018-01-02T06:00:00',
-            'day_2_end': '2018-01-02T14:00:00',
-            'day_2_comment': 'comment 2',
-            'day_3_start': '2018-01-03T06:00:00',
-            'day_3_end': '2018-01-03T14:00:00',
-            'day_3_comment': 'comment 3',
-            'day_4_start': '2018-01-04T06:00:00',
-            'day_4_end': '2018-01-04T14:00:00',
-            'day_4_comment': 'comment 4',
-            'day_5_start': None,
-            'day_5_end': None,
-            'day_5_comment': None,
-            'day_6_start': '2018-01-06T22:00:00',
-            'day_6_end': '2018-01-07T06:00:00',
-            'day_6_comment': 'comment 6',
-            'day_7_start': '2018-01-07T22:00:00',
-            'day_7_end': '2018-01-08T06:00:00',
-            'day_7_comment': 'comment 7',
-            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
-            'schedule_id': (SCHEDULE['model'], 0)
+            'schedule_id': (SCHEDULE['model'], SCHEDULE['post_objects'][0])
         }
     ],
     'put_objects': [
@@ -1020,8 +982,8 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-17T22:00:00',
             'day_7_end': '2018-01-17T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
-            'schedule_id': (SCHEDULE['model'], 1)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
+            'schedule_id': (SCHEDULE['model'], SCHEDULE['post_objects'][0])
         },
         {
             'day_1_start': '2018-01-01T06:00:00',
@@ -1045,8 +1007,8 @@ SCHEDULE_DETAIL = {
             'day_7_start': '2018-01-07T22:00:00',
             'day_7_end': '2018-01-08T06:00:00',
             'day_7_comment': 'comment 7',
-            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
-            'schedule_id': (SCHEDULE['model'], 0)
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
+            'schedule_id': (SCHEDULE['model'], SCHEDULE['post_objects'][0])
         }
     ],
     'endpoints': ['schedule_detail', None, 'schedule_details'],
@@ -1089,7 +1051,7 @@ PAYMENT_DETAIL = {
             'ss_deduction': 123.45,
             'se_deduction': 12.34,
             'isr_deduction': 1.23,
-            'payment_id': ('get_payment', PAYMENT['post_objects'][0])
+            'payment_id': (PAYMENT['model'], PAYMENT['post_objects'][0])
         },
         {
             'payment_type': 'Vacación',
@@ -1097,7 +1059,7 @@ PAYMENT_DETAIL = {
             'ss_deduction': 23.45,
             'se_deduction': 2.34,
             'isr_deduction': 0.23,
-            'payment_id': ('get_payment', PAYMENT['post_objects'][0])
+            'payment_id': (PAYMENT['model'], PAYMENT['post_objects'][0])
         }
     ],
     'put_objects': [
@@ -1107,7 +1069,7 @@ PAYMENT_DETAIL = {
             'ss_deduction': 234.56,
             'se_deduction': 23.45,
             'isr_deduction': 2.34,
-            'payment_id': ('get_payment', PAYMENT['post_objects'][1])
+            'payment_id': (PAYMENT['model'], PAYMENT['post_objects'][1])
         }
     ],
     'endpoints': ['payment_detail', None, 'payment_details'],
@@ -1131,13 +1093,6 @@ CREDITOR = {
             'email': 'test@test_cr_1.com',
             'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
             'is_active': True
-        },
-        {
-            'creditor_name': 'test_cr_0',
-            'phone_number': '123-4567',
-            'email': 'test@test_cr_0.com',
-            'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][1]),
-            'is_active': True
         }
     ],
     'put_objects': [
@@ -1149,7 +1104,7 @@ CREDITOR = {
             'is_active': False
         },
         {
-            'creditor_name': 'new_test_cr_0',
+            'creditor_name': 'test_cr_0',
             'phone_number': '456-7890',
             'email': 'test@new_test_cr_0.com',
             'organization_id': (ORGANIZATION['model'], ORGANIZATION['post_objects'][0]),
@@ -1176,9 +1131,9 @@ DEDUCTION = {
         },
         {
             'start_date': '2018-02-01',
-            'end_date': '2018-02-31',
+            'end_date': '2018-02-28',
             'deduction_per_payment_period': 321.45,
-            'payment_method': 'Transferencia',
+            'payment_method': 'ACH',
             'deduct_in_december': False,
             'is_active': True,
             'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
@@ -1207,23 +1162,23 @@ DEDUCTION_DETAIL = {
     'post_objects': [
         {
             'deducted_amount': 123.45,
-            'payment_id': ('get_payment', PAYMENT['post_objects'][0]),
-            'deduction_id': ('get_deduction', DEDUCTION['post_objects'][0])
+            'payment_id': (PAYMENT['model'], PAYMENT['post_objects'][0]),
+            'deduction_id': (DEDUCTION['model'], DEDUCTION['post_objects'][0])
         },
         {
             'deducted_amount': 321.45,
-            'payment_id': ('get_payment', PAYMENT['post_objects'][0]),
-            'deduction_id': ('get_deduction', DEDUCTION['post_objects'][1])
+            'payment_id': (PAYMENT['model'], PAYMENT['post_objects'][0]),
+            'deduction_id': (DEDUCTION['model'], DEDUCTION['post_objects'][1])
         }
     ],
     'put_objects': [
         {
             'deducted_amount': 89.01,
-            'payment_id': ('get_payment', PAYMENT['post_objects'][1]),
-            'deduction_id': ('get_deduction', DEDUCTION['post_objects'][1])
+            'payment_id': (PAYMENT['model'], PAYMENT['post_objects'][1]),
+            'deduction_id': (DEDUCTION['model'], DEDUCTION['post_objects'][1])
         }
     ],
-    'endpoints': ['deduction_detail', None, 'deduction_detail'],
+    'endpoints': ['deduction_detail', None, 'deduction_details'],
     'user_type': 'test_0'
 }
 
@@ -1251,6 +1206,7 @@ OBJECTS_TO_TEST = [ORGANIZATION, USER, DEPARTMENT, MARITAL_STATUS, EMPLOYMENT_PO
                    UNIFORM_REQUIREMENT, BANK, BANK_ACCOUNT, FAMILY_RELATION, DEPENDENT, SCHEDULE,
                    SCHEDULE_DETAIL, PAYMENT, PAYMENT_DETAIL, CREDITOR, DEDUCTION, DEDUCTION_DETAIL]
 
+
 def create_test_user(user_type):
     """
     Create a user in the db and return its credentials.
@@ -1269,9 +1225,9 @@ def create_test_user(user_type):
         if user_type == 'test_1':
             org = ORGANIZATION['post_objects'][1]
 
-        organization_id = get_item_from_db(ORGANIZATION['model'], org).id
+        organization_id = get_item_from_db(ORGANIZATION['model'], **org).id
 
-        _ = get_item_from_db(USER['model'], {
+        _ = get_item_from_db(USER['model'], **{
             'username': credentials['username'],
             'password': credentials['password'],
             'password_hash': generate_password_hash(credentials['password']),
@@ -1285,12 +1241,16 @@ def create_test_user(user_type):
     return credentials
 
 
-def get_item_from_db(model, kwargs):
+@lru_cache(maxsize=256)
+def get_item_from_db(model, **kwargs):
     """
     Return an instance of a SQLAlchemy model.
 
     Returns the instance from the db if it is there.  If not, instantiates a
     new object, saves it to the db, and returns it.
+
+    The results of the function are cache to avoid unnecessary db queries.  The
+    cache is cleared at the end of each subtest.
 
     :param model: The SQLAlchemy model which will be instantiated and returned
     :param kwargs: A dictionary with the information needed to instantiate the model
@@ -1326,7 +1286,7 @@ def get_object_list(obj_list, num_p):
     return None
 
 
-def get_sys_test_params(b_obj, res_type=0, num_post='none', num_put='none'):
+def get_sys_test_params(b_obj, res_type=0, num_post='none', num_put='none', user_type=None):
     """
     Return the parameters needed to run a system test.
 
@@ -1336,10 +1296,12 @@ def get_sys_test_params(b_obj, res_type=0, num_post='none', num_put='none'):
         items, 'first' will return the first item, 'all' will return all items)
     :param num_put: Number of items from the put_objects list that will be returned ('none' will return 0
         items, 'first' will return the first item, 'all' will return all items)
+    :param user_type: Override the user_type from the b_obj
     :type b_obj: dict
     :type res_type: int
     :type num_post: str
     :type num_put: str
+    :type user_type: str
     :return:
         resource (str): Name of the resource being tested.
         model (db.Model): SQLAlchemy model related to the resource.
@@ -1351,17 +1313,12 @@ def get_sys_test_params(b_obj, res_type=0, num_post='none', num_put='none'):
     """
     resource = b_obj['resources'][res_type]
     model = b_obj['model']
-    endpoint = b_obj['endpoints'][res_type]
-    post_objects = None
-    put_objects = None
-
-    if endpoint:
-        post_objects = get_object_list(b_obj['post_objects'], num_post)
-        put_objects = get_object_list(b_obj['put_objects'], num_put)
-
-    user = create_test_user(b_obj['user_type'])
+    endpoints = b_obj['endpoints']
+    post_objects = get_object_list(b_obj['post_objects'], num_post) if endpoints[0] else None
+    put_objects = get_object_list(b_obj['put_objects'], num_put) if endpoints[0] else None
+    user = create_test_user(user_type if user_type else b_obj['user_type'])
     
-    return resource, model, post_objects, put_objects, endpoint, user
+    return resource, model, post_objects, put_objects, endpoints, user
 
 
 def solve_obj_dependencies(child_obj):
@@ -1378,10 +1335,9 @@ def solve_obj_dependencies(child_obj):
     :return: A dictionary representing the child object with the references to all of its parent's id resolved
     :rtype: dict
     """
-
     # Make deep copy of the object to avoid modifying the original object
     # since it need to be used in subsequent subtests.
-    child_copy = copy.deepcopy(child_obj)
+    child_copy = deepcopy(child_obj)
 
     # Check all properties of the object.
     for k, v in child_copy.items():
@@ -1394,7 +1350,7 @@ def solve_obj_dependencies(child_obj):
             kwargs = solve_obj_dependencies(_dict)
 
             # Create and get the parent object.
-            parent_obj = get_item_from_db(model, kwargs)
+            parent_obj = get_item_from_db(model, **kwargs)
 
             # Add the parent's id to the child object.
             child_copy[k] = parent_obj.id
