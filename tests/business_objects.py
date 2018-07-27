@@ -166,7 +166,12 @@ DEPARTMENT = {
 MARITAL_STATUS = {
     'resources': [None, None, 'MaritalStatuses'],
     'model': MaritalStatusModel,
-    'post_objects': [],
+    'post_objects': [
+        {
+            'status_feminine': 'marital_status_f',
+            'status_masculine': 'marital_status_m'
+        }
+    ],
     'put_objects': [],
     'endpoints': [None, None, 'marital_statuses'],
     'user_type': 'test_0'
@@ -639,7 +644,12 @@ EMERGENCY_CONTACT = {
 COUNTRY = {
     'resources': [None, None, 'Countries'],
     'model': CountryModel,
-    'post_objects': [],
+    'post_objects': [
+        {
+            'country_name': 'Panamá',
+            'nationality': 'panameña'
+        }
+    ],
     'put_objects': [],
     'endpoints': [None, None, 'countries'],
     'user_type': 'test_0'
@@ -778,7 +788,11 @@ UNIFORM_REQUIREMENT = {
 BANK = {
     'resources': [None, None, 'Banks'],
     'model': BankModel,
-    'post_objects': [],
+    'post_objects': [
+        {
+            'bank_name': 'test_b'
+        }
+    ],
     'put_objects': [],
     'endpoints': [None, None, 'banks'],
     'user_type': 'test_0'
@@ -826,7 +840,12 @@ BANK_ACCOUNT = {
 FAMILY_RELATION = {
     'resources': [None, None, 'FamilyRelations'],
     'model': FamilyRelationModel,
-    'post_objects': [],
+    'post_objects': [
+        {
+            'relation_feminine': 'family_relation_f',
+            'relation_masculine': 'family_relation_m'
+        }
+    ],
     'put_objects': [],
     'endpoints': [None, None, 'family_relations'],
     'user_type': 'test_0'
