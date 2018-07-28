@@ -5,6 +5,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.orm import collections
 from sqlalchemy.sql import sqltypes
 from sqlalchemy.sql.schema import UniqueConstraint
+from werkzeug.security import generate_password_hash
 
 from db import db
 
@@ -83,7 +84,8 @@ class ModelMixin(object):
                     parsed_model['str'].append(col.key)
 
         parsed_model['unique'] = cls.get_unique_constraints()
-        parsed_model['excluded'] = list(cls.exclude_from_update)
+        parsed_model['excluded'] = list(cls.exclude_from_update) \
+            if cls.exclude_from_update else []
 
         if cls.__tablename__ == 'app_user':
             # noinspection PyTypeChecker
@@ -115,7 +117,7 @@ class ModelMixin(object):
     def update(self, data):
         for key, value in data.items():
             if key is 'password':
-                setattr(self, 'password_hash', self.get_password_hash(value))
+                setattr(self, 'password_hash', generate_password_hash(value))
             elif key not in self.exclude_from_update:
                 setattr(self, key, value)
         self.save_to_db()

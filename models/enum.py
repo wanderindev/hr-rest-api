@@ -23,7 +23,10 @@ PAYMENT_TYPE = db.Enum('Salario Regular', 'Sobre Tiempo', 'Vacación',
 
 TERMINATION_REASON = db.Enum('Renuncia', 'Período de Prueba',
                              'Expiración de Contrato',
-                             'Despido Causa Justificada', 'Abandono de Trabajo',
+                             'Despido Causa Justificada',
+                             'Abandono de Trabajo',
                              name='termination_reason')
 
 TYPE_OF_CONTRACT = db.Enum('Definido', 'Indefinido', name='type_of_contract')
+
+ATT_TYPE = db.Enum('in', 'out', name='att_type')

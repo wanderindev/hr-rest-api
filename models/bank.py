@@ -5,7 +5,7 @@ from models.bank_account import BankAccountModel
 
 class BankModel(ModelMixin, db.Model):
     __tablename__ = 'bank'
-    exclude_from_update = ()
+    exclude_from_update = None
 
     id = db.Column(db.Integer, primary_key=True)
     bank_name = db.Column(db.String(80), nullable=False)
@@ -18,5 +18,5 @@ class BankModel(ModelMixin, db.Model):
         self.bank_name = bank_name
 
     @classmethod
-    def find_all(cls, user):
+    def find_all(cls, _):
         return cls.query.order_by('bank_name').all()

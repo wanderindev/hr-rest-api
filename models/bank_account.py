@@ -7,8 +7,10 @@ from models.mixin import ModelMixin
 
 class BankAccountModel(ModelMixin, db.Model):
     __tablename__ = 'bank_account'
-    __table_args__ = (UniqueConstraint('account_number', 'employee_id', 'bank_id',
-                                       name='bank_account_account_number_employee_id_bank_id_uindex'),)
+    __table_args__ = (UniqueConstraint('account_number', 'employee_id',
+                                       'bank_id',
+                                       name='bank_account_account_number_'
+                                            'employee_id_bank_id_uindex'),)
     exclude_from_update = ('employee_id',)
 
     id = db.Column(db.Integer, primary_key=True)

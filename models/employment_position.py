@@ -9,11 +9,13 @@ class EmploymentPositionModel(ModelMixin, db.Model):
     __tablename__ = 'employment_position'
     __table_args__ = (UniqueConstraint('position_name_feminine',
                                        'organization_id',
-                                       name='employment_position_p_name_feminine_'
+                                       name='employment_position_'
+                                            'p_name_feminine_'
                                             'organization_id_uindex'),
                       UniqueConstraint('position_name_masculine',
                                        'organization_id',
-                                       name='employment_position_p_name_masculine_'
+                                       name='employment_position_'
+                                            'p_name_masculine_'
                                             'organization_id_uindex')
                       )
     exclude_from_update = ('organization_id', 'is_active')

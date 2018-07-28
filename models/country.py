@@ -5,7 +5,7 @@ from models.passport import PassportModel
 
 class CountryModel(ModelMixin, db.Model):
     __tablename__ = 'country'
-    exclude_from_update = ()
+    exclude_from_update = None
 
     id = db.Column(db.Integer, primary_key=True)
     country_name = db.Column(db.String(80), nullable=False)
@@ -20,5 +20,5 @@ class CountryModel(ModelMixin, db.Model):
         self.nationality = nationality
 
     @classmethod
-    def find_all(cls, user):
+    def find_all(cls, _):
         return cls.query.order_by('country_name').all()

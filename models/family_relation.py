@@ -15,5 +15,5 @@ class FamilyRelationModel(ModelMixin, db.Model):
         self.relation_masculine = relation_masculine
 
     @classmethod
-    def find_all(cls, user):
+    def find_all(cls, _):
         return cls.query.order_by('relation_feminine').all()

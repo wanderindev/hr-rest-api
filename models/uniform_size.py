@@ -7,7 +7,8 @@ from models.mixin import ModelMixin
 class UniformSizeModel(ModelMixin, db.Model):
     __tablename__ = 'uniform_size'
     __table_args__ = (UniqueConstraint('size_description', 'uniform_item_id',
-                                       name='uniform_size_size_description_uniform_item_id_uindex'),)
+                                       name='uniform_size_size_description_'
+                                            'uniform_item_id_uindex'),)
     exclude_from_update = ('uniform_item_id',)
 
     id = db.Column(db.Integer, primary_key=True)
