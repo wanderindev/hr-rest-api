@@ -1,6 +1,5 @@
 import json
 
-from flask_jwt import JWTError
 from unittest import TestCase
 from werkzeug.security import check_password_hash
 
@@ -115,7 +114,7 @@ class BaseTest(TestCase):
                         'Authorization': 'JWT ' +
                                          json.loads(result.data)['access_token']
                     }
-                except JWTError:
+                except KeyError:
                     # Returns fake token for testing purposes if user
                     # is not in the database.
                     return {

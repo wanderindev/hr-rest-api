@@ -44,7 +44,7 @@ class ResourceMixin(Resource):
 
         if self.parsed_model['unique']:
             for constraint in self.parsed_model['unique']:
-                _filter ={}
+                _filter = {}
                 for key in constraint:
                     _filter[key] = data[key]
 
@@ -74,7 +74,7 @@ class ResourceMixin(Resource):
 
         if self.parsed_model['unique']:
             for constraint in self.parsed_model['unique']:
-                _filter ={}
+                _filter = {}
                 for key in constraint:
                     _filter[key] = data[key]
 

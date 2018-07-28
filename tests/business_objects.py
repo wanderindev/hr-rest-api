@@ -1,5 +1,5 @@
-from Lib.copy import deepcopy
-from Lib.functools import lru_cache
+from copy import deepcopy
+from functools import lru_cache
 
 from werkzeug.security import generate_password_hash
 

@@ -54,7 +54,6 @@ class ModelMixin(object):
         self.is_active = False
         self.save_to_db()
 
-
     @classmethod
     def parse_model(cls):
         parsed_model = {
