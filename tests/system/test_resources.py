@@ -1,6 +1,7 @@
 import json
 
 from tests.base_test import BaseTest
+from tests.business_objects import get_sys_test_params, get_item_from_db, OBJECTS_TO_TEST
 
 
 class TestResources(BaseTest):
@@ -20,25 +21,25 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 0, 'first')
                     parsed_model = model.parse_model()
-                    o_post, o_put = self.get_b_object(b_obj)
 
-                    if o_post is not None:
-                        with self.subTest(resource, o_post=o_post, user=user):
+                    if endpoints[0]:
+                        item = post_items[0]
+
+                        with self.subTest(resource, item=item, user=user):
                             if 'password' in parsed_model['keys']:
-                                o = dict(o_post)
+                                o = dict(item)
                                 o.pop('password')
                                 self.assertIsNone(
                                     model.query.filter_by(**o).first())
                             else:
                                 self.assertIsNone(
-                                    model.query.filter_by(**o_post).first())
+                                    model.query.filter_by(**item).first())
 
-                            result = c.post(f'/{endpoint}',
-                                            data=json.dumps(o_post),
+                            result = c.post(f'/{endpoints[0]}',
+                                            data=json.dumps(item),
                                             headers=self.get_headers(user))
 
                             record = json.loads(result.data)['record']
@@ -48,9 +49,11 @@ class TestResources(BaseTest):
                             self.assertIsNotNone(model.query.filter_by(
                                 id=record['id']).first())
 
-                            self.check_record(o_post, record, parsed_model)
+                            self.check_record(item, record, parsed_model)
 
+                            # Clear the db and cache at the end of the subtest.
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_post_without_authentication(self):
         """
@@ -59,20 +62,22 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user('fake')
-                    o_post, o_put = self.get_b_object(b_obj)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 0, 'first',
+                                                                                          'none', 'fake')
 
-                    if o_post is not None:
-                        with self.subTest(resource, o_post=o_post, user=user):
-                            result = c.post(f'/{endpoint}',
-                                            data=json.dumps(o_post),
+                    if endpoints[0]:
+                        item = post_items[0]
+
+                        with self.subTest(resource, item=item, user=user):
+                            result = c.post(f'/{endpoints[0]}',
+                                            data=json.dumps(item),
                                             headers=self.get_headers(user))
 
                             self.assertEqual(401, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_post_not_unique(self):
         """
@@ -81,37 +86,37 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 0, 'first')
                     parsed_model = model.parse_model()
-                    o_post, o_put = self.get_b_object(b_obj)
 
-                    if parsed_model['unique']:
-                        with self.subTest(resource, o_post=o_post, user=user):
+                    if endpoints[0] and parsed_model['unique']:
+                        item = post_items[0]
+
+                        with self.subTest(resource, item=item, user=user):
                             if 'password' in parsed_model['keys']:
-                                o = dict(o_post)
+                                o = dict(item)
                                 o.pop('password')
                                 self.assertIsNone(
                                     model.query.filter_by(**o).first())
                             else:
                                 self.assertIsNone(
-                                    model.query.filter_by(**o_post).first())
+                                    model.query.filter_by(**item).first())
 
-                            # POST object to db.
-                            result = c.post(f'/{endpoint}',
-                                            data=json.dumps(o_post),
+                            result = c.post(f'/{endpoints[0]}',
+                                            data=json.dumps(item),
                                             headers=self.get_headers(user))
 
                             self.assertEqual(201, result.status_code)
 
-                            result = c.post(f'/{endpoint}',
-                                            data=json.dumps(o_post),
+                            result = c.post(f'/{endpoints[0]}',
+                                            data=json.dumps(item),
                                             headers=self.get_headers(user))
 
                             self.assertEqual(400, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_get_with_authentication(self):
         """
@@ -120,31 +125,32 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 0, 'first')
                     parsed_model = model.parse_model()
-                    o_post, o_put = self.get_b_object(b_obj)
 
-                    if o_post is not None:
-                        with self.subTest(resource, o_post=o_post, user=user):
+                    if endpoints[0]:
+                        item = post_items[0]
+
+                        with self.subTest(resource, item=item, user=user):
                             # POST the object to the database and get the id.
-                            result = c.post(f'/{endpoint}',
-                                            data=json.dumps(o_post),
+                            result = c.post(f'/{endpoints[0]}',
+                                            data=json.dumps(item),
                                             headers=self.get_headers(user))
                             _id = json.loads(result.data)['record']['id']
 
                             # Make GET request.
-                            result = c.get(f'/{endpoint}/{_id}',
+                            result = c.get(f'/{endpoints[0]}/{_id}',
                                            headers=self.get_headers(user))
 
                             record = json.loads(result.data)['record']
 
                             self.assertEqual(200, result.status_code)
 
-                            self.check_record(o_post, record, parsed_model)
+                            self.check_record(item, record, parsed_model)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_get_without_authentication(self):
         """
@@ -153,19 +159,19 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user('fake')
-                    o_post, o_put = self.get_b_object(b_obj)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 0, 'none',
+                                                                                         'none', 'fake')
 
-                    if o_post is not None:
+                    if endpoints[0]:
                         with self.subTest(resource, user=user):
-                            result = c.get(f'/{endpoint}/999',
+                            result = c.get(f'/{endpoints[0]}/999',
                                            headers=self.get_headers(user))
 
                             self.assertEqual(401, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_get_not_found(self):
         """
@@ -174,19 +180,18 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
-                    o_post, o_put = self.get_b_object(b_obj)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 0)
 
-                    if o_post is not None:
+                    if endpoints[0]:
                         with self.subTest(resource, user=user):
-                            result = c.get(f'/{endpoint}/999',
+                            result = c.get(f'/{endpoints[0]}/999',
                                            headers=self.get_headers(user))
 
                             self.assertEqual(404, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_put_with_authentication(self):
         """
@@ -195,31 +200,36 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
-                    parsed_model = model.parse_model()
-                    o_post, o_put = self.get_b_object(b_obj)
+                with self.app_context():
+                    for obj in OBJECTS_TO_TEST:
+                        resource, model, post_items, put_items, endpoints, user = get_sys_test_params(obj, 0,
+                                                                                                      'first', 'first')
+                        parsed_model = model.parse_model()
 
-                    if o_post is not None:
-                        with self.subTest(resource, o_put=o_put, user=user):
-                            # POST the object to the database and get the id.
-                            result = c.post(f'/{endpoint}',
-                                            data=json.dumps(o_post),
-                                            headers=self.get_headers(user))
-                            _id = json.loads(result.data)['record']['id']
+                        if endpoints[0]:
+                            item = post_items[0]
+                            mod_item = put_items[0]
 
-                            result = c.put(f'/{endpoint}/{_id}',
-                                           data=json.dumps(o_put),
-                                           headers=self.get_headers(user))
-                            print(result.data)
-                            record = json.loads(result.data)['record']
+                            with self.subTest(resource, item=item, mod_item=mod_item, user=user):
+                                # POST the item to the db and get the id.
+                                result = c.post(f'/{endpoints[0]}',
+                                                data=json.dumps(item),
+                                                headers=self.get_headers(user))
+                                _id = json.loads(result.data)['record']['id']
 
-                            self.assertEqual(200, result.status_code)
+                                # PUT modified item.
+                                result = c.put(f'/{endpoints[0]}/{_id}',
+                                               data=json.dumps(mod_item),
+                                               headers=self.get_headers(user))
 
-                            self.check_record(o_put, record, parsed_model)
+                                record = json.loads(result.data)['record']
 
-                            self.clear_db()
+                                self.assertEqual(200, result.status_code)
+
+                                self.check_record(mod_item, record, parsed_model, item)
+
+                                self.clear_db()
+                                get_item_from_db.cache_clear()
 
     def test_put_without_authentication(self):
         """
@@ -228,20 +238,22 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user('fake')
-                    o_post, o_put = self.get_b_object(b_obj)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, _, put_items, endpoints, user = get_sys_test_params(obj, 0, 'none',
+                                                                                         'first', 'fake')
 
-                    if o_post is not None:
-                        with self.subTest(resource, o_put=o_put, user=user):
-                            result = c.put(f'/{endpoint}/999',
-                                           data=json.dumps(o_put),
+                    if endpoints[0]:
+                        mod_item = put_items[0]
+
+                        with self.subTest(resource, mod_item=mod_item, user=user):
+                            result = c.put(f'/{endpoints[0]}/999',
+                                           data=json.dumps(mod_item),
                                            headers=self.get_headers(user))
 
                             self.assertEqual(401, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_put_not_unique(self):
         """
@@ -250,34 +262,34 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, post_items, put_items, endpoints, user = get_sys_test_params(obj, 0,
+                                                                                                  'all', 'all')
                     parsed_model = model.parse_model()
-                    o_post, o_put = self.get_b_object(b_obj)
 
-                    if parsed_model['unique']:
-                        with self.subTest(resource, o_put=o_put, user=user):
-                            # POST the object to the database and get the id.
-                            result = c.post(f'/{endpoint}',
-                                            data=json.dumps(o_post),
+                    if endpoints[0] and parsed_model['unique']:
+                        with self.subTest(resource, post_items=post_items, put_items=put_items, user=user):
+                            # POST two items to the database and get the id of the second one.
+                            c.post(f'/{endpoints[0]}',
+                                   data=json.dumps(post_items[0]),
+                                   headers=self.get_headers(user))
+
+                            result = c.post(f'/{endpoints[0]}',
+                                            data=json.dumps(post_items[1]),
                                             headers=self.get_headers(user))
                             _id = json.loads(result.data)['record']['id']
 
-                            # POST a new object to the database.
-                            c.post(f'/{endpoint}',
-                                   data=json.dumps(o_put),
-                                   headers=self.get_headers(user))
+                            # PUT into second object data that violates
+                            # unique contraint of the first object.
+                            for item in put_items[1:]:
+                                result = c.put(f'/{endpoints[0]}/{_id}',
+                                               data=json.dumps(item),
+                                               headers=self.get_headers(user))
 
-                            # PUT into original object data that violates
-                            # unique contraint.
-                            result = c.put(f'/{endpoint}/{_id}',
-                                           data=json.dumps(o_put),
-                                           headers=self.get_headers(user))
-
-                            self.assertEqual(400, result.status_code)
+                                self.assertEqual(400, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_put_not_found(self):
         """
@@ -286,20 +298,20 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
-                    o_post, o_put = self.get_b_object(b_obj)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, _, put_items, endpoints, user = get_sys_test_params(obj, 0, 'none', 'first')
 
-                    if o_post is not None:
-                        with self.subTest(resource, o_put=o_put, user=user):
-                            result = c.put(f'/{endpoint}/999',
-                                           data=json.dumps(o_put),
+                    if endpoints[0]:
+                        mod_item = put_items[0]
+                        with self.subTest(resource, mod_item=mod_item, user=user):
+                            result = c.put(f'/{endpoints[0]}/999',
+                                           data=json.dumps(mod_item),
                                            headers=self.get_headers(user))
 
                             self.assertEqual(404, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_delete_with_authentication(self):
         """
@@ -308,25 +320,24 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
-                    o_post, o_put = self.get_b_object(b_obj)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 0, 'first')
 
-                    if o_post is not None:
-                        with self.subTest(resource, o_post=o_post, user=user):
-                            # POST the object to the database and get the id.
-                            result = c.post(f'/{endpoint}',
-                                            data=json.dumps(o_post),
+                    if endpoints[0]:
+                        item = post_items[0]
+                        with self.subTest(resource, item=item, user=user):
+                            result = c.post(f'/{endpoints[0]}',
+                                            data=json.dumps(item),
                                             headers=self.get_headers(user))
                             _id = json.loads(result.data)['record']['id']
 
-                            result = c.delete(f'/{endpoint}/{_id}',
+                            result = c.delete(f'/{endpoints[0]}/{_id}',
                                               headers=self.get_headers(user))
 
                             self.assertEqual(200, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_delete_without_authentication(self):
         """
@@ -335,19 +346,18 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user('fake')
-                    o_post, o_put = self.get_b_object(b_obj)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 0, 'none', 'none', 'fake')
 
-                    if o_post is not None:
+                    if endpoints[0]:
                         with self.subTest(resource, user=user):
-                            result = c.delete(f'/{endpoint}/999',
+                            result = c.delete(f'/{endpoints[0]}/999',
                                               headers=self.get_headers(user))
 
                             self.assertEqual(401, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_delete_not_found(self):
         """
@@ -356,19 +366,18 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
-                    o_post, o_put = self.get_b_object(b_obj)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 0)
 
-                    if o_post is not None:
+                    if endpoints[0]:
                         with self.subTest(resource, user=user):
-                            result = c.delete(f'/{endpoint}/999',
+                            result = c.delete(f'/{endpoints[0]}/999',
                                               headers=self.get_headers(user))
 
                             self.assertEqual(404, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_activate_inactivate_with_authentication(self):
         """
@@ -377,22 +386,20 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
-                    parsed_model = model.parse_model()
-                    o_post, o_put = self.get_b_object(b_obj)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 1, 'first')
 
-                    if 'is_active' in parsed_model['keys']:
-                        with self.subTest(resource, o_post=o_post, user=user):
-                            # POST the object to the database and get the id.
-                            result = c.post(f'/{endpoint}',
-                                            data=json.dumps(o_post),
+                    if endpoints[1]:
+                        item = post_items[0]
+
+                        with self.subTest(resource, item=item, user=user):
+                            result = c.post(f'/{endpoints[0]}',
+                                            data=json.dumps(item),
                                             headers=self.get_headers(user))
                             _id = json.loads(result.data)['record']['id']
 
                             # Make record inactive
-                            result = c.put(f'/activate_{endpoint}/{_id}',
+                            result = c.put(f'/{endpoints[1]}/{_id}',
                                            data=json.dumps({
                                                'is_active': False
                                            }),
@@ -404,7 +411,7 @@ class TestResources(BaseTest):
                                              json.loads(result.data)['message'])
 
                             # Make record active.
-                            result = c.put(f'/activate_{endpoint}/{_id}',
+                            result = c.put(f'/{endpoints[1]}/{_id}',
                                            data=json.dumps({
                                                'is_active': True
                                            }),
@@ -416,6 +423,7 @@ class TestResources(BaseTest):
                                              json.loads(result.data)['message'])
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_activate_inactivate_active_inactive(self):
         """
@@ -425,22 +433,19 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
-                    parsed_model = model.parse_model()
-                    o_post, o_put = self.get_b_object(b_obj)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 1, 'first')
 
-                    if 'is_active' in parsed_model['keys']:
-                        with self.subTest(resource, o_post=o_post, user=user):
-                            # POST the object to the database and get the id.
-                            result = c.post(f'/{endpoint}',
-                                            data=json.dumps(o_post),
+                    if endpoints[1]:
+                        item = post_items[0]
+                        with self.subTest(resource, item=item, user=user):
+                            result = c.post(f'/{endpoints[0]}',
+                                            data=json.dumps(item),
                                             headers=self.get_headers(user))
                             _id = json.loads(result.data)['record']['id']
 
                             # Try to activate an active record.
-                            result = c.put(f'/activate_{endpoint}/{_id}',
+                            result = c.put(f'/{endpoints[1]}/{_id}',
                                            data=json.dumps({
                                                'is_active': True
                                            }),
@@ -452,14 +457,14 @@ class TestResources(BaseTest):
                                              json.loads(result.data)['message'])
 
                             # Make record inactive.
-                            c.put(f'/activate_{endpoint}/{_id}',
+                            c.put(f'/{endpoints[1]}/{_id}',
                                   data=json.dumps({
                                       'is_active': False
                                   }),
                                   headers=self.get_headers(user))
 
                             # Try to inactivate an inactive record.
-                            result = c.put(f'/activate_{endpoint}/{_id}',
+                            result = c.put(f'/{endpoints[1]}/{_id}',
                                            data=json.dumps({
                                                'is_active': False
                                            }),
@@ -471,6 +476,7 @@ class TestResources(BaseTest):
                                              json.loads(result.data)['message'])
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_activate_without_authentication(self):
         """
@@ -479,14 +485,12 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user('fake')
-                    parsed_model = model.parse_model()
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 1, 'none', 'none', 'fake')
 
-                    if 'is_active' in parsed_model['keys']:
+                    if endpoints[1]:
                         with self.subTest(resource, user=user):
-                            result = c.put(f'/activate_{endpoint}/999',
+                            result = c.put(f'/{endpoints[1]}/999',
                                            data=json.dumps({
                                                'is_active': True
                                            }),
@@ -495,6 +499,7 @@ class TestResources(BaseTest):
                             self.assertEqual(401, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_activate_not_found(self):
         """
@@ -503,14 +508,12 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
-                    parsed_model = model.parse_model()
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 1, 'none', 'none')
 
-                    if 'is_active' in parsed_model['keys']:
+                    if endpoints[1]:
                         with self.subTest(resource, user=user):
-                            result = c.put(f'/activate_{endpoint}/999',
+                            result = c.put(f'/{endpoints[1]}/999',
                                            data=json.dumps({
                                                'is_active': True
                                            }),
@@ -519,6 +522,7 @@ class TestResources(BaseTest):
                             self.assertEqual(404, result.status_code)
 
                             self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_list_with_authentication(self):
         """
@@ -527,56 +531,53 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user(user_type)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 2, 'first')
                     parsed_model = model.parse_model()
-                    o_post, o_put = self.get_b_object(b_obj)
 
-                    with self.subTest(resource, o_post=o_post, user=user):
-                        if endpoint in ['marital_statuses',
-                                        'countries',
-                                        'banks',
-                                        'family_relations']:
-                            result = c.get(f'/{endpoint}',
-                                           headers=self.get_headers(user))
-                        else:
-                            # POST the object to the database.
-                            c.post(f'/{endpoint}',
-                                   data=json.dumps(o_post),
-                                   headers=self.get_headers(user))
-
-                            if 'schedule_id' in parsed_model['keys']:
-                                result = c.get(f'/{endpoint}s'
-                                               f'/{o_post["schedule_id"]}',
-                                               headers=self.get_headers(user))
-                            elif 'payment_id' in parsed_model['keys']:
-                                result = c.get(f'/{endpoint}s'
-                                               f'/{o_post["payment_id"]}',
-                                               headers=self.get_headers(user))
-                            elif 'employee_id' in parsed_model['keys']:
-                                result = c.get(f'/{endpoint}s'
-                                               f'/{o_post["employee_id"]}',
-                                               headers=self.get_headers(user))
-                            elif 'uniform_item_id' in parsed_model['keys']:
-                                result = c.get(f'/{endpoint}s'
-                                               f'/{o_post["uniform_item_id"]}',
-                                               headers=self.get_headers(user))
-                            elif 'department_id' in parsed_model['keys'] and endpoint is not 'employee':
-                                result = c.get(f'/{endpoint}s'
-                                               f'/{o_post["department_id"]}',
+                    if endpoints[2]:
+                        with self.subTest(resource, user=user):
+                            # No need to post data for these endpoints.
+                            if endpoints[2] in ['marital_statuses',
+                                                'countries',
+                                                'banks',
+                                                'family_relations']:
+                                result = c.get(f'/{endpoints[2]}',
                                                headers=self.get_headers(user))
                             else:
-                                result = c.get(f'/{endpoint}s',
-                                               headers=self.get_headers(user))
+                                item = post_items[0]
+                                c.post(f'/{endpoints[0]}',
+                                       data=json.dumps(item),
+                                       headers=self.get_headers(user))
 
-                        _list = json.loads(result.data)['list']
+                                if 'schedule_id' in parsed_model['keys']:
+                                    _id = item['schedule_id']
+                                elif 'payment_id' in parsed_model['keys']:
+                                    _id = item['payment_id']
+                                elif 'employee_id' in parsed_model['keys']:
+                                    _id = item['employee_id']
+                                elif 'uniform_item_id' in parsed_model['keys']:
+                                    _id = item['uniform_item_id']
+                                elif 'department_id' in parsed_model['keys'] and endpoints[2] is not 'employees':
+                                    _id = item['department_id']
+                                else:
+                                    _id = None
 
-                        self.assertEqual(200, result.status_code)
+                                if _id:
+                                    result = c.get(f'/{endpoints[2]}/{_id}',
+                                                   headers=self.get_headers(user))
+                                else:
+                                    result = c.get(f'/{endpoints[2]}',
+                                                   headers=self.get_headers(user))
 
-                        self.assertGreater(len(_list), 0)
+                            _list = json.loads(result.data)['list']
 
-                        self.clear_db()
+                            self.assertEqual(200, result.status_code)
+
+                            self.assertGreater(len(_list), 0)
+
+                            self.clear_db()
+                            get_item_from_db.cache_clear()
 
     def test_list_without_authentication(self):
         """
@@ -585,25 +586,22 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for params in self.get_system_test_params():
-                    resource, model, b_obj, endpoint, user_type = params
-                    user = self.get_test_user('fake')
-                    parsed_model = model.parse_model()
-                    o_post, o_put = self.get_b_object(b_obj)
+                for obj in OBJECTS_TO_TEST:
+                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 2, 'none', 'none', 'fake')
 
-                    with self.subTest(resource, user=user):
-                        if endpoint == 'marital_statuses' or 'countries':
-                            result = c.get(f'/{endpoint}',
-                                           headers=self.get_headers(user))
-                        else:
-                            if 'employee_id' in parsed_model['keys']:
-                                result = c.get(f'/{endpoint}s'
-                                               f'/{o_post["employee_id"]}',
+                    if endpoints[2]:
+                        with self.subTest(resource, user=user):
+                            if endpoints[2] in ['bank_accounts', 'deduction_details', 'deductions', 'dependents',
+                                                'emergency_contacts', 'employee', 'health_permits', 'passports',
+                                                'payment_details', 'payments', 'schedule_details', 'schedules',
+                                                'uniform_requirements', 'uniform_sizes']:
+                                result = c.get(f'/{endpoints[2]}/999',
                                                headers=self.get_headers(user))
                             else:
-                                result = c.get(f'/{endpoint}s',
+                                result = c.get(f'/{endpoints[2]}',
                                                headers=self.get_headers(user))
 
-                        self.assertEqual(401, result.status_code)
+                            self.assertEqual(401, result.status_code)
 
-                        self.clear_db()
+                            self.clear_db()
+                            get_item_from_db.cache_clear()

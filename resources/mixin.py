@@ -159,6 +159,7 @@ class ListMixin(Resource):
             _list = self.model.find_all(current_identity, _id)
         else:
             _list = self.model.find_all(current_identity)
+
         if _list:
             return {'list': list(map(lambda x: x.to_dict(), _list))}
 

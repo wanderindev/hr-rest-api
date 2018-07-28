@@ -54,10 +54,12 @@ class ModelMixin(object):
         self.is_active = False
         self.save_to_db()
 
+
     @classmethod
     def parse_model(cls):
         parsed_model = {
             'keys': [],
+            'excluded': [],
             'unique': [],
             'nullable': [],
             'int': [],
@@ -70,8 +72,6 @@ class ModelMixin(object):
             if col.key not in ['id', 'created_on', 'current_login',
                                'last_login', 'login_count']:
                 parsed_model['keys'].append(col.key)
-                if col.unique:
-                    parsed_model['unique'].append(col.key)
                 if col.nullable:
                     parsed_model['nullable'].append(col.key)
                 if isinstance(col.type, sqltypes.Integer):
@@ -84,6 +84,7 @@ class ModelMixin(object):
                     parsed_model['str'].append(col.key)
 
         parsed_model['unique'] = cls.get_unique_constraints()
+        parsed_model['excluded'] = list(cls.exclude_from_update)
 
         if cls.__tablename__ == 'app_user':
             # noinspection PyTypeChecker

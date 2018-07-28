@@ -1340,6 +1340,15 @@ def get_sys_test_params(b_obj, res_type=0, num_post='none', num_put='none', user
     return resource, model, post_objects, put_objects, endpoints, user
 
 
+def get_unit_test_params(b_obj):
+    obj_copy = deepcopy(b_obj['post_objects'][0])
+    for k, v in obj_copy.items():
+        if type(v) == tuple:
+            obj_copy[k] = 1
+
+    return b_obj['model'], obj_copy
+
+
 def solve_obj_dependencies(child_obj):
     """
     Check if an object depends on another object.  If it does, create the parent object in the db

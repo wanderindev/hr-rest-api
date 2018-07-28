@@ -6,5 +6,6 @@ class HealthPermit(ResourceMixin):
     model = HealthPermitModel
     parsed_model = model.parse_model()
 
+
 class HealthPermits(ListMixin):
     model = HealthPermitModel
