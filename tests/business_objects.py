@@ -3,6 +3,7 @@ from functools import lru_cache
 
 from werkzeug.security import generate_password_hash
 
+from models.absence_authorization import AbsenceAuthorizationModel
 from models.attendance import AttendanceModel
 from models.bank import BankModel
 from models.bank_account import BankAccountModel
@@ -26,6 +27,7 @@ from models.raw_attendance import RawAttendanceModel
 from models.schedule import ScheduleModel
 from models.schedule_detail import ScheduleDetailModel
 from models.shift import ShiftModel
+from models.sick_note import SickNoteModel
 from models.uniform_item import UniformItemModel
 from models.uniform_requirement import UniformRequirementModel
 from models.uniform_size import UniformSizeModel
@@ -1336,6 +1338,84 @@ RAW_ATTENDANCE = {
         }
     ],
     'endpoints': ['raw_attendance', None, 'raw_attendances'],
+    'user_type': 'test_0'
+}
+
+SICK_NOTE = {
+    'resources': ['SickNote', None, 'SickNotes'],
+    'model': SickNoteModel,
+    'post_objects': [
+        {
+            'sick_note_date': '2018-01-01',
+            'number_of_hours_requested': 8,
+            'number_of_hours_approved': 6,
+            'date_received': '2018-01-02',
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
+        },
+        {
+            'sick_note_date': '2018-01-03',
+            'number_of_hours_requested': 4,
+            'number_of_hours_approved': 4,
+            'date_received': '2018-01-04',
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
+        }
+    ],
+    'put_objects': [
+        {
+            'sick_note_date': '2018-01-02',
+            'number_of_hours_requested': 6,
+            'number_of_hours_approved': 6,
+            'date_received': '2018-01-04',
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1])
+        },
+        {
+            'sick_note_date': '2018-01-01',
+            'number_of_hours_requested': 8,
+            'number_of_hours_approved': 6,
+            'date_received': '2018-01-04',
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
+        }
+    ],
+    'endpoints': ['sick_note', None, 'sick_notes'],
+    'user_type': 'test_0'
+}
+
+ABSENCE_AUTHORIZATION = {
+    'resources': ['AbsenceAuthorization', None, 'AbsenceAuthorizations'],
+    'model': AbsenceAuthorizationModel,
+    'post_objects': [
+        {
+            'absence_date': '2018-01-02',
+            'absence_reason': 'test absence reason 0',
+            'is_payment_authorized': True,
+            'authorization_request_date': '2018-01-01',
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
+        },
+        {
+            'absence_date': '2018-01-03',
+            'absence_reason': 'test absence reason 1',
+            'is_payment_authorized': False,
+            'authorization_request_date': '2018-01-02',
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
+        }
+    ],
+    'put_objects': [
+        {
+            'absence_date': '2018-01-05',
+            'absence_reason': 'new test absence reason 0',
+            'is_payment_authorized': False,
+            'authorization_request_date': '2018-01-02',
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
+        },
+        {
+            'absence_date': '2018-01-02',
+            'absence_reason': 'new test absence reason 0',
+            'is_payment_authorized': True,
+            'authorization_request_date': '2018-01-02',
+            'employee_id': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0])
+        }
+    ],
+    'endpoints': ['absence_authorization', None, 'absence_authorizations'],
     'user_type': 'test_0'
 }
 

@@ -708,6 +708,7 @@ class TestResources(BaseTest):
                 self.assertEqual(200, result.status_code)
 
                 self.clear_db()
+                get_item_from_db.cache_clear()
 
     def test_post_raw_attendance_without_authentication(self):
         """
@@ -736,3 +737,4 @@ class TestResources(BaseTest):
                 self.assertEqual(401, result.status_code)
 
                 self.clear_db()
+                get_item_from_db.cache_clear()

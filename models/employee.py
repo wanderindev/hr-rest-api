@@ -18,7 +18,7 @@ from models.uniform_requirement import UniformRequirementModel
 class EmployeeModel(ModelMixin, db.Model):
     __tablename__ = 'employee'
 
-    exclude_from_update = None
+    exclude_from_update = ()
 
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(40), nullable=False)
