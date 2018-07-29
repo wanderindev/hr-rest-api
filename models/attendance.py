@@ -4,9 +4,9 @@ from db import db
 from models.mixin import ModelMixin
 
 
-class ScheduleDetailModel(ModelMixin, db.Model):
+class AttendanceModel(ModelMixin, db.Model):
     __tablename__ = 'attendance'
-    __table_args__ = (UniqueConstraint('employee_id', 'schedule_id',
+    __table_args__ = (UniqueConstraint('employee_id', 'work_day',
                                        name='attendance_employee_id_'
                                             'work_day_uindex'),)
     exclude_from_update = ('employee_id',)
