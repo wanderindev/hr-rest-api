@@ -1,6 +1,7 @@
 from db import db
 from models.enum import GENDER, PAYMENT_METHOD, TERMINATION_REASON, \
     TYPE_OF_CONTRACT
+from models.attendance import AttendanceModel
 from models.bank_account import BankAccountModel
 from models.deduction import DeductionModel
 from models.dependent import DependentModel
@@ -76,6 +77,9 @@ class EmployeeModel(ModelMixin, db.Model):
     deductions = db.relationship(DeductionModel,
                                  backref='employee',
                                  lazy='joined')
+    attendances = db.relationship(AttendanceModel,
+                                  backref='employee',
+                                  lazy='joined')
 
     def __init__(self, first_name, second_name, first_surname, second_surname,
                  national_id_number, is_panamanian, date_of_birth, gender,
