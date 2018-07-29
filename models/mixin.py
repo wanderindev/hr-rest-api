@@ -74,7 +74,8 @@ class ModelMixin(object):
                 parsed_model['keys'].append(col.key)
                 if col.nullable:
                     parsed_model['nullable'].append(col.key)
-                if isinstance(col.type, sqltypes.Integer):
+                if isinstance(col.type, sqltypes.Integer) or \
+                        isinstance(col.type, sqltypes.BigInteger):
                     parsed_model['int'].append(col.key)
                 elif isinstance(col.type, sqltypes.Numeric):
                     parsed_model['float'].append(col.key)

@@ -13,6 +13,7 @@ class RawAttendanceModel(ModelMixin, db.Model):
     userid = db.Column(db.Integer, nullable=False)
     att_time = db.Column(db.BigInteger, nullable=False)
     att_type = db.Column(ATT_TYPE, nullable=False)
+    was_processed = db.Column(db.Boolean, nullable=False, default=False)
 
     def __init__(self, stgid, userid, att_time, att_type):
         self.stgid = stgid
@@ -31,10 +32,16 @@ class RawAttendanceModel(ModelMixin, db.Model):
                 return record
 
     @classmethod
-    def find_all(cls, user, employee_id):
+    def find_all(cls, user):
+        from models.department import DepartmentModel
         from models.employee import EmployeeModel
 
-        records = cls.query.filter_by(userid=employee_id).all()
+        departments = DepartmentModel.find_all(user)
+        d_ids = [department.id for department in departments]
 
-        if records and EmployeeModel.find_by_id(employee_id, user):
-            return records
+        employees = EmployeeModel.query.filter(
+            EmployeeModel.department_id.in_(d_ids)).all()
+        e_ids = [employee.id for employee in employees]
+
+        return cls.query.filter(cls.userid.in_(e_ids),
+                                cls.was_processed==False).all()
