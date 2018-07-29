@@ -1,11 +1,12 @@
 from db import db
-from models.enum import GENDER, PAYMENT_METHOD, TERMINATION_REASON, \
-    TYPE_OF_CONTRACT
+from models.absence_authorization import AbsenceAuthorizationModel
 from models.attendance import AttendanceModel
 from models.bank_account import BankAccountModel
 from models.deduction import DeductionModel
 from models.dependent import DependentModel
 from models.emergency_contact import EmergencyContactModel
+from models.enum import GENDER, PAYMENT_METHOD, TERMINATION_REASON, \
+    TYPE_OF_CONTRACT
 from models.health_permit import HealthPermitModel
 from models.mixin import ModelMixin
 from models.passport import PassportModel
@@ -85,6 +86,9 @@ class EmployeeModel(ModelMixin, db.Model):
     sick_notes = db.relationship(SickNoteModel,
                                  backref='employee',
                                  lazy='joined')
+    absence_authorizations = db.relationship(AbsenceAuthorizationModel,
+                                             backref='employee',
+                                             lazy='joined')
 
     def __init__(self, first_name, second_name, first_surname, second_surname,
                  national_id_number, is_panamanian, date_of_birth, gender,
