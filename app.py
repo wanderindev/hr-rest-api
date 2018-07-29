@@ -27,6 +27,7 @@ from resources.payment_detail import PaymentDetail, PaymentDetails
 from resources.raw_attendance import RawAttendance, RawAttendances
 from resources.schedule import Schedule, Schedules
 from resources.schedule_detail import ScheduleDetail, ScheduleDetails
+from resources.sick_note import SickNote, SickNotes
 from resources.shift import ActivateShift, Shift, Shifts
 from resources.uniform_item import UniformItem, UniformItems
 from resources.uniform_requirement import UniformRequirement, \
@@ -237,5 +238,9 @@ def create_app(config_file=None):
                      '/raw_attendance')
     api.add_resource(RawAttendances,
                      '/raw_attendances')
-
+    api.add_resource(SickNote,
+                     '/sick_note',
+                     '/sick_note/<int:_id>')
+    api.add_resource(SickNotes,
+                     '/sick_notes/<int:_id>')
     return app
