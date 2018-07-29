@@ -2,6 +2,8 @@ from flask import Flask, make_response
 from flask_jwt import JWT
 from flask_restful import Api
 
+from resources.absence_authorization import AbsenceAuthorization, \
+    AbsenceAuthorizations
 from resources.attendance import Attendance, Attendances
 from resources.bank import Banks
 from resources.bank_account import ActivateBankAccount, BankAccount, \
@@ -243,4 +245,9 @@ def create_app(config_file=None):
                      '/sick_note/<int:_id>')
     api.add_resource(SickNotes,
                      '/sick_notes/<int:_id>')
+    api.add_resource(AbsenceAuthorization,
+                     '/absence_authorization',
+                     '/absence_authorization/<int:_id>')
+    api.add_resource(AbsenceAuthorizations,
+                     '/absence_authorizations/<int:_id>')
     return app
