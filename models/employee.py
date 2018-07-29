@@ -10,6 +10,7 @@ from models.health_permit import HealthPermitModel
 from models.mixin import ModelMixin
 from models.passport import PassportModel
 from models.payment import PaymentModel
+from models.sick_note import SickNoteModel
 from models.uniform_requirement import UniformRequirementModel
 
 
@@ -81,6 +82,9 @@ class EmployeeModel(ModelMixin, db.Model):
     attendances = db.relationship(AttendanceModel,
                                   backref='employee',
                                   lazy='joined')
+    sick_notes = db.relationship(SickNoteModel,
+                                 backref='employee',
+                                 lazy='joined')
 
     def __init__(self, first_name, second_name, first_surname, second_surname,
                  national_id_number, is_panamanian, date_of_birth, gender,
