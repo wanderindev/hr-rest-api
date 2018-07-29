@@ -2,6 +2,7 @@ from flask import Flask
 from flask_jwt import JWT
 from flask_restful import Api
 
+from resources.attendance import Attendance, Attendances
 from resources.bank import Banks
 from resources.bank_account import ActivateBankAccount, BankAccount, \
     BankAccounts
@@ -220,5 +221,10 @@ def create_app(config_file=None):
                      '/deduction_detail/<int:_id>')
     api.add_resource(DeductionDetails,
                      '/deduction_details/<int:_id>')
+    api.add_resource(Attendance,
+                     '/attendance',
+                     '/attendance/<int:_id>')
+    api.add_resource(Attendances,
+                     '/attendances/<int:_id>')
 
     return app
