@@ -132,9 +132,6 @@ class EmployeeModel(ModelMixin, db.Model):
         from models.department import DepartmentModel
 
         departments = DepartmentModel.find_all(user)
-        ids = []
+        d_ids = [department.id for department in departments]
 
-        for department in departments:
-            ids.append(department.id)
-
-        return cls.query.filter(cls.department_id.in_(ids)).all()
+        return cls.query.filter(cls.department_id.in_(d_ids)).all()
