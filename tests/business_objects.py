@@ -22,6 +22,7 @@ from models.organization import OrganizationModel
 from models.passport import PassportModel
 from models.payment import PaymentModel
 from models.payment_detail import PaymentDetailModel
+from models.raw_attendance import RawAttendanceModel
 from models.schedule import ScheduleModel
 from models.schedule_detail import ScheduleDetailModel
 from models.shift import ShiftModel
@@ -1306,6 +1307,35 @@ ATTENDANCE = {
         }
     ],
     'endpoints': ['attendance', None, 'attendances'],
+    'user_type': 'test_0'
+}
+
+RAW_ATTENDANCE = {
+    'resources': ['RawAttendance', None, 'RawAttendance'],
+    'model': RawAttendanceModel,
+    'post_objects': [
+        {
+            'stgid': 'abc12345',
+            'userid': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
+            'att_time': 1424051296,
+            'att_type': 'in'
+        },
+        {
+            'stgid': 'abc12345',
+            'userid': (EMPLOYEE['model'], EMPLOYEE['post_objects'][0]),
+            'att_time': 1424091296,
+            'att_type': 'out'
+        }
+    ],
+    'put_objects': [
+        {
+            'stgid': 'abc12345',
+            'userid': (EMPLOYEE['model'], EMPLOYEE['post_objects'][1]),
+            'att_time': 1424051299,
+            'att_type': 'out'
+        }
+    ],
+    'endpoints': ['raw_attendance', None, 'raw_attendances'],
     'user_type': 'test_0'
 }
 

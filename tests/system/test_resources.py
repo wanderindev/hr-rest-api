@@ -1,8 +1,11 @@
 import json
+from copy import deepcopy
+
+from flask import current_app
 
 from tests.base_test import BaseTest
 from tests.business_objects import get_sys_test_params, get_item_from_db, \
-    OBJECTS_TO_TEST
+    OBJECTS_TO_TEST, RAW_ATTENDANCE
 
 
 class TestResources(BaseTest):
@@ -47,12 +50,12 @@ class TestResources(BaseTest):
 
                             record = json.loads(result.data)['record']
 
-                            self.assertEqual(201, result.status_code)
+                            self.check_record(item, record, parsed_model)
 
                             self.assertIsNotNone(model.query.filter_by(
                                 id=record['id']).first())
 
-                            self.check_record(item, record, parsed_model)
+                            self.assertEqual(201, result.status_code)
 
                             # Clear the db and cache at the end of the subtest.
                             self.clear_db()
@@ -569,7 +572,9 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for obj in OBJECTS_TO_TEST:
+                objs = deepcopy(OBJECTS_TO_TEST)
+                objs.append(RAW_ATTENDANCE)
+                for obj in objs:
                     resource, model, post_items, _, endpoints, \
                         user = get_sys_test_params(obj, 2, 'first')
 
@@ -586,23 +591,38 @@ class TestResources(BaseTest):
                                                headers=self.get_headers(user))
                             else:
                                 item = post_items[0]
-                                c.post(f'/{endpoints[0]}',
-                                       data=json.dumps(item),
-                                       headers=self.get_headers(user))
-
-                                if 'schedule_id' in parsed_model['keys']:
-                                    _id = item['schedule_id']
-                                elif 'payment_id' in parsed_model['keys']:
-                                    _id = item['payment_id']
-                                elif 'employee_id' in parsed_model['keys']:
-                                    _id = item['employee_id']
-                                elif 'uniform_item_id' in parsed_model['keys']:
-                                    _id = item['uniform_item_id']
-                                elif 'department_id' in parsed_model['keys'] \
-                                        and endpoints[2] is not 'employees':
-                                    _id = item['department_id']
-                                else:
+                                if endpoints[2] == 'raw_attendances':
+                                    item['auth_token'] = current_app.config[
+                                        'CLOCK_SECRETS'][item['stgid']]
                                     _id = None
+                                    c.post(f'/{endpoints[0]}',
+                                           data=json.dumps(item),
+                                           headers={
+                                               'Content-Type':
+                                                   'application/json',
+                                               'Accept': 'application/text'
+                                           })
+                                else:
+                                    item = post_items[0]
+                                    c.post(f'/{endpoints[0]}',
+                                           data=json.dumps(item),
+                                           headers=self.get_headers(user))
+
+                                    if 'schedule_id' in parsed_model['keys']:
+                                        _id = item['schedule_id']
+                                    elif 'payment_id' in parsed_model['keys']:
+                                        _id = item['payment_id']
+                                    elif 'employee_id' in parsed_model['keys']:
+                                        _id = item['employee_id']
+                                    elif 'uniform_item_id' in \
+                                            parsed_model['keys']:
+                                        _id = item['uniform_item_id']
+                                    elif 'department_id' in \
+                                            parsed_model['keys'] and \
+                                            endpoints[2] is not 'employees':
+                                        _id = item['department_id']
+                                    else:
+                                        _id = None
 
                                 if _id:
                                     result = c.get(f'/{endpoints[2]}/{_id}',
@@ -629,7 +649,9 @@ class TestResources(BaseTest):
         """
         with self.client() as c:
             with self.app_context():
-                for obj in OBJECTS_TO_TEST:
+                objs = deepcopy(OBJECTS_TO_TEST)
+                objs.append(RAW_ATTENDANCE)
+                for obj in objs:
                     resource, model, _, _, endpoints, \
                         user = get_sys_test_params(obj, 2, 'none',
                                                    'none', 'fake')
@@ -641,8 +663,8 @@ class TestResources(BaseTest):
                                                 'deductions', 'dependents',
                                                 'emergency_contacts',
                                                 'employee', 'health_permits',
-                                                'passports',
-                                                'payment_details', 'payments',
+                                                'passports', 'payment_details',
+                                                'payments', 'raw_attendance',
                                                 'schedule_details',
                                                 'schedules',
                                                 'uniform_requirements',
@@ -657,3 +679,60 @@ class TestResources(BaseTest):
 
                             self.clear_db()
                             get_item_from_db.cache_clear()
+
+    def test_post_raw_attendance_with_authentication(self):
+        """
+        Test that a  POST request to the raw_attendance endpoint return
+        status code 200 and 'ok' if the correct secret is included.
+        """
+        with self.client() as c:
+            with self.app_context():
+                resource, model, post_items, _, endpoints, \
+                    user = get_sys_test_params(RAW_ATTENDANCE, 0, 'first')
+
+                item = post_items[0]
+
+                self.assertIsNone(
+                    model.query.filter_by(**item).first())
+
+                item['auth_token'] = current_app.config[
+                    'CLOCK_SECRETS'][item['stgid']]
+
+                result = c.post(f'/{endpoints[0]}',
+                                data=json.dumps(item),
+                                headers={
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/text'
+                                })
+
+                self.assertEqual(200, result.status_code)
+
+                self.clear_db()
+
+    def test_post_raw_attendance_without_authentication(self):
+        """
+        Test that a  POST request to the raw_attendance endpoint return
+        status code 401 if the correct secret is not included.
+        """
+        with self.client() as c:
+            with self.app_context():
+                resource, model, post_items, _, endpoints, \
+                    user = get_sys_test_params(RAW_ATTENDANCE, 0, 'first')
+
+                item = post_items[0]
+
+                self.assertIsNone(
+                    model.query.filter_by(**item).first())
+
+                item['auth_token'] = 'fAkEsEcReT'
+
+                result = c.post(f'/{endpoints[0]}',
+                                data=json.dumps(item),
+                                headers={
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/text'
+                                })
+
+                self.assertEqual(401, result.status_code)
+
+                self.clear_db()

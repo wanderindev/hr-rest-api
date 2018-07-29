@@ -20,6 +20,7 @@ from models.organization import OrganizationModel
 from models.passport import PassportModel
 from models.payment import PaymentModel
 from models.payment_detail import PaymentDetailModel
+from models.raw_attendance import RawAttendanceModel
 from models.schedule import ScheduleModel
 from models.schedule_detail import ScheduleDetailModel
 from models.shift import ShiftModel
@@ -78,6 +79,7 @@ class BaseTest(TestCase):
         PaymentDetailModel.query.delete()
         PaymentModel.query.delete()
         AttendanceModel.query.delete()
+        RawAttendanceModel.query.delete()
         EmployeeModel.query.delete()
         EmploymentPositionModel.query.delete()
         ShiftModel.query.delete()
@@ -114,7 +116,9 @@ class BaseTest(TestCase):
                     return {
                         'Content-Type': 'application/json',
                         'Authorization': 'JWT ' +
-                                         json.loads(result.data)['access_token']
+                                         json.loads(result.data)[
+                                             'access_token'
+                                         ]
                     }
                 except KeyError:
                     # Returns fake token for testing purposes if user
@@ -124,24 +128,30 @@ class BaseTest(TestCase):
                         'Authorization': 'JWT FaKeToKeN!!'
                     }
 
-    def check_record(self, data_sent, data_received, parsed_model=None, orig_data=None):
+    def check_record(self, data_sent, data_received, parsed_model=None,
+                     orig_data=None):
         """
         Assert that all columns in a record contain the expected values.
 
-        This method compares key by key the dictionary containing the values sent to the
-        resources endpoint with the dictionary cotaining the values returned by the endpoint.
-        If any value does not match, an exception is raised and the subtest fails.
+        This method compares key by key the dictionary containing the values
+        sent to the resources endpoint with the dictionary cotaining the
+        values returned by the endpoint. If any value does not match, an
+        exception is raised and the subtest fails.
 
-        Some models do not allow certain column values to change after record creation.  The
-        names of these columns are included in the exclude_from_update property of the model.
-        For this reason, when checking PUT requests, the values of any keys included in
-        exclude_from_update are checked against the original value and not the value sent
-        in the payload of the PUT request.
+        Some models do not allow certain column values to change after record
+        creation.  The names of these columns are included in the
+        exclude_from_update property of the model. For this reason, when
+        checking PUT requests, the values of any keys included in
+        exclude_from_update are checked against the original value and
+        not the value sent in the payload of the PUT request.
 
-        :param data_sent: A dictionary with the values sent to the resources endpoint
-        :param data_received: A dictionary with the values returned by the endpoint
+        :param data_sent: A dictionary with the values sent to the
+            resources endpoint
+        :param data_received: A dictionary with the values returned
+            by the endpoint
         :param parsed_model: A dictionary with the model's metadata
-        :param orig_data: A dictionary with the values used to instantiate the model
+        :param orig_data: A dictionary with the values used to
+            instantiate the model
         :type data_sent: dict
         :type data_received: dict
         :type parsed_model: dict
@@ -152,7 +162,8 @@ class BaseTest(TestCase):
                 data_sent[k] = orig_data[k]
 
                 if k == 'password':
-                    self.assertTrue(check_password_hash(data_received['password_hash'], v))
+                    self.assertTrue(check_password_hash(
+                        data_received['password_hash'], v))
                 else:
                     self.compare_item(data_sent[k], data_received[k])
 
@@ -160,9 +171,9 @@ class BaseTest(TestCase):
         """
         Asserts that item_1 and item_2 are equal.
 
-        Since item_2 may come from the json returned by a request to an empoint,
-        it it necessary to cast it to the appropriate type befor doing the
-        assertion.
+        Since item_2 may come from the json returned by a request to
+        an empoint, it it necessary to cast it to the appropriate type
+        before doing the assertion.
 
         :param item_1: A value sent to an endpoint or a model
         :param item_2: A value returned from an endpoint or a model
