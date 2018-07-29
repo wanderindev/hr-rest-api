@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash
 
 from app import create_app
 from db import db
+from models.attendance import AttendanceModel
 from models.bank_account import BankAccountModel
 from models.creditor import CreditorModel
 from models.deduction import DeductionModel
@@ -76,6 +77,7 @@ class BaseTest(TestCase):
         CreditorModel.query.delete()
         PaymentDetailModel.query.delete()
         PaymentModel.query.delete()
+        AttendanceModel.query.delete()
         EmployeeModel.query.delete()
         EmploymentPositionModel.query.delete()
         ShiftModel.query.delete()

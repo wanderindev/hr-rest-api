@@ -1,7 +1,8 @@
 import json
 
 from tests.base_test import BaseTest
-from tests.business_objects import get_sys_test_params, get_item_from_db, OBJECTS_TO_TEST
+from tests.business_objects import get_sys_test_params, get_item_from_db, \
+    OBJECTS_TO_TEST
 
 
 class TestResources(BaseTest):
@@ -22,7 +23,9 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 0, 'first')
+                    resource, model, post_items, _, endpoints, \
+                        user = get_sys_test_params(obj, 0, 'first')
+
                     parsed_model = model.parse_model()
 
                     if endpoints[0]:
@@ -63,8 +66,9 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 0, 'first',
-                                                                                          'none', 'fake')
+                    resource, model, post_items, _, endpoints, \
+                        user = get_sys_test_params(obj, 0, 'first',
+                                                   'none', 'fake')
 
                     if endpoints[0]:
                         item = post_items[0]
@@ -87,7 +91,9 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 0, 'first')
+                    resource, model, post_items, _, endpoints, \
+                        user = get_sys_test_params(obj, 0, 'first')
+
                     parsed_model = model.parse_model()
 
                     if endpoints[0] and parsed_model['unique']:
@@ -126,7 +132,9 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 0, 'first')
+                    resource, model, post_items, _, endpoints, \
+                        user = get_sys_test_params(obj, 0, 'first')
+
                     parsed_model = model.parse_model()
 
                     if endpoints[0]:
@@ -160,8 +168,9 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 0, 'none',
-                                                                                         'none', 'fake')
+                    resource, model, _, _, endpoints, \
+                        user = get_sys_test_params(obj, 0, 'none',
+                                                   'none', 'fake')
 
                     if endpoints[0]:
                         with self.subTest(resource, user=user):
@@ -181,7 +190,8 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 0)
+                    resource, model, _, _, endpoints, \
+                        user = get_sys_test_params(obj, 0)
 
                     if endpoints[0]:
                         with self.subTest(resource, user=user):
@@ -202,15 +212,18 @@ class TestResources(BaseTest):
             with self.app_context():
                 with self.app_context():
                     for obj in OBJECTS_TO_TEST:
-                        resource, model, post_items, put_items, endpoints, user = get_sys_test_params(obj, 0,
-                                                                                                      'first', 'first')
+                        resource, model, post_items, put_items, endpoints, \
+                            user = get_sys_test_params(obj, 0, 'first',
+                                                       'first')
+
                         parsed_model = model.parse_model()
 
                         if endpoints[0]:
                             item = post_items[0]
                             mod_item = put_items[0]
 
-                            with self.subTest(resource, item=item, mod_item=mod_item, user=user):
+                            with self.subTest(resource, item=item,
+                                              mod_item=mod_item, user=user):
                                 # POST the item to the db and get the id.
                                 result = c.post(f'/{endpoints[0]}',
                                                 data=json.dumps(item),
@@ -226,7 +239,8 @@ class TestResources(BaseTest):
 
                                 self.assertEqual(200, result.status_code)
 
-                                self.check_record(mod_item, record, parsed_model, item)
+                                self.check_record(mod_item, record,
+                                                  parsed_model, item)
 
                                 self.clear_db()
                                 get_item_from_db.cache_clear()
@@ -239,13 +253,15 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, _, put_items, endpoints, user = get_sys_test_params(obj, 0, 'none',
-                                                                                         'first', 'fake')
+                    resource, model, _, put_items, endpoints, \
+                        user = get_sys_test_params(obj, 0, 'none',
+                                                   'first', 'fake')
 
                     if endpoints[0]:
                         mod_item = put_items[0]
 
-                        with self.subTest(resource, mod_item=mod_item, user=user):
+                        with self.subTest(resource, mod_item=mod_item,
+                                          user=user):
                             result = c.put(f'/{endpoints[0]}/999',
                                            data=json.dumps(mod_item),
                                            headers=self.get_headers(user))
@@ -263,13 +279,16 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, post_items, put_items, endpoints, user = get_sys_test_params(obj, 0,
-                                                                                                  'all', 'all')
+                    resource, model, post_items,  put_items, endpoints, \
+                        user = get_sys_test_params(obj, 0, 'all', 'all')
+
                     parsed_model = model.parse_model()
 
                     if endpoints[0] and parsed_model['unique']:
-                        with self.subTest(resource, post_items=post_items, put_items=put_items, user=user):
-                            # POST two items to the database and get the id of the second one.
+                        with self.subTest(resource, post_items=post_items,
+                                          put_items=put_items, user=user):
+                            # POST two items to the database and get the
+                            # id of the second one.
                             c.post(f'/{endpoints[0]}',
                                    data=json.dumps(post_items[0]),
                                    headers=self.get_headers(user))
@@ -299,11 +318,13 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, _, put_items, endpoints, user = get_sys_test_params(obj, 0, 'none', 'first')
+                    resource, model, _, put_items, endpoints, \
+                        user = get_sys_test_params(obj, 0, 'none', 'first')
 
                     if endpoints[0]:
                         mod_item = put_items[0]
-                        with self.subTest(resource, mod_item=mod_item, user=user):
+                        with self.subTest(resource, mod_item=mod_item,
+                                          user=user):
                             result = c.put(f'/{endpoints[0]}/999',
                                            data=json.dumps(mod_item),
                                            headers=self.get_headers(user))
@@ -321,7 +342,8 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 0, 'first')
+                    resource, model, post_items, _, endpoints, \
+                        user = get_sys_test_params(obj, 0, 'first')
 
                     if endpoints[0]:
                         item = post_items[0]
@@ -347,7 +369,9 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 0, 'none', 'none', 'fake')
+                    resource, model, _, _, \
+                        endpoints, user = get_sys_test_params(obj, 0, 'none',
+                                                              'none', 'fake')
 
                     if endpoints[0]:
                         with self.subTest(resource, user=user):
@@ -367,7 +391,8 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 0)
+                    resource, model, _, _, \
+                        endpoints, user = get_sys_test_params(obj, 0)
 
                     if endpoints[0]:
                         with self.subTest(resource, user=user):
@@ -387,7 +412,8 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 1, 'first')
+                    resource, model, post_items, _, \
+                        endpoints, user = get_sys_test_params(obj, 1, 'first')
 
                     if endpoints[1]:
                         item = post_items[0]
@@ -408,7 +434,9 @@ class TestResources(BaseTest):
                             self.assertEqual(200, result.status_code)
 
                             self.assertEqual('El registro fue inactivado.',
-                                             json.loads(result.data)['message'])
+                                             json.loads(
+                                                 result.data)['message']
+                                             )
 
                             # Make record active.
                             result = c.put(f'/{endpoints[1]}/{_id}',
@@ -420,7 +448,9 @@ class TestResources(BaseTest):
                             self.assertEqual(200, result.status_code)
 
                             self.assertEqual('El registro fue activado.',
-                                             json.loads(result.data)['message'])
+                                             json.loads(
+                                                 result.data)['message']
+                                             )
 
                             self.clear_db()
                             get_item_from_db.cache_clear()
@@ -434,7 +464,8 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 1, 'first')
+                    resource, model, post_items, _, \
+                        endpoints, user = get_sys_test_params(obj, 1, 'first')
 
                     if endpoints[1]:
                         item = post_items[0]
@@ -454,7 +485,9 @@ class TestResources(BaseTest):
                             self.assertEqual(400, result.status_code)
 
                             self.assertEqual('El registro ya estaba activo.',
-                                             json.loads(result.data)['message'])
+                                             json.loads(
+                                                 result.data)['message']
+                                             )
 
                             # Make record inactive.
                             c.put(f'/{endpoints[1]}/{_id}',
@@ -473,7 +506,9 @@ class TestResources(BaseTest):
                             self.assertEqual(400, result.status_code)
 
                             self.assertEqual('El registro ya estaba inactivo.',
-                                             json.loads(result.data)['message'])
+                                             json.loads(
+                                                 result.data)['message']
+                                             )
 
                             self.clear_db()
                             get_item_from_db.cache_clear()
@@ -486,7 +521,9 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 1, 'none', 'none', 'fake')
+                    resource, model, _, _, endpoints, \
+                        user = get_sys_test_params(obj, 1, 'none',
+                                                   'none', 'fake')
 
                     if endpoints[1]:
                         with self.subTest(resource, user=user):
@@ -509,7 +546,8 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 1, 'none', 'none')
+                    resource, model, _, _, endpoints, \
+                        user = get_sys_test_params(obj, 1, 'none', 'none')
 
                     if endpoints[1]:
                         with self.subTest(resource, user=user):
@@ -532,7 +570,9 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, post_items, _, endpoints, user = get_sys_test_params(obj, 2, 'first')
+                    resource, model, post_items, _, endpoints, \
+                        user = get_sys_test_params(obj, 2, 'first')
+
                     parsed_model = model.parse_model()
 
                     if endpoints[2]:
@@ -558,17 +598,20 @@ class TestResources(BaseTest):
                                     _id = item['employee_id']
                                 elif 'uniform_item_id' in parsed_model['keys']:
                                     _id = item['uniform_item_id']
-                                elif 'department_id' in parsed_model['keys'] and endpoints[2] is not 'employees':
+                                elif 'department_id' in parsed_model['keys'] \
+                                        and endpoints[2] is not 'employees':
                                     _id = item['department_id']
                                 else:
                                     _id = None
 
                                 if _id:
                                     result = c.get(f'/{endpoints[2]}/{_id}',
-                                                   headers=self.get_headers(user))
+                                                   headers=self.get_headers(
+                                                       user))
                                 else:
                                     result = c.get(f'/{endpoints[2]}',
-                                                   headers=self.get_headers(user))
+                                                   headers=self.get_headers(
+                                                       user))
 
                             _list = json.loads(result.data)['list']
 
@@ -587,14 +630,23 @@ class TestResources(BaseTest):
         with self.client() as c:
             with self.app_context():
                 for obj in OBJECTS_TO_TEST:
-                    resource, model, _, _, endpoints, user = get_sys_test_params(obj, 2, 'none', 'none', 'fake')
+                    resource, model, _, _, endpoints, \
+                        user = get_sys_test_params(obj, 2, 'none',
+                                                   'none', 'fake')
 
                     if endpoints[2]:
                         with self.subTest(resource, user=user):
-                            if endpoints[2] in ['bank_accounts', 'deduction_details', 'deductions', 'dependents',
-                                                'emergency_contacts', 'employee', 'health_permits', 'passports',
-                                                'payment_details', 'payments', 'schedule_details', 'schedules',
-                                                'uniform_requirements', 'uniform_sizes']:
+                            if endpoints[2] in ['attendances', 'bank_accounts',
+                                                'deduction_details',
+                                                'deductions', 'dependents',
+                                                'emergency_contacts',
+                                                'employee', 'health_permits',
+                                                'passports',
+                                                'payment_details', 'payments',
+                                                'schedule_details',
+                                                'schedules',
+                                                'uniform_requirements',
+                                                'uniform_sizes']:
                                 result = c.get(f'/{endpoints[2]}/999',
                                                headers=self.get_headers(user))
                             else:

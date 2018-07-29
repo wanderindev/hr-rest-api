@@ -1,4 +1,17 @@
 [report]
 exclude_lines =
     pragma: no cover
-    except exc.SQLAlchemyError:
+    except SQLAlchemyError as e:
+    def __repr__
+
+[run]
+omit =
+    config/development.py
+    /instance/*
+    /venv/*
+    .env
+    .gitignore
+    Dockerfile
+    requirements.txt
+    run.py
+    util.py
