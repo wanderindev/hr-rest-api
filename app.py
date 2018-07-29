@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, make_response
 from flask_jwt import JWT
 from flask_restful import Api
 
@@ -24,6 +24,7 @@ from resources.organization import ActivateOrganization, Organization, \
 from resources.passport import Passport, Passports
 from resources.payment import Payment, Payments
 from resources.payment_detail import PaymentDetail, PaymentDetails
+from resources.raw_attendance import RawAttendance, RawAttendances
 from resources.schedule import Schedule, Schedules
 from resources.schedule_detail import ScheduleDetail, ScheduleDetails
 from resources.shift import ActivateShift, Shift, Shifts
@@ -64,6 +65,12 @@ def create_app(config_file=None):
     # Register the extensions.
     JWT(app, authenticate, identity)
     api = Api(app)
+
+    # Create custom representation for application/text requests.
+    @api.representation('application/text')
+    def output_text(data, code, headers=None):
+        resp = make_response(data, code, headers)
+        return resp
 
     # Add API resources.
     api.add_resource(Organization,
@@ -226,5 +233,9 @@ def create_app(config_file=None):
                      '/attendance/<int:_id>')
     api.add_resource(Attendances,
                      '/attendances/<int:_id>')
+    api.add_resource(RawAttendance,
+                     '/raw_attendance')
+    api.add_resource(RawAttendances,
+                     '/raw_attendances')
 
     return app

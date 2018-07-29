@@ -56,6 +56,8 @@ class ResourceMixin(Resource):
 
         try:
             record.save_to_db()
+            if 'stgid' in data:
+                return 'ok', 201
             return {
                        'message': 'Registro creado exitosamente.',
                        'record': self.model.find_by_id(
