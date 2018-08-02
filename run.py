@@ -5,11 +5,11 @@ Available functions:
 - create_tables:  Runs before the first request.  Tells SQLAlchemy to
       create all the database tables.
 """
-
+import os
 from app import create_app
 from db import db
 
-app = create_app('development')
+app = create_app(os.getenv('FLASK_CONFIG') or 'development')
 db.init_app(app)
 
 

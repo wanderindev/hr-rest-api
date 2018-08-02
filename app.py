@@ -2,6 +2,7 @@ from flask import Flask, make_response
 from flask_jwt import JWT
 from flask_restful import Api
 
+from config import config
 from resources.absence_authorization import AbsenceAuthorization, \
     AbsenceAuthorizations
 from resources.attendance import Attendance, Attendances
@@ -40,30 +41,17 @@ from security import authenticate, identity
 
 
 # noinspection PyTypeChecker
-def create_app(config_file=None):
+def create_app(config_name):
     """
     App factory for the creation of a Flask app.
 
-    Creates a Flask app.  The app configuration is set from the
-    file passed-in as an argument.  The file must be located
-    within the config folder.
-
-    Secret or sensitive configuration settings should be placed
-    in the 'instance/settings.py' file which should be kept out
-    of version control.
-
-    :param config_file: The name of the file (without .py) within the
-        'config' folder which has the configuration values.
-    :return: A Flask app instance.
+    :param config_name: The key for the config setting to use
+    :type config_name: str
+    :return: A Flask app instance
     """
-    app = Flask(__name__, instance_relative_config=True)
-
-    # Load config settings for development or testing.
-    if config_file:
-        app.config.from_object(f'config.{config_file}')
-
-    # Apply production settings, if available.
-    app.config.from_pyfile('settings.py', silent=True)
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
 
     # Register the extensions.
     JWT(app, authenticate, identity)
