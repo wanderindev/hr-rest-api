@@ -37,8 +37,8 @@ class RawAttendance(Resource):
                 record.save_to_db()
                 return 'ok', 200, {'Content-Type': 'application/text'}
             except SQLAlchemyError as e:
-                return 'Ocurrió un error al tratar de crear el registro.  ' \
-                       'Error: "{e}"', 500, \
+                return f'Ocurrió un error al tratar de crear el registro.  ' \
+                       f'Error: "{e}"', 500, \
                        {'Content-Type': 'application/text'}
 
         return 'Token incorrecto.', 401, {'Content-Type': 'application/text'}

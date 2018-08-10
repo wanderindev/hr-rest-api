@@ -1,5 +1,5 @@
 from models.emergency_contact import EmergencyContactModel
-from resources.mixin import ActivateMixin, ListMixin, ResourceMixin
+from resources.mixin import ListMixin, ResourceMixin
 
 
 class EmergencyContact(ResourceMixin):

@@ -7,9 +7,12 @@ RUN apk update \
   && apk add postgresql-dev
 
 ENV INSTALL_PATH /rest
+
 RUN mkdir -p $INSTALL_PATH
 
 WORKDIR $INSTALL_PATH
+
+RUN pip install --upgrade pip
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
@@ -19,4 +22,4 @@ COPY . .
 RUN addgroup -S rest && adduser -S -g rest rest
 USER rest
 
-CMD gunicorn -b 0.0.0.0:5001 --access-logfile - --reload "run:app"
+CMD gunicorn -b 0.0.0.0:5001 --access-logfile - --reload 'run:app'

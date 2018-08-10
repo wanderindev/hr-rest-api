@@ -1,4 +1,5 @@
-import json, os
+import json
+import os
 
 
 class Config:
@@ -8,6 +9,11 @@ class Config:
         if os.environ.get('CLOCK_SECRETS') else {
         'abc12345': 'TmsDxTm53ViWecv9k6sCNuwS'
     }
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'SQLALCHEMY_DATABASE_URI') or \
+        'postgresql://hr_user:pass@db:5432/hr_dev'
+    TESTING = os.environ.get('TESTING') or False
+    DEBUG = os.environ.get('DEBUG') or True
 
     @staticmethod
     def init_app(app):
