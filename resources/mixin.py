@@ -8,23 +8,24 @@ class ResourceMixin(Resource):
         parser = reqparse.RequestParser()
 
         for key in self.parsed_model['keys']:
-            is_required = key not in self.parsed_model['nullable']
-            if key in self.parsed_model['int']:
-                parser.add_argument(key,
-                                    type=int,
-                                    required=is_required)
-            elif key in self.parsed_model['float']:
-                parser.add_argument(key,
-                                    type=float,
-                                    required=is_required)
-            elif key in self.parsed_model['bool']:
-                parser.add_argument(key,
-                                    type=bool,
-                                    required=is_required)
-            else:
-                parser.add_argument(key,
-                                    type=str,
-                                    required=is_required)
+            if key is not 'password_hash':
+                is_required = key not in self.parsed_model['nullable']
+                if key in self.parsed_model['int']:
+                    parser.add_argument(key,
+                                        type=int,
+                                        required=is_required)
+                elif key in self.parsed_model['float']:
+                    parser.add_argument(key,
+                                        type=float,
+                                        required=is_required)
+                elif key in self.parsed_model['bool']:
+                    parser.add_argument(key,
+                                        type=bool,
+                                        required=is_required)
+                else:
+                    parser.add_argument(key,
+                                        type=str,
+                                        required=is_required)
 
         return parser
 
