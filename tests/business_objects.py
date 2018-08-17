@@ -1421,7 +1421,7 @@ ABSENCE_AUTHORIZATION = {
 
 CREDENTIALS = {
     'root': {
-        'username': 'jfeliu',
+        'username': 'nuvanz',
         'password': '1234'
     },
     'test_0': {
