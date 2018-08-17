@@ -1,6 +1,8 @@
 import json
 import os
 
+from datetime import timedelta
+
 
 class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -14,6 +16,7 @@ class Config:
         'postgresql://hr_user:pass@db:5432/hr_dev'
     TESTING = os.environ.get('TESTING') or False
     DEBUG = os.environ.get('DEBUG') or True
+    JWT_EXPIRATION_DELTA = timedelta(seconds=1800)
 
     @staticmethod
     def init_app(app):
