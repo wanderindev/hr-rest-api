@@ -1,0 +1,35 @@
+# docker build -f Dockerfile_production -t feliuio/rest:latest
+
+FROM python:3.7.0-alpine3.8
+
+MAINTAINER Javier Feliu <jfeliu@nuvanz.com>
+
+RUN apk update \
+  && apk add --virtual build-deps gcc python3-dev musl-dev \
+  && apk add postgresql-dev
+
+ENV INSTALL_PATH /rest
+ENV SECRET_KEY 'CmSAGpcN3dV85DByPqcCqHSY3Zh3'
+ENV CLOCK_SECRETS '{"ST-KY18002070":"tRXPVhxRTbw6"}'
+ENV DEBUG=False
+ENV TESTING=False
+ENV SQLALCHEMY_DATABASE_URI 'postgresql://nuvanz_hr:hnpEgpHgzMhdSt2iumAHkr9AFSrb@db:5432/nuvanz_hr'
+ENV FLASK_CONFIG 'production'
+
+RUN printenv
+
+RUN mkdir -p $INSTALL_PATH
+
+WORKDIR $INSTALL_PATH
+
+RUN pip install --upgrade pip
+
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+RUN addgroup -S rest && adduser -S -g rest rest
+USER rest
+
+CMD gunicorn -b 0.0.0.0:5001 --access-logfile - --reload 'run:app'

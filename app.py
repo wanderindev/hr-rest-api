@@ -1,4 +1,4 @@
-from flask import Flask, make_response
+from flask import Flask
 from flask_jwt import JWT
 from flask_restful import Api
 
@@ -56,12 +56,6 @@ def create_app(config_name):
     # Register the extensions.
     JWT(app, authenticate, identity)
     api = Api(app)
-
-    # Create custom representation for application/text requests.
-    @api.representation('application/text')
-    def output_text(data, code, headers=None):
-        resp = make_response(data, code, headers)
-        return resp
 
     # Add API resources.
     api.add_resource(Organization,

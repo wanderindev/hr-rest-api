@@ -1,6 +1,6 @@
-from flask import current_app
+from flask import current_app, make_response
 from flask_jwt import current_identity, jwt_required
-from flask_restful import reqparse, Resource
+from flask_restful import reqparse, Resource, request
 from sqlalchemy.exc import SQLAlchemyError
 
 from models.raw_attendance import RawAttendanceModel
@@ -35,7 +35,9 @@ class RawAttendance(Resource):
 
             try:
                 record.save_to_db()
-                return 'ok', 200, {'Content-Type': 'application/text'}
+                resp = make_response('ok', 200,
+                                     {'Content-Type': 'application/text'})
+                return resp
             except SQLAlchemyError as e:
                 return f'Ocurrió un error al tratar de crear el registro.  ' \
                        f'Error: "{e}"', 500, \
