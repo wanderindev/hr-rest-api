@@ -6,12 +6,17 @@ exclude_lines =
 
 [run]
 omit =
-    config/development.py
-    /instance/*
-    /venv/*
-    .env
+    venv/**/*
+    db/**/*
+    coverage/**/*
+    rest/tests/**/*
+    rest/.env
+    rest/__init__.py
+    rest/Dockerfile
+    rest/Dockerfile_prod
+    rest/requirements.txt
+    rest/run.py
     .gitignore
-    Dockerfile
-    requirements.txt
-    run.py
-    util.py
+    docker-compose.yml
+    LICENSE.md
+    README.md

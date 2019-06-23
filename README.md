@@ -53,7 +53,24 @@ In the window that pops open, select the `hr-rest-api` collection and the `hr-re
 environment.
 
 Click on Run.
+
+## Deployment
+Modify `rest/Dockerfile_prod`, adding the correct values for the environment variables.
+
+Build the container image and push to Docker Hub:
+```sh
+cd rest
+docker build -t wanderindev/hr-rest -f Dockerfile_prod .
+docker push wanderindev/hr-rest
+``` 
  
+ Go to the [do-managed-kubernetes](https://github.com/wanderindev/do-managed-kubernetes) 
+ repository and re-deploy the pod.
+ ```sh
+kubectl delete deployment hr-rest
+kubectl apply -f ./sites/hr-rest.yml
+``` 
+
  ## Author
 
 👤 **Javier Feliu**
