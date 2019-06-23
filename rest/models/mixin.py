@@ -13,6 +13,10 @@ from db import db
 # noinspection PyAttributeOutsideInit
 class ModelMixin(object):
     metadata = MetaData()
+    __table__ = None
+    exclude_from_update = None
+    __tablename__ = None
+    id = None
 
     def __iter__(self):
         return ((k, v) for k, v in vars(self).items() if not k.startswith('_'))

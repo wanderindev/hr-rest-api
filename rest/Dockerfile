@@ -22,4 +22,4 @@ COPY . .
 RUN addgroup -S rest && adduser -S -g rest rest
 USER rest
 
-CMD gunicorn -b 0.0.0.0:5001 --access-logfile - --reload 'run:app'
+CMD gunicorn -b 0.0.0.0:5002 --access-logfile - --reload 'run:app'

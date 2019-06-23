@@ -1,6 +1,6 @@
 from flask import current_app, make_response
 from flask_jwt import current_identity, jwt_required
-from flask_restful import reqparse, Resource, request
+from flask_restful import reqparse, Resource
 from sqlalchemy.exc import SQLAlchemyError
 
 from models.raw_attendance import RawAttendanceModel

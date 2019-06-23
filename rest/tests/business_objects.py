@@ -1458,13 +1458,13 @@ def create_test_user(user_type):
     :rtype: dict
     """
     credentials = CREDENTIALS[user_type]
-    org: dict = ORGANIZATION['post_objects'][0]
+    org = dict(ORGANIZATION['post_objects'][0])
 
     if user_type != 'root' and user_type != 'fake':
         # Only add test users to the db since root user is already
         # seeded and fake user should not be able to authenticate.
         if user_type == 'test_1':
-            org = ORGANIZATION['post_objects'][1]
+            org = dict(ORGANIZATION['post_objects'][1])
 
         organization_id = get_item_from_db(ORGANIZATION['model'], **org).id
 

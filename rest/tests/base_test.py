@@ -3,7 +3,7 @@ import json
 from unittest import TestCase
 from werkzeug.security import check_password_hash
 
-from app import create_app
+from rest.app import create_app
 from db import db
 from models.attendance import AttendanceModel
 from models.bank_account import BankAccountModel
