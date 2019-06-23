@@ -658,7 +658,8 @@ class TestResources(BaseTest):
 
                     if endpoints[2]:
                         with self.subTest(resource, user=user):
-                            if endpoints[2] in ['attendances', 'bank_accounts',
+                            if endpoints[2] in ['absence_authorizations',
+                                                'attendances', 'bank_accounts',
                                                 'deduction_details',
                                                 'deductions', 'dependents',
                                                 'emergency_contacts',
@@ -666,7 +667,7 @@ class TestResources(BaseTest):
                                                 'passports', 'payment_details',
                                                 'payments', 'raw_attendance',
                                                 'schedule_details',
-                                                'schedules',
+                                                'schedules', 'sick_notes',
                                                 'uniform_requirements',
                                                 'uniform_sizes']:
                                 result = c.get(f'/{endpoints[2]}/999',

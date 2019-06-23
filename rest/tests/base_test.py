@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash
 
 from rest.app import create_app
 from db import db
+from models.absence_authorization import AbsenceAuthorizationModel
 from models.attendance import AttendanceModel
 from models.bank_account import BankAccountModel
 from models.creditor import CreditorModel
@@ -24,6 +25,7 @@ from models.raw_attendance import RawAttendanceModel
 from models.schedule import ScheduleModel
 from models.schedule_detail import ScheduleDetailModel
 from models.shift import ShiftModel
+from models.sick_note import SickNoteModel
 from models.uniform_item import UniformItemModel
 from models.uniform_requirement import UniformRequirementModel
 from models.uniform_size import UniformSizeModel
@@ -80,6 +82,8 @@ class BaseTest(TestCase):
         PaymentModel.query.delete()
         AttendanceModel.query.delete()
         RawAttendanceModel.query.delete()
+        AbsenceAuthorizationModel.query.delete()
+        SickNoteModel.query.delete()
         EmployeeModel.query.delete()
         EmploymentPositionModel.query.delete()
         ShiftModel.query.delete()
