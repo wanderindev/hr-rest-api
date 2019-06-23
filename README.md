@@ -24,12 +24,12 @@ using Flask, Flask-RESTful, SQLAlchemy, and Flask-JWT.  For testing, I used Unit
 ## How to use in development
 Clone the repository:
 ```sh
-$ git clone https://github.com/wanderindev/hr-rest-api.git
-$ cd hr-rest-api
+git clone https://github.com/wanderindev/hr-rest-api.git
+cd hr-rest-api
 ``` 
 Start the application with docker-compose:
 ```sh
-$ docker-compose up --build
+docker-compose up --build
 ```
 This will create a database container, a RESTful API container, a backend network, and a volume
 mapping the ./rest directory in the repository with the working directory in the container.
@@ -43,7 +43,7 @@ From PyCharm, right-click in the `tests/system` or `tests/unit` directory and se
 Clone the [postman-hr-rest-api](https://github.com/wanderindev/postman-hr-rest-api)
 repository:
 ```sh
-$ git clone https://github.com/wanderindev/postman-hr-rest-api.git
+git clone https://github.com/wanderindev/postman-hr-rest-api.git
 ``` 
 Open Postman and import `hr-rest-api.json` and `hr-rest-api-environment.json`.
 
